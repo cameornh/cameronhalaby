@@ -3,17 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby | Projects</title>
+    <title>Cameron Halaby</title>
+    
+    <!-- Clean, prestige geometric sans-serif font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #020203;
+            --bg-color: #030303;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --glass-bg: rgba(18, 18, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
             --mouse-x: 50vw;
             --mouse-y: 50vh;
-            
-            /* Riso-inspired organic colors for the hidden background */
-            --color-magenta: #c91461;
-            --color-blue: #0f2c6b;
-            --color-gold: #c9a445;
         }
 
         * {
@@ -26,429 +32,294 @@
             width: 100vw;
             height: 100vh;
             background-color: var(--bg-color);
-            font-family: 'Georgia', serif;
+            font-family: 'Inter', sans-serif;
             overflow: hidden;
-            color: #ececec;
-            cursor: crosshair;
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* 1. HEAVY RISO GRAIN OVERLAY */
+        /* 1. GLOBAL FILM GRAIN */
         .grain-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
+            inset: 0;
             z-index: 100;
-            opacity: 0.6;
-            mix-blend-mode: overlay;
+            pointer-events: none;
+            opacity: 0.4;
         }
 
-        /* 2. THE SPOTLIGHT LAYER */
-        /* This layer is colorful but is completely hidden EXCEPT where the mouse is */
+        /* 2. THE PITCH-BLACK BASE */
+        .base-darkness {
+            position: fixed;
+            inset: 0;
+            background-color: #000000;
+            z-index: 0;
+        }
+
+        /* 3. ABSTRACT BACKGROUND MESH & SPOTLIGHT */
+        /* This layer contains the abstract pattern, but is masked out except where the mouse is */
         .spotlight-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            inset: 0;
             z-index: 1;
-            /* Organic, topographic wavy background using CSS gradients */
-            background: 
-                radial-gradient(circle at 30% 70%, var(--color-magenta) 0%, transparent 50%),
-                radial-gradient(circle at 70% 30%, var(--color-blue) 0%, transparent 60%),
-                repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 10px, rgba(201, 164, 69, 0.1) 11px, transparent 12px),
-                var(--color-blue);
+            /* Abstract topographic/interference pattern using gradients */
+            background-image: 
+                radial-gradient(circle at center, rgba(30, 35, 45, 0.8) 0%, transparent 60%),
+                repeating-radial-gradient(circle at 20% 30%, transparent 0, transparent 30px, rgba(255, 255, 255, 0.03) 31px, transparent 32px),
+                repeating-radial-gradient(circle at 80% 70%, transparent 0, transparent 40px, rgba(255, 255, 255, 0.02) 41px, transparent 42px),
+                repeating-radial-gradient(circle at 50% 100%, transparent 0, transparent 25px, rgba(255, 255, 255, 0.04) 26px, transparent 27px);
+            background-blend-mode: screen;
             
-            /* The flashlight mask */
-            -webkit-mask-image: radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
-            mask-image: radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            /* The flashlight mask following the mouse */
+            -webkit-mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            transition: -webkit-mask-image 0.1s ease-out;
         }
 
-        /* 3. CANVAS PARTICLES (Black spores) */
-        #particles {
+        /* 4. PRESTIGE GLASSMORPHISM UI */
+        .ui-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        /* 4. BLACK SILHOUETTE LEAVES */
-        /* They sit above the spotlight but blend into the black background */
-        .jungle-foreground {
-            position: fixed;
-            top: -5%;
-            left: -5%;
-            width: 110vw;
-            height: 110vh;
-            pointer-events: none;
-            z-index: 3;
-        }
-
-        .leaf {
-            position: absolute;
-            fill: var(--bg-color); /* Pitch black */
-            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            transform-origin: center;
-        }
-
-        /* 5. HIDDEN EYES */
-        .eye-container {
-            position: absolute;
+            inset: 0;
+            z-index: 10;
             display: flex;
-            gap: 8px;
-            z-index: 4;
-            /* Subtle glow so you can barely see them in the dark */
-            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
-        }
-
-        .eye {
-            width: 16px;
-            height: 10px;
-            background: #ffffff;
-            border-radius: 50% 50% 10% 10% / 80% 80% 20% 20%;
-            position: relative;
-            overflow: hidden;
-            transition: height 0.1s;
-        }
-
-        .pupil {
-            width: 6px;
-            height: 6px;
-            background: var(--bg-color);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* 6. VIGNETTE */
-        .vignette {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            box-shadow: inset 0 0 200px rgba(0,0,0,1);
-            pointer-events: none;
-            z-index: 90;
-        }
-
-        /* 7. GLASSMORPHISM UI */
-        .ui-layer {
-            position: relative;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            padding: 40px;
+            perspective: 2000px;
         }
 
-        .glass-panel {
-            background: rgba(15, 15, 20, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 50px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        .glass-card {
+            position: relative;
+            width: 360px;
+            padding: 45px 40px;
+            border-radius: 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(28px) saturate(1.1);
+            -webkit-backdrop-filter: blur(28px) saturate(1.1);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            overflow: hidden;
         }
 
+        /* Frosted / Dithery Texture baked strictly into the glass */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.12;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Ambient interior reflection on the glass */
+        .glass-reflection {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle 300px at var(--mouse-x-rel) var(--mouse-y-rel), rgba(255, 255, 255, 0.05), transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 5. TYPOGRAPHY */
         h1 {
-            font-size: 2.8rem;
-            font-weight: normal;
-            margin-bottom: 5px;
-            text-align: center;
-            color: var(--color-gold); /* Subtle metallic gold */
-            letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            font-weight: 600;
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
         }
 
         .subtitle {
-            text-align: center;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
-            color: #888;
-            margin-bottom: 40px;
+            font-weight: 400;
+            font-size: 0.75rem;
             letter-spacing: 2px;
             text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
         }
 
-        .projects {
+        /* 6. PROJECT LIST */
+        .projects-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 4px;
+            position: relative;
+            z-index: 1;
+            /* Pops the text off the glass slightly for 3D effect */
+            transform: translateZ(25px);
         }
 
-        .project-link {
+        .project-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            justify-content: space-between;
+            padding: 14px 0;
             text-decoration: none;
-            color: #ccc;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.95rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
         }
 
-        /* Subtle Riso-color hover effect for projects */
-        .project-link::before {
+        .project-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Subtle indicator line on hover */
+        .project-item::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; width: 2px; height: 100%;
-            background: var(--color-gold);
-            transform: scaleY(0);
-            transition: transform 0.3s ease;
-            transform-origin: bottom;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 0;
+            width: 2px;
+            background-color: #ffffff;
+            transition: height 0.3s ease;
         }
 
-        .project-link:hover {
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
-            border-color: rgba(201, 164, 69, 0.3); /* Gold border */
+        .project-name {
+            font-weight: 500;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .project-number {
+            font-weight: 300;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, color 0.3s ease;
+        }
+
+        .project-item:hover {
+            color: #ffffff;
+        }
+
+        .project-item:hover::before {
+            height: 50%;
+        }
+
+        .project-item:hover .project-name {
             transform: translateX(5px);
         }
 
-        .project-link:hover::before {
-            transform: scaleY(1);
-        }
-
-        .project-meta {
-            font-size: 0.75rem;
-            color: #666;
+        .project-item:hover .project-number {
+            opacity: 1;
+            color: #ffffff;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- SVG Filter for organic paper/film grain -->
+    <!-- SVG Filter for the global noise/grain -->
     <svg style="display: none;">
-        <filter id="noise">
+        <filter id="global-noise">
             <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
-            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.4 0" />
+            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.25 0" />
         </filter>
     </svg>
-    <div class="grain-overlay" style="backdrop-filter: url(#noise);"></div>
 
-    <!-- The Vignette -->
-    <div class="vignette"></div>
+    <!-- Pitch black base layer -->
+    <div class="base-darkness"></div>
 
-    <!-- The Hidden Colorful Organic Background -->
-    <div class="spotlight-layer"></div>
+    <!-- The masked abstract spotlight layer -->
+    <div class="spotlight-layer" id="spotlight"></div>
+    
+    <!-- Global grain placed over everything -->
+    <div class="grain-overlay" style="backdrop-filter: url(#global-noise);"></div>
 
-    <!-- Canvas for Black Spores -->
-    <canvas id="particles"></canvas>
-
-    <!-- The Black Foreground Jungle Elements -->
-    <div class="jungle-foreground">
-        
-        <!-- Monstera Leaf Top Left -->
-        <svg class="leaf" style="top: -10%; left: -5%; width: 45vw;" viewBox="0 0 200 200" data-parallax="0.03">
-            <path d="M20,20 C80,-10 160,20 180,80 C190,120 170,160 140,180 C135,160 150,130 130,120 C140,140 120,180 100,190 C95,160 110,120 80,110 C90,130 70,180 40,170 C45,140 60,100 30,90 C40,100 10,130 5,100 C-5,50 0,30 20,20 Z" />
-        </svg>
-
-        <!-- Broad Banana Leaf Bottom Right -->
-        <svg class="leaf" style="bottom: -10%; right: -10%; width: 55vw;" viewBox="0 0 200 200" data-parallax="-0.04">
-            <path d="M180,180 C120,210 40,180 20,120 C10,80 30,40 60,20 C70,40 50,70 80,80 C70,60 100,20 120,10 C125,40 100,80 130,90 C120,70 150,30 170,40 C165,70 140,110 170,120 C160,110 190,80 195,110 C205,160 200,180 180,180 Z" />
-        </svg>
-
-        <!-- Palm Fronds Top Right -->
-        <svg class="leaf" style="top: -5%; right: -5%; width: 40vw; transform: rotate(45deg);" viewBox="0 0 100 200" data-parallax="0.05">
-            <path d="M50,200 C45,150 40,100 50,0 C60,20 80,30 90,25 C70,45 60,60 55,70 C75,80 95,90 100,85 C80,105 60,120 55,130 C75,140 90,150 95,145 C70,165 60,180 50,200 Z" />
-            <path d="M50,200 C55,150 60,100 50,0 C40,20 20,30 10,25 C30,45 40,60 45,70 C25,80 5,90 0,85 C20,105 40,120 45,130 C25,140 10,150 5,145 C30,165 40,180 50,200 Z" />
-        </svg>
-
-        <!-- Overhanging Vines Bottom Left -->
-        <svg class="leaf" style="bottom: 0%; left: -5%; width: 30vw; transform: rotate(-20deg);" viewBox="0 0 100 200" data-parallax="-0.02">
-            <path d="M20,200 C30,150 10,100 40,50 C50,60 70,50 80,40 C60,70 50,80 45,100 C60,110 80,100 90,90 C70,120 60,140 50,160 C70,170 80,160 90,150 C60,180 40,190 20,200 Z" />
-        </svg>
-
-    </div>
-
-    <!-- Hidden Eyes Peeking out -->
-    <div class="eye-container" style="top: 15%; left: 25%;">
-        <div class="eye"><div class="pupil"></div></div>
-        <div class="eye"><div class="pupil"></div></div>
-    </div>
-    <div class="eye-container" style="bottom: 25%; right: 15%; transform: scale(0.8);">
-        <div class="eye"><div class="pupil"></div></div>
-        <div class="eye"><div class="pupil"></div></div>
-    </div>
-    <div class="eye-container" style="top: 40%; right: 5%; transform: scale(0.6) rotate(-15deg);">
-        <div class="eye"><div class="pupil"></div></div>
-        <div class="eye"><div class="pupil"></div></div>
-    </div>
-
-    <!-- Main UI Content -->
-    <div class="ui-layer">
-        <div class="glass-panel">
+    <!-- Central Glass UI -->
+    <div class="ui-container">
+        <div class="glass-card" id="glass-card">
+            <div class="glass-reflection" id="glass-reflection"></div>
+            
             <h1>Cameron Halaby</h1>
-            <div class="subtitle">Creative Vault</div>
+            <div class="subtitle">Engineering & Design</div>
 
-            <div class="projects">
-                <a href="#" class="project-link">
-                    <span>Project 1</span>
-                    <span class="project-meta">01</span>
+            <nav class="projects-list">
+                <a href="#" class="project-item">
+                    <span class="project-name">Project One</span>
+                    <span class="project-number">01</span>
                 </a>
-                <a href="#" class="project-link">
-                    <span>Project 2</span>
-                    <span class="project-meta">02</span>
+                <a href="#" class="project-item">
+                    <span class="project-name">Project Two</span>
+                    <span class="project-number">02</span>
                 </a>
-                <a href="#" class="project-link">
-                    <span>Project 3</span>
-                    <span class="project-meta">03</span>
+                <a href="#" class="project-item">
+                    <span class="project-name">Project Three</span>
+                    <span class="project-number">03</span>
                 </a>
-                <a href="#" class="project-link">
-                    <span>Project 4</span>
-                    <span class="project-meta">04</span>
+                <a href="#" class="project-item">
+                    <span class="project-name">Project Four</span>
+                    <span class="project-number">04</span>
                 </a>
-                <a href="#" class="project-link">
-                    <span>Project 5</span>
-                    <span class="project-meta">05</span>
+                <a href="#" class="project-item">
+                    <span class="project-name">Project Five</span>
+                    <span class="project-number">05</span>
                 </a>
-            </div>
+            </nav>
         </div>
     </div>
 
     <script>
-        // --- 1. SPOTLIGHT & PARALLAX ---
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
+        const glassCard = document.getElementById('glass-card');
 
         document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
+            const mouseX = e.clientX;
+            const mouseY = e.clientY;
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
 
-            // Move the spotlight mask
+            // 1. UPDATE SPOTLIGHT MASK POSITION
             document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
             document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
 
-            // Parallax effect on the black leaves
-            document.querySelectorAll('.leaf').forEach(leaf => {
-                const speed = parseFloat(leaf.getAttribute('data-parallax'));
-                const x = (window.innerWidth / 2 - mouseX) * speed;
-                const y = (window.innerHeight / 2 - mouseY) * speed;
-                leaf.style.transform = `translate(${x}px, ${y}px)`;
-            });
+            // 2. 3D GLASS TILT
+            // Calculate tilt based on distance from center of screen
+            let tiltX = (centerY - mouseY) / 45;
+            let tiltY = (mouseX - centerX) / 45;
+            
+            // 3. DYNAMIC DROP SHADOW
+            // Shadow pushes away from the mouse
+            const cardRect = glassCard.getBoundingClientRect();
+            const cardCenterX = cardRect.left + cardRect.width / 2;
+            const cardCenterY = cardRect.top + cardRect.height / 2;
+            
+            let shadowX = (cardCenterX - mouseX) / 20;
+            let shadowY = (cardCenterY - mouseY) / 20;
 
-            // --- 2. EYE TRACKING ---
-            document.querySelectorAll('.eye').forEach(eye => {
-                const rect = eye.getBoundingClientRect();
-                const eyeX = rect.left + rect.width / 2;
-                const eyeY = rect.top + rect.height / 2;
-                
-                const angle = Math.atan2(mouseY - eyeY, mouseX - eyeX);
-                const distance = Math.min(3, Math.hypot(mouseX - eyeX, mouseY - eyeY) / 30); // Max distance pupil moves
-                
-                const pupilX = Math.cos(angle) * distance;
-                const pupilY = Math.sin(angle) * distance;
-                
-                const pupil = eye.querySelector('.pupil');
-                pupil.style.transform = `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`;
-            });
+            glassCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            glassCard.style.boxShadow = `${shadowX}px ${shadowY}px 50px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1)`;
+
+            // 4. INTERNAL GLASS SHEEN
+            // Coordinates relative to the card for the inner reflection
+            let relX = mouseX - cardRect.left;
+            let relY = mouseY - cardRect.top;
+            glassCard.style.setProperty('--mouse-x-rel', `${relX}px`);
+            glassCard.style.setProperty('--mouse-y-rel', `${relY}px`);
         });
 
-        // Blinking effect for eyes (Random intervals)
-        setInterval(() => {
-            const eyes = document.querySelectorAll('.eye');
-            // Pick a random eye pair to blink
-            const pairIndex = Math.floor(Math.random() * (eyes.length / 2)) * 2;
+        // Reset elements smoothly when mouse leaves the viewport
+        document.addEventListener('mouseleave', () => {
+            glassCard.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            glassCard.style.boxShadow = `0 25px 50px rgba(0, 0, 0, 0.9)`;
             
-            eyes[pairIndex].style.height = '1px';
-            eyes[pairIndex+1].style.height = '1px';
-            
-            setTimeout(() => {
-                eyes[pairIndex].style.height = '10px';
-                eyes[pairIndex+1].style.height = '10px';
-            }, 150);
-        }, 3000);
-
-        // --- 3. BLACK SPORE PARTICLES ---
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
-        
-        let particlesArray =[];
-
-        function setCanvasSize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        setCanvasSize();
-        window.addEventListener('resize', setCanvasSize);
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                // Varying sizes for depth
-                this.size = Math.random() * 3 + 0.5; 
-                this.speedX = (Math.random() * 1) - 0.5;
-                this.speedY = (Math.random() * 1.5) - 0.75;
-                // Slight wobble offset
-                this.angle = Math.random() * Math.PI * 2; 
-            }
-
-            update() {
-                this.angle += 0.02;
-                // Drifting motion + wobble
-                this.x += this.speedX + Math.sin(this.angle) * 0.5;
-                this.y += this.speedY;
-
-                // Wrap around edges
-                if (this.x < 0) this.x = canvas.width;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y < 0) this.y = canvas.height;
-                if (this.y > canvas.height) this.y = 0;
-            }
-
-            draw() {
-                // Particles are black. They will only be visible when floating 
-                // over the bright spotlight area.
-                ctx.fillStyle = '#000000';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particlesArray =[];
-            // High density of particles for that dusty, natural feel
-            const numberOfParticles = (canvas.width * canvas.height) / 4000;
-            for (let i = 0; i < numberOfParticles; i++) {
-                particlesArray.push(new Particle());
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particlesArray.length; i++) {
-                particlesArray[i].update();
-                particlesArray[i].draw();
-            }
-            requestAnimationFrame(animateParticles);
-        }
-
-        initParticles();
-        animateParticles();
-
+            // Move sheen off-screen smoothly
+            glassCard.style.setProperty('--mouse-x-rel', `-500px`);
+            glassCard.style.setProperty('--mouse-y-rel', `-500px`);
+        });
     </script>
 </body>
 </html>
