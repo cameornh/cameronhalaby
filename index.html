@@ -3,353 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby | Selected Works</title>
-    
-    <!-- Importing bespoke, professional fonts safely via Bunny Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=syne:400,600,700|archivo:300,400,500" rel="stylesheet" />
-
+    <title>Cameron Halaby</title>
     <style>
         :root {
-            --bg-color: #020202;
-            --text-main: #f4f4f5;
-            --text-muted: #a1a1aa;
-            --glass-bg: rgba(15, 15, 18, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
-            --mouse-x: 50vw;
-            --mouse-y: 50vh;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg: #050507;
+            --accent: #fff;
+            --meta: #444;
+            --dim-light: rgba(255, 255, 255, 0.05);
         }
 
         body, html {
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color);
-            font-family: 'Archivo', sans-serif;
-            overflow: hidden;
-            color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--accent);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            height: 100%;
+            cursor: none; /* Custom light source replaces cursor */
         }
 
-        /* 1. GLOBAL FILM GRAIN */
-        .grain-overlay {
+        /* --- THE LIGHTING CANVAS --- */
+        #light-canvas {
             position: fixed;
-            inset: 0;
-            z-index: 100;
-            pointer-events: none;
-            opacity: 0.35;
-        }
-
-        /* 2. PITCH BLACK BASE */
-        .base-darkness {
-            position: fixed;
-            inset: 0;
-            background-color: #000000;
-            z-index: 0;
-        }
-
-        /* 3. ABSTRACT FLUID MARBLE SPOTLIGHT */
-        .spotlight-wrapper {
-            position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
             z-index: 1;
-            /* Flashlight mask following the mouse */
-            -webkit-mask-image: radial-gradient(circle 400px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
-            mask-image: radial-gradient(circle 400px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
-            transition: -webkit-mask-image 0.1s ease-out;
+            pointer-events: none;
         }
 
-        .fluid-texture {
-            width: 120vw;
-            height: 120vh;
-            position: absolute;
-            top: -10%;
-            left: -10%;
-            /* Base bands of Midnight Blue, Deep Violet, and Magenta */
-            background: repeating-linear-gradient(
-                45deg,
-                #07050f 0%,
-                #110a2b 10%,
-                #2d0b5e 20%,
-                #831568 30%,
-                #07050f 40%
-            );
-            /* The SVG filter warps these straight bands into highly detailed marbled swirls */
-            filter: url(#marble-warp);
-            opacity: 0.8;
-            /* Slow pan to keep the fluid feeling alive */
-            animation: fluidPan 40s linear infinite;
-        }
-
-        @keyframes fluidPan {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-2%, -2%); }
-            100% { transform: translate(0, 0); }
-        }
-
-        /* 4. EDITORIAL GLASS UI */
-        .ui-container {
-            position: fixed;
-            inset: 0;
+        /* --- UI OVERLAY --- */
+        .interface {
+            position: relative;
             z-index: 10;
+            padding: 4vw;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            margin-bottom: 10vh;
+        }
+
+        h1 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5rem;
+            font-weight: 300;
+            margin: 0;
+            color: var(--accent);
+            opacity: 0.8;
+        }
+
+        /* --- CAROUSEL (Main Observation) --- */
+        .carousel-container {
+            grid-column: 1 / 9;
+            aspect-ratio: 16 / 9;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            perspective: 2000px;
         }
 
-        .glass-card {
-            position: relative;
-            width: 400px;
-            padding: 50px 45px;
-            border-radius: 4px; /* Very sharp, straight, professional edges */
-            background: var(--glass-bg);
-            backdrop-filter: blur(35px) saturate(1.2);
-            -webkit-backdrop-filter: blur(35px) saturate(1.2);
-            border: 1px solid var(--glass-border);
-            border-top: 1px solid var(--glass-highlight);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.95);
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Frosted Dithery Texture baked inside the glass */
-        .glass-card::before {
-            content: '';
+        .slide {
             position: absolute;
-            inset: 0;
-            opacity: 0.15;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        /* 5. TYPOGRAPHY */
-        h1 {
-            font-family: 'Syne', sans-serif;
-            font-weight: 700;
-            font-size: 1.8rem;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
-            color: var(--text-main);
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .subtitle {
-            font-family: 'Archivo', sans-serif;
-            font-weight: 300;
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 45px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* 6. EDITORIAL PROJECT LIST */
-        .projects-list {
-            display: flex;
-            flex-direction: column;
             width: 100%;
-            gap: 16px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 1s ease;
+            font-size: 0.7rem;
+            letter-spacing: 0.2rem;
+            text-transform: uppercase;
+            color: var(--meta);
+        }
+
+        .slide.active { opacity: 1; }
+
+        /* --- THE FOUR SQUARES (Optical Obstacles) --- */
+        .square-grid {
+            grid-column: 9 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+
+        .obstacle {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.01);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: var(--meta);
+            text-transform: uppercase;
             position: relative;
-            z-index: 1;
-            transform: translateZ(25px); /* Pops the text slightly off the glass */
+            transition: border 0.3s ease;
+        }
+
+        /* --- PROJECT LIST --- */
+        .projects-wrap {
+            grid-column: 1 / 5;
+            margin-top: 5vh;
         }
 
         .project-item {
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.4s ease;
             position: relative;
-            group: hover;
         }
 
-        .project-number {
-            font-weight: 300;
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-right: 15px;
-            transition: color 0.4s ease;
+        .project-item:hover {
+            padding-left: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.4);
         }
 
         .project-name {
-            font-weight: 500;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            transition: color 0.4s ease, transform 0.4s ease;
-        }
-
-        /* The straight, subtle connecting line */
-        .project-line {
-            flex-grow: 1;
-            height: 1px;
-            background-color: var(--glass-border);
-            margin: 0 15px;
-            transform-origin: left;
-            transition: background-color 0.4s ease, transform 0.4s ease;
-        }
-
-        .project-type {
+            font-size: 1.2rem;
             font-weight: 300;
-            font-size: 0.65rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            opacity: 0.4;
-            transition: opacity 0.4s ease;
         }
 
-        /* Hover interactions */
-        .project-item:hover {
-            color: var(--text-main);
-        }
-        
-        .project-item:hover .project-number {
-            color: #d156b8; /* Subtle magenta accent */
+        .project-meta {
+            font-size: 0.7rem;
+            color: var(--meta);
         }
 
-        .project-item:hover .project-name {
-            transform: translateX(4px);
+        /* --- LIGHT EMITTER (CURSOR) --- */
+        #emitter {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 0 20px #fff, 0 0 40px rgba(255,255,255,0.5);
         }
 
-        .project-item:hover .project-line {
-            background-color: rgba(255, 255, 255, 0.3);
-            transform: scaleX(0.95);
+        /* Responsive */
+        @media (max-width: 900px) {
+            .carousel-container, .square-grid, .projects-wrap {
+                grid-column: 1 / -1;
+            }
         }
-
-        .project-item:hover .project-type {
-            opacity: 1;
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- SVG Filters -->
-    <svg style="display: none;">
-        <defs>
-            <!-- Global Noise Overlay -->
-            <filter id="global-noise">
-                <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
-                <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.25 0" />
-            </filter>
+    <div id="emitter"></div>
+    <canvas id="light-canvas"></canvas>
 
-            <!-- Complex Fluid/Marble Displacement Filter for Background -->
-            <filter id="marble-warp">
-                <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="4" result="noise" />
-                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 -0.5" in="noise" result="coloredNoise" />
-                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="250" in="SourceGraphic" in2="coloredNoise" />
-            </filter>
-        </defs>
-    </svg>
-
-    <!-- Pitch black base layer -->
-    <div class="base-darkness"></div>
-
-    <!-- The masked fluid spotlight layer -->
-    <div class="spotlight-wrapper" id="spotlight">
-        <div class="fluid-texture"></div>
-    </div>
-    
-    <!-- Global grain placed over everything for the editorial texture -->
-    <div class="grain-overlay" style="backdrop-filter: url(#global-noise);"></div>
-
-    <!-- Central Glass UI -->
-    <div class="ui-container">
-        <div class="glass-card" id="glass-card">
-            
+    <div class="interface">
+        <header>
             <h1>Cameron Halaby</h1>
-            <div class="subtitle">MS AI</div>
+        </header>
 
-            <nav class="projects-list">
-                <a href="#" class="project-item">
-                    <span class="project-number">01</span>
-                    <span class="project-name">Project One</span>
-                    <span class="project-line"></span>
-                    <span class="project-type">1</span>
-                </a>
-                <a href="#" class="project-item">
-                    <span class="project-number">02</span>
-                    <span class="project-name">Project Two</span>
-                    <span class="project-line"></span>
-                    <span class="project-type">2</span>
-                </a>
-                <a href="#" class="project-item">
-                    <span class="project-number">03</span>
-                    <span class="project-name">Project Three</span>
-                    <span class="project-line"></span>
-                    <span class="project-type">3</span>
-                </a>
-                <a href="#" class="project-item">
-                    <span class="project-number">04</span>
-                    <span class="project-name">Project Four</span>
-                    <span class="project-line"></span>
-                    <span class="project-type">4</span>
-                </a>
-                <a href="#" class="project-item">
-                    <span class="project-number">05</span>
-                    <span class="project-name">Project Five</span>
-                    <span class="project-line"></span>
-                    <span class="project-type">5</span>
-                </a>
-            </nav>
+        <!-- Dynamic Carousel -->
+        <div class="carousel-container obstacle" id="main-portal">
+            <div class="slide active">Observation_Node_01</div>
+            <div class="slide">Observation_Node_02</div>
+            <div class="slide">Observation_Node_03</div>
+        </div>
+
+        <!-- Four Square Obstacles -->
+        <div class="square-grid">
+            <div class="obstacle">Sensor_A</div>
+            <div class="obstacle">Sensor_B</div>
+            <div class="obstacle">Sensor_C</div>
+            <div class="obstacle">Sensor_D</div>
+        </div>
+
+        <!-- Projects -->
+        <div class="projects-wrap">
+            <div class="project-item">
+                <span class="project-name">Project 1</span>
+                <span class="project-meta">2024 / TRACE</span>
+            </div>
+            <div class="project-item">
+                <span class="project-name">Project 2</span>
+                <span class="project-meta">2023 / SCATTER</span>
+            </div>
+            <div class="project-item">
+                <span class="project-name">Project 3</span>
+                <span class="project-meta">2023 / REFRACT</span>
+            </div>
+            <div class="project-item">
+                <span class="project-name">Project 4</span>
+                <span class="project-meta">2022 / PHASE</span>
+            </div>
         </div>
     </div>
 
     <script>
-        const glassCard = document.getElementById('glass-card');
+        const canvas = document.getElementById('light-canvas');
+        const ctx = canvas.getContext('2d');
+        const emitter = document.getElementById('emitter');
+        let obstacles = [];
+        let mouse = { x: -1000, y: -1000 };
 
-        document.addEventListener('mousemove', (e) => {
-            const mouseX = e.clientX;
-            const mouseY = e.clientY;
-            
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
+        // Handle Resize
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Map the DOM elements as physical obstacles for the light engine
+            updateObstacles();
+        }
 
-            // 1. UPDATE SPOTLIGHT MASK POSITION
-            document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
-            document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
+        function updateObstacles() {
+            const elements = document.querySelectorAll('.obstacle, .project-item');
+            obstacles = Array.from(elements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.left,
+                    y: rect.top,
+                    w: rect.width,
+                    h: rect.height,
+                    center: { x: rect.left + rect.width/2, y: rect.top + rect.height/2 }
+                };
+            });
+        }
 
-            // 2. 3D GLASS TILT
-            // Calculate tilt based on distance from center of screen
-            let tiltX = (centerY - mouseY) / 45;
-            let tiltY = (mouseX - centerX) / 45;
-            
-            // 3. DYNAMIC DROP SHADOW
-            // Shadow pushes away from the mouse to create physical depth
-            const cardRect = glassCard.getBoundingClientRect();
-            const cardCenterX = cardRect.left + cardRect.width / 2;
-            const cardCenterY = cardRect.top + cardRect.height / 2;
-            
-            let shadowX = (cardCenterX - mouseX) / 25;
-            let shadowY = (cardCenterY - mouseY) / 25;
-
-            glassCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-            glassCard.style.boxShadow = `${shadowX}px ${shadowY}px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15)`;
+        window.addEventListener('resize', resize);
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            emitter.style.left = mouse.x + 'px';
+            emitter.style.top = mouse.y + 'px';
         });
 
-        // Reset elements smoothly when mouse leaves the viewport entirely
-        document.addEventListener('mouseleave', () => {
-            glassCard.style.transform = `rotateX(0deg) rotateY(0deg)`;
-            glassCard.style.boxShadow = `0 30px 60px rgba(0, 0, 0, 0.95)`;
-        });
+        // Simple Raycasting Logic for Geometric Shadows
+        function drawShadows() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Ambient background glow
+            const ambient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 800);
+            ambient.addColorStop(0, 'rgba(255,255,255,0.08)');
+            ambient.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = ambient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            obstacles.forEach(ob => {
+                // Calculate vector from light to obstacle
+                const points = [
+                    {x: ob.x, y: ob.y},
+                    {x: ob.x + ob.w, y: ob.y},
+                    {x: ob.x + ob.w, y: ob.y + ob.h},
+                    {x: ob.x, y: ob.y + ob.h}
+                ];
+
+                ctx.fillStyle = 'rgba(0,0,0,0.95)';
+                ctx.beginPath();
+                
+                // For each edge of the rectangle, project a shadow volume
+                points.forEach((p, i) => {
+                    const nextP = points[(i + 1) % 4];
+                    
+                    // Project points away from mouse
+                    const angle1 = Math.atan2(p.y - mouse.y, p.x - mouse.x);
+                    const angle2 = Math.atan2(nextP.y - mouse.y, nextP.x - mouse.x);
+                    
+                    const dist = 3000; // Project shadows into "infinity"
+                    
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x + Math.cos(angle1) * dist, p.y + Math.sin(angle1) * dist);
+                    ctx.lineTo(nextP.x + Math.cos(angle2) * dist, nextP.y + Math.sin(angle2) * dist);
+                    ctx.lineTo(nextP.x, nextP.y);
+                });
+                ctx.fill();
+
+                // Add a "specular" hit on the edge facing the mouse
+                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(ob.x, ob.y, ob.w, ob.h);
+            });
+
+            // Chromatic Aberration - Red/Blue dispersion fringes
+            ctx.globalCompositeOperation = 'screen';
+            drawFringe(2, 'rgba(255,0,0,0.05)');
+            drawFringe(-2, 'rgba(0,100,255,0.05)');
+            ctx.globalCompositeOperation = 'source-over';
+
+            requestAnimationFrame(drawShadows);
+        }
+
+        function drawFringe(offset, color) {
+            ctx.fillStyle = color;
+            obstacles.forEach(ob => {
+                const angle = Math.atan2(ob.center.y - mouse.y, ob.center.x - mouse.x);
+                ctx.save();
+                ctx.translate(Math.cos(angle) * offset, Math.sin(angle) * offset);
+                ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
+                ctx.restore();
+            });
+        }
+
+        // Simple Carousel
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 4000);
+
+        // Init
+        resize();
+        drawShadows();
+        // Periodically update obstacle positions in case of layout shifts
+        setInterval(updateObstacles, 2000);
+
     </script>
 </body>
 </html>
