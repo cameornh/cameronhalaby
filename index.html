@@ -30,16 +30,14 @@
 
         body, html {
             width: 100vw;
-            background-color: var(--bg-light); /* The rest of the site is light cream */
+            background-color: var(--bg-light);
             font-family: 'Archivo', sans-serif;
             color: var(--text-dark);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
 
-        /* =========================================
-           1. NAVIGATION (Blend Mode trick)
-           ========================================= */
+        /* NAVIGATION */
         .site-header {
             position: fixed;
             top: 0;
@@ -49,7 +47,7 @@
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
-            pointer-events: none; /* Let clicks pass through */
+            pointer-events: none;
         }
 
         .header-logo, .header-nav a {
@@ -60,7 +58,6 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             font-weight: 500;
-            /* This makes the text white on the black hero, and black on the cream body */
             color: #ffffff;
             mix-blend-mode: difference; 
         }
@@ -70,9 +67,7 @@
             gap: 40px;
         }
 
-        /* =========================================
-           2. HERO SECTION (The Dark Spotlight)
-           ========================================= */
+        /* HERO SECTION */
         .hero-section {
             position: relative;
             width: 100vw;
@@ -95,7 +90,6 @@
             position: absolute;
             inset: 0;
             z-index: 1;
-            /* Flashlight mask */
             -webkit-mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
             mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
             transition: -webkit-mask-image 0.1s ease-out;
@@ -107,7 +101,6 @@
             position: absolute;
             top: -10%;
             left: -10%;
-            /* Base bands of Midnight Blue and Deep Magenta */
             background: repeating-linear-gradient(
                 45deg,
                 #020105 0%,
@@ -116,7 +109,6 @@
                 #5c0d48 30%,
                 #020105 40%
             );
-            /* The enhanced SVG dither filter */
             filter: url(#dithered-marble);
             opacity: 0.95;
             animation: fluidPan 40s linear infinite;
@@ -128,15 +120,13 @@
             100% { transform: translate(0, 0); }
         }
 
-        /* Canvas for interactive particle grid */
         #particle-canvas {
             position: absolute;
             inset: 0;
-            z-index: 2; /* Sits above the spotlight, but below the UI */
+            z-index: 2;
             pointer-events: none;
         }
 
-        /* Hero Editorial Glass UI */
         .hero-ui {
             position: relative;
             z-index: 10;
@@ -162,7 +152,6 @@
             align-items: center;
         }
 
-        /* Frosted texture inside the glass */
         .glass-card::before {
             content: '';
             position: absolute;
@@ -173,7 +162,6 @@
             pointer-events: none;
         }
 
-        /* The Gleam Typography */
         .hero-name {
             font-family: 'Cormorant Garamond', serif;
             font-weight: 600;
@@ -183,8 +171,6 @@
             text-align: center;
             position: relative;
             z-index: 1;
-            
-            /* Dynamic gleam gradient */
             background-image: radial-gradient(
                 circle 280px at var(--mouse-x-rel) var(--mouse-y-rel),
                 #ffffff 0%,     
@@ -225,29 +211,25 @@
             transition: all 0.4s ease;
         }
 
-        .hp-num { font-weight: 300; font-size: 0.7rem; opacity: 0.5; margin-right: 15px; transition: color 0.4s ease; }
-        .hp-name { font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; transition: transform 0.4s ease; }
-        .hp-line { flex-grow: 1; height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 0 15px; transform-origin: left; transition: background-color 0.4s ease, transform 0.4s ease; }
-        .hp-type { font-weight: 300; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; opacity: 0.3; transition: opacity 0.4s ease; }
+        .hp-num { font-weight: 300; font-size: 0.7rem; opacity: 0.5; margin-right: 15px; }
+        .hp-name { font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; }
+        .hp-line { flex-grow: 1; height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 0 15px; }
+        .hp-type { font-weight: 300; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; opacity: 0.3; }
 
         .hero-project-item:hover { color: #f4f4f5; }
         .hero-project-item:hover .hp-num { color: #d156b8; }
         .hero-project-item:hover .hp-name { transform: translateX(4px); }
-        .hero-project-item:hover .hp-line { background-color: rgba(255, 255, 255, 0.25); transform: scaleX(0.95); }
         .hero-project-item:hover .hp-type { opacity: 1; }
 
-        /* =========================================
-           3. TEMPLATE SECTIONS (Obsidian Style)
-           ========================================= */
+        /* SECTIONS */
         .page-section {
             padding: 120px 10%;
-            background: radial-gradient(circle at 50% 0%, #ffffff 0%, var(--bg-light) 70%);
-            min-height: 100vh;
+            background: var(--bg-light);
         }
+        
+        #work { background: radial-gradient(circle at 50% 0%, #ffffff 0%, var(--bg-light) 70%); }
 
-        .section-header {
-            margin-bottom: 60px;
-        }
+        .section-header { margin-bottom: 60px; }
 
         .section-title {
             font-family: 'Cormorant Garamond', serif;
@@ -264,14 +246,12 @@
             color: #666;
         }
 
-        /* The Dark Floating Cards Layout */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 40px;
         }
 
-        /* The Obsidian Card Style */
         .obs-card {
             background: linear-gradient(145deg, #2b2b2e 0%, #161618 100%);
             border-radius: 18px;
@@ -282,7 +262,6 @@
             transition: transform 0.2s ease-out;
         }
 
-        /* Glowing Top Sheen */
         .obs-card::before {
             content: '';
             position: absolute;
@@ -293,38 +272,11 @@
             z-index: 2;
         }
 
-        /* Card Header */
-        .obs-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            transform: translateZ(20px); /* 3D pop */
-        }
+        .obs-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; transform: translateZ(20px); }
+        .obs-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #a78bfa, #7c3aed); border-radius: 12px; }
+        .obs-title { color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; }
 
-        .obs-icon {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #a78bfa, #7c3aed);
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
-        }
-
-        .obs-title {
-            color: #ffffff;
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
-            letter-spacing: 0.5px;
-        }
-
-        /* Inner Light List Items (Chromatic Aberration Borders) */
-        .obs-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            transform: translateZ(10px);
-        }
-
+        .obs-list { display: flex; flex-direction: column; gap: 10px; transform: translateZ(10px); }
         .obs-item {
             background: #f4f4f6;
             padding: 12px 18px;
@@ -335,38 +287,42 @@
             color: #111;
             font-weight: 500;
             font-size: 0.9rem;
-            /* Subtly splits the shadow into Cyan (top) and Orange (bottom) */
-            box-shadow: 
-                0 -2px 4px -2px rgba(0, 200, 255, 0.7),
-                0 2px 4px -2px rgba(255, 120, 0, 0.7);
-            transition: transform 0.3s ease, background 0.3s ease;
-            cursor: pointer;
+            box-shadow: 0 -2px 4px -2px rgba(0, 200, 255, 0.7), 0 2px 4px -2px rgba(255, 120, 0, 0.7);
+            transition: transform 0.3s ease;
         }
 
-        .obs-item:hover {
-            transform: translateY(-2px) scale(1.02);
-            background: #ffffff;
+        .obs-item:hover { transform: translateY(-2px) scale(1.02); background: #ffffff; }
+
+        /* GENERATIVE ART SECTION */
+        .art-section {
+            padding: 140px 0 100px 0;
+            background-color: #050508;
+            color: #f0f0f0;
+            overflow: hidden;
         }
 
-        .obs-item-meta {
-            font-size: 0.7rem;
-            color: #64748b;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .art-title-formula {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.1rem;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 0 50px;
+            line-height: 1.6;
+            letter-spacing: 0.05em;
+            color: #888;
         }
 
-        /* Subtly chromatic text effect for the meta data */
-        .chromatic-text {
-            text-shadow: 
-                -0.5px -0.5px 0px rgba(0, 255, 200, 0.5),
-                0.5px 0.5px 0px rgba(255, 100, 0, 0.5);
+        .art-title-formula b { font-weight: 600; color: #ccc; }
+        .art-title-formula i { font-style: italic; }
+
+        #function-art-canvas {
+            display: block;
+            width: 100%;
+            height: 500px;
+            background-color: #000;
         }
 
-        /* =========================================
-           4. FOOTER
-           ========================================= */
         .site-footer {
             background-color: #111111;
             color: #888;
@@ -381,38 +337,22 @@
 </head>
 <body>
 
-    <!-- =========================================
-         SVG FILTERS
-         ========================================= -->
     <svg style="display: none;">
         <defs>
-            <!-- Heavy Retro Dither Filter for the Hero -->
             <filter id="dithered-marble" x="-20%" y="-20%" width="140%" height="140%">
-                <!-- 1. Generate Fluid Displacement -->
                 <feTurbulence type="fractalNoise" baseFrequency="0.003" numOctaves="2" result="fluidNoise" />
-                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 4 -1.5" in="fluidNoise" result="fluidContrast" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 4 -1.5" in="fluidNoise" result="fluidContrast" />
                 <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="400" in="SourceGraphic" in2="fluidContrast" result="marbled" />
-
-                <!-- 2. Generate High-Frequency Noise for Dithering -->
                 <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" result="ditherNoise" />
-                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -3" in="ditherNoise" result="sharpDither" />
-
-                <!-- 3. Blend them together -->
+                <feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 8 -3" in="ditherNoise" result="sharpDither" />
                 <feComposite operator="arithmetic" k1="0" k2="0.8" k3="0.4" k4="0" in="marbled" in2="sharpDither" result="mixed" />
-                
-                <!-- 4. Strict Component Transfer crushes colors into discrete pixelated bands -->
                 <feComponentTransfer in="mixed">
-                    <feFuncR type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
-                    <feFuncG type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
-                    <feFuncB type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
+                    <feFuncR type="discrete" tableValues="0 0.15 0.4 0.7 1"/><feFuncG type="discrete" tableValues="0 0.15 0.4 0.7 1"/><feFuncB type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
                 </feComponentTransfer>
             </filter>
         </defs>
     </svg>
 
-    <!-- =========================================
-         SITE HEADER
-         ========================================= -->
     <nav class="site-header">
         <a href="#" class="header-logo">C. Halaby</a>
         <div class="header-nav">
@@ -423,317 +363,148 @@
     </nav>
 
     <main>
-        <!-- =========================================
-             HERO SECTION (Dark)
-             ========================================= -->
         <section class="hero-section" id="hero">
             <div class="hero-base-darkness"></div>
-            
-            <div class="spotlight-wrapper" id="spotlight">
-                <div class="fluid-texture"></div>
-            </div>
-
+            <div class="spotlight-wrapper" id="spotlight"><div class="fluid-texture"></div></div>
             <canvas id="particle-canvas"></canvas>
-
             <div class="hero-ui">
                 <div class="glass-card" id="glass-card">
                     <h1 class="hero-name">Cameron Halaby</h1>
                     <div class="hero-subtitle">AI, ML, DS, CS</div>
-
                     <nav class="hero-projects">
-                        <a href="#" class="hero-project-item">
-                            <span class="hp-num">01</span>
-                            <span class="hp-name">Project One</span>
-                            <span class="hp-line"></span>
-                            <span class="hp-type">Under Construction, Check back later</span>
-                        </a>
-                        <a href="#" class="hero-project-item">
-                            <span class="hp-num">02</span>
-                            <span class="hp-name">Project Two</span>
-                            <span class="hp-line"></span>
-                            <span class="hp-type">Under Construction, Check back later</span>
-                        </a>
-                        <a href="#" class="hero-project-item">
-                            <span class="hp-num">03</span>
-                            <span class="hp-name">Project Three</span>
-                            <span class="hp-line"></span>
-                            <span class="hp-type">Under Construction, Check back later</span>
-                        </a>
-                        <a href="#" class="hero-project-item">
-                            <span class="hp-num">04</span>
-                            <span class="hp-name">Project Four</span>
-                            <span class="hp-line"></span>
-                            <span class="hp-type">Under Construction, Check back later</span>
-                        </a>
+                        <a href="#" class="hero-project-item"><span class="hp-num">01</span><span class="hp-name">Project One</span><span class="hp-line"></span><span class="hp-type">Under Construction</span></a>
+                        <a href="#" class="hp-num hp-item-construction" style="opacity: 0.5; text-decoration: none; cursor: default; margin: 16px 0; font-size: 0.85rem; letter-spacing: 1px; color: #8a8a93; display: flex; align-items: center;"><span style="margin-right: 15px;">02</span><span>Archival Data ...</span></a>
+                        <a href="#" class="hp-num hp-item-construction" style="opacity: 0.5; text-decoration: none; cursor: default; margin: 16px 0; font-size: 0.85rem; letter-spacing: 1px; color: #8a8a93; display: flex; align-items: center;"><span style="margin-right: 15px;">03</span><span>System Index ...</span></a>
                     </nav>
                 </div>
             </div>
         </section>
 
-        <!-- =========================================
-             GALLERY SECTION (Light Cream)
-             ========================================= -->
         <section class="page-section" id="work">
             <div class="section-header">
-                <h2 class="section-title">Template Gallery</h2>
-                <p class="section-subtitle">Components</p>
+                <h2 class="section-title">Component Vault</h2>
+                <p class="section-subtitle">Interface Modules</p>
             </div>
-
             <div class="card-grid">
-                
-                <!-- Obsidian Card 1 -->
                 <div class="obs-card">
-                    <div class="obs-header">
-                        <div class="obs-icon"></div>
-                        <h3 class="obs-title">Vault Alpha</h3>
-                    </div>
+                    <div class="obs-header"><div class="obs-icon"></div><h3 class="obs-title">Vault Alpha</h3></div>
                     <div class="obs-list">
-                        <div class="obs-item">
-                            <span>New Note 1</span>
-                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
-                        </div>
-                        <div class="obs-item">
-                            <span>New Note 2</span>
-                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
-                        </div>
-                        <div class="obs-item">
-                            <span>New Note 3</span>
-                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
-                        </div>
-                        <div class="obs-item">
-                            <span>New Note 4</span>
-                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
-                        </div>
+                        <div class="obs-item"><span>Note 1</span></div>
+                        <div class="obs-item"><span>Note 2</span></div>
                     </div>
                 </div>
-
-                <!-- Obsidian Card 2 -->
                 <div class="obs-card">
-                    <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #60a5fa, #2563eb);"></div>
-                        <h3 class="obs-title">Vault Beta</h3>
-                    </div>
+                    <div class="obs-header"><div class="obs-icon" style="background: #2563eb;"></div><h3 class="obs-title">Vault Beta</h3></div>
                     <div class="obs-list">
-                        <div class="obs-item">
-                            <span>Component A</span>
-                            <span class="obs-item-meta chromatic-text">⚙️ CONFIG</span>
-                        </div>
-                        <div class="obs-item">
-                            <span>Component B</span>
-                            <span class="obs-item-meta chromatic-text">⚙️ CONFIG</span>
-                        </div>
-                        <div class="obs-item">
-                            <span>Component C</span>
-                            <span class="obs-item-meta chromatic-text">⚙️ CONFIG</span>
-                        </div>
+                        <div class="obs-item"><span>Module Configuration</span></div>
                     </div>
                 </div>
-
             </div>
         </section>
 
-        <!-- =========================================
-             FEATURES SECTION (Light Cream)
-             ========================================= -->
+        <section class="art-section" id="generative-art">
+            <h2 class="art-title-formula">
+                <i>f</i>(<i>x,y,t; σ</i>) = 1.5 · (Σ<sub><i>i</i>=1</sub><sup>2</sup> exp(−((<i>x</i> − <i>x<sub>i</sub></i>(<i>t</i>))² + (<i>y</i> − <i>y<sub>i</sub></i>(<i>t</i>))²) / 2<i>σ<sub>i</sub></i>²)) · [sin(1.5(<i>u</i>·cos(0.1<i>t</i>) − <i>v</i>·sin(0.1<i>t</i>)) + <i>t</i>) · cos(1.5(<i>u</i>·sin(0.1<i>t</i>) + <i>v</i>·cos(0.1<i>t</i>)))] · [sin(1.55<i>u</i>(1 + 0.1·sin(0.2<i>t</i>))) · cos(1.55<i>v</i>(1 + 0.1·sin(0.2<i>t</i>)))] | <i>u</i>=(<i>x</i>−<i>x<sub>center</sub></i>​)⋅scale and <i>v</i>=(<i>y</i>−<i>y<sub>center</sub></i>)⋅scale
+            </h2>
+            <canvas id="function-art-canvas"></canvas>
+        </section>
+
         <section class="page-section" id="about">
             <div class="section-header">
-                <h2 class="section-title">Another Section</h2>
-                <p class="section-subtitle">Additional Template Content</p>
+                <h2 class="section-title">Additional Systems</h2>
+                <p class="section-subtitle">Deep Archives</p>
             </div>
-            
             <div class="card-grid">
                 <div class="obs-card">
-                    <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #f43f5e, #e11d48);"></div>
-                        <h3 class="obs-title">Module X</h3>
-                    </div>
-                    <div class="obs-list">
-                        <div class="obs-item">
-                            <span>System Log 01</span>
-                            <span class="obs-item-meta chromatic-text">TXT</span>
-                        </div>
-                        <div class="obs-item">
-                            <span>System Log 02</span>
-                            <span class="obs-item-meta chromatic-text">TXT</span>
-                        </div>
-                    </div>
+                    <div class="obs-header"><div class="obs-icon" style="background: #e11d48;"></div><h3 class="obs-title">Unit X</h3></div>
+                    <div class="obs-list"><div class="obs-item"><span>System Log Access</span></div></div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- =========================================
-         FOOTER
-         ========================================= -->
-    <footer class="site-footer">
-        <p>2026 Cameron Halaby. No rights reserved.</p>
-    </footer>
+    <footer class="site-footer"><p>2026 Cameron Halaby. No Rights Reserved.</p></footer>
 
-    <!-- =========================================
-         INTERACTION SCRIPTS
-         ========================================= -->
     <script>
-        // --- 1. HERO SECTION LOGIC ---
-        const heroSection = document.getElementById('hero');
-        const glassCard = document.getElementById('glass-card');
-        
-        // These will be updated by the mousemove event for the particles
-        let heroMouseX = window.innerWidth / 2;
-        let heroMouseY = window.innerHeight / 2;
+        const heroSection = document.getElementById('hero'), glassCard = document.getElementById('glass-card');
+        let heroMX = window.innerWidth / 2, heroMY = window.innerHeight / 2;
 
         heroSection.addEventListener('mousemove', (e) => {
-            // Get coordinates relative to the hero section for the spotlight
-            const heroRect = heroSection.getBoundingClientRect();
-            const mouseX = e.clientX - heroRect.left;
-            const mouseY = e.clientY - heroRect.top;
-
-            // Update global hero mouse coordinates for particle script
-            heroMouseX = mouseX;
-            heroMouseY = mouseY;
-            
-            // Update Spotlight
-            heroSection.style.setProperty('--mouse-x', `${mouseX}px`);
-            heroSection.style.setProperty('--mouse-y', `${mouseY}px`);
-
-            // Update Glass Gleam Text relative to the card itself
-            const cardRect = glassCard.getBoundingClientRect();
-            let relX = e.clientX - cardRect.left;
-            let relY = e.clientY - cardRect.top;
-            glassCard.style.setProperty('--mouse-x-rel', `${relX}px`);
-            glassCard.style.setProperty('--mouse-y-rel', `${relY}px`);
-
-            // 3D Glass Tilt
-            const centerX = heroRect.width / 2;
-            const centerY = heroRect.height / 2;
-            let tiltX = (centerY - mouseY) / 60;
-            let tiltY = (mouseX - centerX) / 60;
-            
-            // Dynamic Drop Shadow
-            const cardCenterX = cardRect.left + cardRect.width / 2;
-            const cardCenterY = cardRect.top + cardRect.height / 2;
-            let shadowX = (cardCenterX - e.clientX) / 25;
-            let shadowY = (cardCenterY - e.clientY) / 25;
-
-            glassCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-            glassCard.style.boxShadow = `${shadowX}px ${shadowY}px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15)`;
+            const rect = heroSection.getBoundingClientRect(), mx = e.clientX - rect.left, my = e.clientY - rect.top;
+            heroMX = mx; heroMY = my;
+            heroSection.style.setProperty('--mouse-x', `${mx}px`);
+            heroSection.style.setProperty('--mouse-y', `${my}px`);
+            const cR = glassCard.getBoundingClientRect();
+            glassCard.style.setProperty('--mouse-x-rel', `${e.clientX - cR.left}px`);
+            glassCard.style.setProperty('--mouse-y-rel', `${e.clientY - cR.top}px`);
+            const tX = (rect.height / 2 - my) / 60, tY = (mx - rect.width / 2) / 60;
+            const sX = (cR.left + cR.width / 2 - e.clientX) / 25, sY = (cR.top + cR.height / 2 - e.clientY) / 25;
+            glassCard.style.transform = `rotateX(${tX}deg) rotateY(${tY}deg)`;
+            glassCard.style.boxShadow = `${sX}px ${sY}px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15)`;
         });
 
-        heroSection.addEventListener('mouseleave', () => {
-            glassCard.style.transform = `rotateX(0deg) rotateY(0deg)`;
-            glassCard.style.boxShadow = `0 30px 60px rgba(0, 0, 0, 0.95)`;
-            glassCard.style.setProperty('--mouse-x-rel', `-500px`);
-            glassCard.style.setProperty('--mouse-y-rel', `-500px`);
-        });
-
-        // --- 2. OBSIDIAN CARDS 3D LOGIC ---
-        document.querySelectorAll('.obs-card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = ((y - centerY) / centerY) * -4;
-                const rotateY = ((x - centerX) / centerX) * 4;
-                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
+        const pCanvas = document.getElementById('particle-canvas'), pCtx = pCanvas.getContext('2d');
+        let parts = [];
+        const initP = () => {
+            pCanvas.width = heroSection.clientWidth; pCanvas.height = heroSection.clientHeight;
+            parts = [];
+            for (let y = 0; y < pCanvas.height; y += 25) for (let x = 0; x < pCanvas.width; x += 25) parts.push({x, y, bx: x, by: y, vx: 0, vy: 0});
+        };
+        const animP = () => {
+            pCtx.clearRect(0,0,pCanvas.width,pCanvas.height); pCtx.fillStyle = '#000';
+            parts.forEach(p => {
+                const dx = heroMX - p.x, dy = heroMY - p.y, d = Math.sqrt(dx*dx + dy*dy);
+                if (d < 120) { p.vx -= (dx/d) * (120-d)/120 * 20; p.vy -= (dy/d) * (120-d)/120 * 20; }
+                else { p.vx += (p.bx - p.x)/10; p.vy += (p.by - p.y)/10; }
+                p.vx *= 0.9; p.vy *= 0.9; p.x += p.vx; p.y += p.vy;
+                pCtx.beginPath(); pCtx.arc(p.x, p.y, 0.6, 0, Math.PI*2); pCtx.fill();
             });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)`;
+            requestAnimationFrame(animP);
+        };
+        initP(); animP(); window.addEventListener('resize', initP);
+
+        document.querySelectorAll('.obs-card').forEach(c => {
+            c.addEventListener('mousemove', e => {
+                const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+                c.style.transform = `perspective(1200px) rotateX(${(r.height/2-y)/20}deg) rotateY(${(x-r.width/2)/20}deg) translateY(-5px)`;
             });
+            c.addEventListener('mouseleave', () => c.style.transform = 'none');
         });
 
-        // --- 3. HERO PARTICLE GRID LOGIC (MODIFIED) ---
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        const particleGridGap = 25; // The space between each particle in the grid
+        const aCanv = document.getElementById('function-art-canvas'), aCtx = aCanv.getContext('2d');
+        let t = 0;
+        const resArt = () => { aCanv.width = aCanv.clientWidth / 2; aCanv.height = aCanv.clientHeight / 2; };
+        resArt(); window.addEventListener('resize', resArt);
 
-        function setCanvasSize() {
-            canvas.width = heroSection.clientWidth;
-            canvas.height = heroSection.clientHeight;
-        }
+        const lerpC = (v) => {
+            const n = (v + 1) / 2;
+            if (n < 0.3) { const f = n / 0.3; return [0, 10 * f, 40 * f]; }
+            else if (n < 0.7) { const f = (n - 0.3) / 0.4; return [150 * f, 10 + 20 * f, 40 + 150 * f]; }
+            else { const f = (n - 0.7) / 0.3; return [150 + 105 * f, 30 + 120 * f, 190 - 50 * f]; }
+        };
 
-        class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.baseX = this.x; // Original "home" grid position
-                this.baseY = this.y;
-                this.size = 0.6; // Uniform small size
-                this.density = 40; // Uniform repulsion strength
-                this.vx = 0;
-                this.vy = 0;
-            }
+        const drawA = () => {
+            t += 0.012;
+            const w = aCanv.width, h = aCanv.height, iD = aCtx.createImageData(w, h), dat = iD.data;
+            const g1x = w/2 + Math.sin(t*0.6)*w*0.3, g1y = h/2 + Math.cos(t*0.5)*h*0.3;
+            const g2x = w/2 + Math.sin(t*0.4)*w*0.4, g2y = h/2 + Math.cos(t*0.7)*h*0.4;
 
-            update() {
-                const dx = heroMouseX - this.x;
-                const dy = heroMouseY - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                const forceDirectionX = dx / distance;
-                const forceDirectionY = dy / distance;
-                const maxDistance = 120; // Repulsion radius
-                const force = (maxDistance - distance) / maxDistance;
-
-                let directionX = 0;
-                let directionY = 0;
-
-                if (distance < maxDistance) {
-                    // Repel from mouse
-                    directionX = -forceDirectionX * force * this.density * 0.6;
-                    directionY = -forceDirectionY * force * this.density * 0.6;
-                } else {
-                    // Return to original grid position
-                    directionX = (this.baseX - this.x) / 10; // Quicker return
-                    directionY = (this.baseY - this.y) / 10;
-                }
-                
-                // Apply velocity with damping for a smooth effect
-                this.vx += directionX;
-                this.vy += directionY;
-                this.vx *= 0.9;
-                this.vy *= 0.9;
-                
-                this.x += this.vx;
-                this.y += this.vy;
-            }
-
-            draw() {
-                // Particles are black, so they only show up against the spotlight
-                ctx.fillStyle = '#000000';
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticleGrid() {
-            particles = [];
-            for (let y = 0; y < canvas.height; y += particleGridGap) {
-                for (let x = 0; x < canvas.width; x += particleGridGap) {
-                    particles.push(new Particle(x, y));
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const idx = (y * w + x) * 4;
+                    const u = (x - w/2) / w * 120, v = (y - h/2) / h * 120;
+                    const ang = t * 0.1, ur = u * Math.cos(ang) - v * Math.sin(ang), vr = u * Math.sin(ang) + v * Math.cos(ang);
+                    const l1 = Math.sin(ur * 1.5 + t) * Math.cos(vr * 1.5);
+                    const sc = 1 + Math.sin(t * 0.2) * 0.1, l2 = Math.sin(u * 1.55 * sc) * Math.cos(v * 1.55 * sc);
+                    const d1 = Math.exp(-(Math.pow(x-g1x,2) + Math.pow(y-g1y,2))/15000), d2 = Math.exp(-(Math.pow(x-g2x,2) + Math.pow(y-g2y,2))/25000);
+                    const rgb = lerpC(Math.max(-1, Math.min(1, l1 * l2 * (d1 + d2) * 1.5)));
+                    dat[idx] = rgb[0]; dat[idx+1] = rgb[1]; dat[idx+2] = rgb[2]; dat[idx+3] = 255;
                 }
             }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for(let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-            }
-            requestAnimationFrame(animateParticles);
-        }
-
-        // Initialize and run
-        setCanvasSize();
-        initParticleGrid();
-        animateParticles();
-
-        window.addEventListener('resize', () => {
-            setCanvasSize();
-            initParticleGrid();
-        });
-
+            aCtx.putImageData(iD, 0, 0);
+            requestAnimationFrame(drawA);
+        };
+        drawA();
     </script>
 </body>
 </html>
