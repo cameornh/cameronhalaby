@@ -3,373 +3,468 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby | Projects</title>
+    <title>Cameron Halaby | Art & Engineering</title>
     <style>
+        /* RISOGRAPH COLOR PALETTE */
         :root {
-            --bg-color: #0a0a0c;
-            --glass-bg: rgba(25, 27, 30, 0.4);
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --text-main: #ffffff;
-            --text-muted: #8892b0;
-            --border-light: rgba(255, 255, 255, 0.08);
-            
-            /* These update via JS to track the mouse */
+            --riso-black: #050508;
+            --riso-dark-blue: #0b1021;
+            --riso-magenta: #ff007f;
+            --riso-blue: #0088ff;
+            --riso-yellow: #ffea00;
             --mouse-x: 50vw;
             --mouse-y: 50vh;
         }
 
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
+        body, html {
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background-color: var(--bg-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            perspective: 1200px;
-            color: var(--text-main);
+            background-color: var(--riso-black);
+            font-family: 'Courier New', Courier, monospace; /* Typewriter/Riso feel */
+            overflow-x: hidden;
+            color: white;
+            cursor: crosshair;
         }
 
-        /* 
-         * BACKGROUND PATTERN
-         * A subtle dot matrix that interacts with the lighting 
-         */
-        .background-pattern {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-            background-size: 24px 24px;
-            z-index: -2;
-        }
-
-        /* 
-         * MOUSE LIGHTING EFFECT 
-         * A glowing orb that follows the mouse, illuminating the background
-         */
-        .cursor-light {
+        /* 1. RISO GRAIN OVERLAY */
+        /* This simulates the textured paper and imperfect ink of a risograph printer */
+        .noise-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            background: radial-gradient(
-                600px circle at var(--mouse-x) var(--mouse-y), 
-                rgba(120, 160, 255, 0.15), /* Soft blue-ish light */
-                transparent 40%
-            );
-            z-index: -1;
+            z-index: 9999;
+            opacity: 0.35;
+            mix-blend-mode: overlay;
         }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transform-style: preserve-3d;
-            z-index: 10;
+        /* 2. THE MOUSE FLASHLIGHT & HALFTONE REVEAL */
+        /* A halftone pattern that is ONLY visible where the mouse shines */
+        .halftone-jungle {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--riso-dark-blue);
+            background-image: radial-gradient(var(--riso-magenta) 2px, transparent 2px), radial-gradient(var(--riso-blue) 2px, transparent 2px);
+            background-size: 16px 16px;
+            background-position: 0 0, 8px 8px;
+            mix-blend-mode: screen;
+            z-index: 0;
+            /* The flashlight mask */
+            -webkit-mask-image: radial-gradient(circle 250px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1), rgba(0,0,0,0));
+            mask-image: radial-gradient(circle 250px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1), rgba(0,0,0,0));
+            transition: -webkit-mask-image 0.1s ease-out;
         }
 
-        /* Top Header */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            transform: translateZ(60px);
+        /* 3. PARALLAX JUNGLE LEAVES */
+        .jungle-container {
+            position: fixed;
+            top: -5%;
+            left: -5%;
+            width: 110vw;
+            height: 110vh;
             pointer-events: none;
+            z-index: 1;
         }
 
-        .name-title {
-            font-family: 'Georgia', Times, serif;
-            font-size: 3.5rem;
-            margin: 0;
-            letter-spacing: -1px;
-            /* Sleek silver/metallic gradient instead of the chromatic split */
-            background: linear-gradient(135deg, #ffffff 0%, #a0a5b5 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-        }
-
-        .subtitle {
-            margin-top: 10px;
-            font-size: 1rem;
-            color: var(--text-muted);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        /* 
-         * THE VAULT WINDOW
-         * Frosted glassmorphism effect (Refraction)
-         */
-        .app-window {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            width: 480px;
-            border-radius: 24px;
-            padding: 25px 25px 35px 15px;
-            border: 1px solid var(--border-light);
-            position: relative;
-            display: flex;
-            transition: transform 0.1s ease-out;
-            transform-style: preserve-3d;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-
-        /* Surface Reflection Sheen on the vault */
-        .app-window::after {
-            content: '';
+        .leaf {
             position: absolute;
-            inset: 0;
-            border-radius: inherit;
-            background: radial-gradient(
-                800px circle at var(--mouse-x) var(--mouse-y), 
-                rgba(255, 255, 255, 0.05), 
-                transparent 40%
-            );
-            pointer-events: none;
-            z-index: 5;
+            fill: var(--riso-black);
+            stroke: var(--riso-blue);
+            stroke-width: 2;
+            filter: drop-shadow(5px 5px 0px rgba(255,0,127,0.3)); /* Magenta offset shadow */
+            transition: transform 0.2s ease-out;
         }
 
-        /* Left Sidebar Icons */
-        .sidebar {
-            width: 50px;
+        /* 4. TRACKING EYES (Easter Eggs) */
+        .eye-pair {
+            position: absolute;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            padding-top: 10px;
-            border-right: 1px solid var(--border-light);
-            margin-right: 20px;
-            z-index: 10;
+            gap: 15px;
+            z-index: 2;
         }
 
-        .sidebar-icon {
-            width: 20px;
-            height: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+        .eye {
+            width: 30px;
+            height: 12px;
+            background: var(--riso-black);
+            border: 2px solid var(--riso-magenta);
+            border-radius: 50% 50% 0 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(255,0,127,0.2);
+            transition: border-color 0.3s;
+        }
+
+        .pupil {
+            width: 8px;
+            height: 8px;
+            background: var(--riso-magenta);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             transition: background 0.3s;
         }
 
-        /* Project List */
-        .project-list {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 10;
+        /* 5. INTERACTIVE PARTICLES */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 3;
+            pointer-events: none;
+            mix-blend-mode: screen;
         }
 
-        /* 
-         * PROJECT CARDS 
-         */
-        .project-item {
+        /* 6. MAIN CONTENT */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10vh 20px;
+            min-height: 100vh;
+        }
+
+        /* Typography Misregistration Effect */
+        h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 60px;
+            position: relative;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--riso-blue);
+        }
+
+        h1::before, h1::after {
+            content: "Cameron Halaby";
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        h1::before {
+            color: var(--riso-magenta);
+            -webkit-text-stroke: 0px;
+            transform: translate(-4px, -4px);
+            z-index: -1;
+        }
+
+        h1::after {
+            color: var(--riso-blue);
+            -webkit-text-stroke: 0px;
+            transform: translate(4px, 4px);
+            z-index: -2;
+        }
+
+        h1:hover::before { transform: translate(-8px, -8px); color: var(--riso-yellow); }
+        h1:hover::after { transform: translate(8px, 8px); color: var(--riso-magenta); }
+
+        /* Project List */
+        .projects-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .project-card {
+            background: var(--riso-black);
+            border: 2px solid var(--riso-blue);
+            padding: 25px 30px;
+            text-decoration: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            position: relative;
+            text-transform: uppercase;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--card-bg);
-            border: 1px solid var(--border-light);
-            padding: 16px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--text-main);
-            position: relative;
-            transform-style: preserve-3d;
-            transform: translateZ(20px);
-            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s;
-            /* Default shadow, overridden by JS dynamically based on mouse position */
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: all 0.2s;
         }
 
-        .project-item:hover {
-            transform: translateZ(45px) translateY(-2px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
+        /* Riso offset block shadow */
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--riso-magenta),
+                var(--riso-magenta) 2px,
+                transparent 2px,
+                transparent 6px
+            );
+            z-index: -1;
+            transition: all 0.3s ease;
         }
 
-        .project-name {
-            font-weight: 500;
-            font-size: 1.05rem;
-            letter-spacing: 0.5px;
+        .project-card:hover {
+            transform: translate(-4px, -4px);
+            border-color: var(--riso-yellow);
+            color: var(--riso-yellow);
         }
 
-        .project-meta {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            font-family: 'Courier New', Courier, monospace;
+        /* The yellow is used sparingly—only appearing violently on hover */
+        .project-card:hover::after {
+            top: 15px;
+            left: 15px;
+            background: var(--riso-magenta); /* Fills solid on hover */
         }
 
-        .file-icon {
-            opacity: 0.5;
+        .project-number {
+            font-size: 0.9rem;
+            color: var(--riso-magenta);
+            font-weight: normal;
         }
-
-        .file-ext {
-            color: var(--text-muted);
-            letter-spacing: 1px;
+        
+        .project-card:hover .project-number {
+            color: var(--riso-black);
+            background: var(--riso-yellow);
+            padding: 2px 6px;
         }
 
     </style>
 </head>
 <body>
 
-    <div class="background-pattern"></div>
-    <div class="cursor-light"></div>
+    <!-- 1. SVG Filters for Paper Grain Texture -->
+    <svg style="display: none;">
+        <filter id="noiseFilter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
+            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.5 0" />
+        </filter>
+    </svg>
+    <div class="noise-overlay" style="backdrop-filter: url(#noiseFilter);"></div>
 
-    <div class="container">
-        
-        <div class="header">
-            <h1 class="name-title">Cameron Halaby</h1>
-            <p class="subtitle">Projects Vault</p>
+    <!-- 2. Interactive Halftone Background -->
+    <div class="halftone-jungle"></div>
+
+    <!-- 3. Parallax Jungle Leaves (SVGs) -->
+    <div class="jungle-container" id="jungle">
+        <!-- Leaf 1 -->
+        <svg class="leaf" style="top: -10%; left: -5%; width: 400px; transform-origin: top left;" viewBox="0 0 100 100" preserveAspectRatio="none" data-speed="0.05">
+            <path d="M0,0 C30,20 80,10 90,50 C80,30 50,60 10,90 Z" />
+        </svg>
+        <!-- Leaf 2 -->
+        <svg class="leaf" style="bottom: -10%; right: -5%; width: 500px; transform-origin: bottom right;" viewBox="0 0 100 100" preserveAspectRatio="none" data-speed="-0.03">
+            <path d="M100,100 C70,80 20,90 10,50 C20,70 50,40 90,10 Z" />
+            <path d="M80,80 L50,50" stroke-width="1"/>
+        </svg>
+        <!-- Leaf 3 -->
+        <svg class="leaf" style="top: 30%; left: -10%; width: 250px; transform-origin: center left;" viewBox="0 0 100 100" preserveAspectRatio="none" data-speed="0.08">
+            <path d="M0,50 C40,20 90,40 100,50 C90,60 40,80 0,50 Z" />
+        </svg>
+    </div>
+
+    <!-- 4. Hidden Eyes -->
+    <div class="eye-pair" style="top: 25%; right: 15%;">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+    </div>
+    <div class="eye-pair" style="bottom: 20%; left: 10%;">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+    </div>
+    <div class="eye-pair" style="top: 10%; left: 40%; transform: scale(0.6); opacity: 0.6;">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+    </div>
+
+    <!-- 5. Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- 6. Main Content -->
+    <div class="content-wrapper">
+        <h1 data-text="Cameron Halaby">Cameron Halaby</h1>
+
+        <div class="projects-container">
+            <a href="#" class="project-card">
+                <span>Project 1</span>
+                <span class="project-number">01</span>
+            </a>
+            <a href="#" class="project-card">
+                <span>Project 2</span>
+                <span class="project-number">02</span>
+            </a>
+            <a href="#" class="project-card">
+                <span>Project 3</span>
+                <span class="project-number">03</span>
+            </a>
+            <a href="#" class="project-card">
+                <span>Project 4</span>
+                <span class="project-number">04</span>
+            </a>
+            <a href="#" class="project-card">
+                <span>Project 5</span>
+                <span class="project-number">05</span>
+            </a>
         </div>
-
-        <main class="app-window" id="vault-window">
-            
-            <div class="sidebar">
-                <div class="sidebar-icon" style="border-radius: 50%; opacity: 0.5;"></div>
-                <div class="sidebar-icon" style="height: 12px; width: 18px; opacity: 0.3;"></div>
-                <div class="sidebar-icon" style="height: 18px; width: 18px; opacity: 0.2;"></div>
-                <div class="sidebar-icon" style="height: 18px; width: 18px; opacity: 0.1;"></div>
-            </div>
-
-            <div class="project-list">
-                
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 1</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 2</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 3</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 4</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 5</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 6</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 7</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-                <a href="#" class="project-item">
-                    <span class="project-name">Project 8</span>
-                    <div class="project-meta">
-                        <span class="file-icon">📄</span>
-                        <span class="file-ext">.MD FILE</span>
-                    </div>
-                </a>
-
-            </div>
-        </main>
     </div>
 
     <script>
-        const vaultWindow = document.getElementById('vault-window');
-        const container = document.querySelector('.container');
-        const projectItems = document.querySelectorAll('.project-item');
+        // --- 1. GLOBAL MOUSE TRACKING ---
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
 
         document.addEventListener('mousemove', (e) => {
-            const x = e.clientX;
-            const y = e.clientY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
 
-            // 1. UPDATE LIGHTING POSITION
-            // This updates CSS variables to move the global light source and surface reflection
-            document.documentElement.style.setProperty('--mouse-x', `${x}px`);
-            document.documentElement.style.setProperty('--mouse-y', `${y}px`);
+            // Update Flashlight Mask
+            document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
+            document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
 
-            // 2. 3D TILT EFFECT
-            // Calculate tilt based on distance from center of screen
-            let xAxis = (window.innerWidth / 2 - x) / 50;
-            let yAxis = (window.innerHeight / 2 - y) / 50;
-            vaultWindow.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-            container.style.transform = `translateX(${-xAxis}px) translateY(${-yAxis}px)`;
+            // --- 2. PARALLAX LEAVES ---
+            document.querySelectorAll('.leaf').forEach(leaf => {
+                const speed = leaf.getAttribute('data-speed');
+                const x = (window.innerWidth - mouseX * speed) / 50;
+                const y = (window.innerHeight - mouseY * speed) / 50;
+                leaf.style.transform = `translateX(${x}px) translateY(${y}px) rotate(${x * 0.5}deg)`;
+            });
 
-            // 3. DYNAMIC SHADOWS FOR INDIVIDUAL CARDS
-            // Casts shadows away from the mouse to create physical depth
-            projectItems.forEach(item => {
-                const rect = item.getBoundingClientRect();
-                const itemCenterX = rect.left + rect.width / 2;
-                const itemCenterY = rect.top + rect.height / 2;
+            // --- 3. TRACKING EYES ---
+            document.querySelectorAll('.eye').forEach(eye => {
+                const rect = eye.getBoundingClientRect();
+                const eyeCenterX = rect.left + rect.width / 2;
+                const eyeCenterY = rect.top + rect.height / 2;
                 
-                // Calculate distance vector from card to mouse
-                const distanceX = (itemCenterX - x) / 10;
-                const distanceY = (itemCenterY - y) / 10;
-
-                // Apply dynamic drop shadow opposite to the light source
-                item.style.boxShadow = `${distanceX}px ${distanceY}px 15px rgba(0,0,0,0.5)`;
-            });
-
-            // Dynamic shadow for the main vault window
-            const vaultRect = vaultWindow.getBoundingClientRect();
-            const vaultCenterX = vaultRect.left + vaultRect.width / 2;
-            const vaultCenterY = vaultRect.top + vaultRect.height / 2;
-            const vaultDistX = (vaultCenterX - x) / 15;
-            const vaultDistY = (vaultCenterY - y) / 15;
-            
-            vaultWindow.style.boxShadow = `${vaultDistX}px ${vaultDistY}px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)`;
-        });
-
-        // Reset elements when the mouse leaves the screen entirely
-        document.addEventListener('mouseleave', () => {
-            vaultWindow.style.transform = `rotateY(0deg) rotateX(0deg)`;
-            container.style.transform = `translateX(0px) translateY(0px)`;
-            
-            vaultWindow.style.boxShadow = `0 25px 50px rgba(0,0,0,0.5)`;
-            projectItems.forEach(item => {
-                item.style.boxShadow = `0 10px 20px rgba(0,0,0,0.3)`;
+                // Calculate angle from eye to mouse
+                const angle = Math.atan2(mouseY - eyeCenterY, mouseX - eyeCenterX);
+                
+                // Max distance pupil can move from center
+                const distance = Math.min(6, Math.hypot(mouseX - eyeCenterX, mouseY - eyeCenterY) / 15);
+                
+                const pupilX = Math.cos(angle) * distance;
+                const pupilY = Math.sin(angle) * distance;
+                
+                const pupil = eye.querySelector('.pupil');
+                // Adjusting translation since pupil is already -50% -50% centered
+                pupil.style.transform = `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`;
             });
         });
+
+        // --- 4. EASTER EGG: EYE BLINK & YELLOW FLASH ON CLICK ---
+        document.addEventListener('mousedown', () => {
+            document.querySelectorAll('.eye').forEach(eye => {
+                eye.style.height = '2px'; // Blink shut
+                eye.style.borderColor = 'var(--riso-yellow)';
+                eye.querySelector('.pupil').style.background = 'var(--riso-yellow)';
+            });
+            // Flash particles to yellow briefly
+            particles.forEach(p => p.color = '#ffea00');
+        });
+
+        document.addEventListener('mouseup', () => {
+            document.querySelectorAll('.eye').forEach(eye => {
+                eye.style.height = '12px'; // Open
+                eye.style.borderColor = 'var(--riso-magenta)';
+                eye.querySelector('.pupil').style.background = 'var(--riso-magenta)';
+            });
+            // Reset particle colors
+            particles.forEach(p => p.color = Math.random() > 0.5 ? '#ff007f' : '#0088ff');
+        });
+
+        // --- 5. INTERACTIVE INK PARTICLES ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particles =[];
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                // Alternate between Riso Magenta and Blue
+                this.color = Math.random() > 0.5 ? '#ff007f' : '#0088ff';
+                this.baseX = this.x;
+                this.baseY = this.y;
+            }
+
+            update() {
+                // Natural drift
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Wrap around edges
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+
+                // Mouse interaction: Particles scatter away from cursor
+                const dx = mouseX - this.x;
+                const dy = mouseY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    const forceDirectionX = dx / distance;
+                    const forceDirectionY = dy / distance;
+                    // Push away
+                    this.x -= forceDirectionX * 5;
+                    this.y -= forceDirectionY * 5;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles =[];
+            const particleCount = (window.innerWidth * window.innerHeight) / 10000; // Density
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        initParticles();
+        animateParticles();
+
     </script>
 </body>
 </html>
