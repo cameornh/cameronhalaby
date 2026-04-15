@@ -128,6 +128,14 @@
             100% { transform: translate(0, 0); }
         }
 
+        /* Canvas for interactive particle grid */
+        #particle-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 2; /* Sits above the spotlight, but below the UI */
+            pointer-events: none;
+        }
+
         /* Hero Editorial Glass UI */
         .hero-ui {
             position: relative;
@@ -425,6 +433,8 @@
                 <div class="fluid-texture"></div>
             </div>
 
+            <canvas id="particle-canvas"></canvas>
+
             <div class="hero-ui">
                 <div class="glass-card" id="glass-card">
                     <h1 class="hero-name">Cameron Halaby</h1>
@@ -566,12 +576,20 @@
         // --- 1. HERO SECTION LOGIC ---
         const heroSection = document.getElementById('hero');
         const glassCard = document.getElementById('glass-card');
+        
+        // These will be updated by the mousemove event for the particles
+        let heroMouseX = window.innerWidth / 2;
+        let heroMouseY = window.innerHeight / 2;
 
         heroSection.addEventListener('mousemove', (e) => {
             // Get coordinates relative to the hero section for the spotlight
             const heroRect = heroSection.getBoundingClientRect();
             const mouseX = e.clientX - heroRect.left;
             const mouseY = e.clientY - heroRect.top;
+
+            // Update global hero mouse coordinates for particle script
+            heroMouseX = mouseX;
+            heroMouseY = mouseY;
             
             // Update Spotlight
             heroSection.style.setProperty('--mouse-x', `${mouseX}px`);
@@ -607,9 +625,7 @@
             glassCard.style.setProperty('--mouse-y-rel', `-500px`);
         });
 
-
         // --- 2. OBSIDIAN CARDS 3D LOGIC ---
-        // Adds a subtle, premium 3D tilt interaction to the dark gallery cards
         document.querySelectorAll('.obs-card').forEach(card => {
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
@@ -617,18 +633,107 @@
                 const y = e.clientY - rect.top;
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
-                
-                // Calculate subtle rotation
                 const rotateX = ((y - centerY) / centerY) * -4;
                 const rotateY = ((x - centerX) / centerX) * 4;
-                
                 card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
             });
-
             card.addEventListener('mouseleave', () => {
                 card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)`;
             });
         });
+
+        // --- 3. HERO PARTICLE GRID LOGIC (MODIFIED) ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const particleGridGap = 25; // The space between each particle in the grid
+
+        function setCanvasSize() {
+            canvas.width = heroSection.clientWidth;
+            canvas.height = heroSection.clientHeight;
+        }
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.baseX = this.x; // Original "home" grid position
+                this.baseY = this.y;
+                this.size = 0.6; // Uniform small size
+                this.density = 40; // Uniform repulsion strength
+                this.vx = 0;
+                this.vy = 0;
+            }
+
+            update() {
+                const dx = heroMouseX - this.x;
+                const dy = heroMouseY - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const forceDirectionX = dx / distance;
+                const forceDirectionY = dy / distance;
+                const maxDistance = 120; // Repulsion radius
+                const force = (maxDistance - distance) / maxDistance;
+
+                let directionX = 0;
+                let directionY = 0;
+
+                if (distance < maxDistance) {
+                    // Repel from mouse
+                    directionX = -forceDirectionX * force * this.density * 0.6;
+                    directionY = -forceDirectionY * force * this.density * 0.6;
+                } else {
+                    // Return to original grid position
+                    directionX = (this.baseX - this.x) / 10; // Quicker return
+                    directionY = (this.baseY - this.y) / 10;
+                }
+                
+                // Apply velocity with damping for a smooth effect
+                this.vx += directionX;
+                this.vy += directionY;
+                this.vx *= 0.9;
+                this.vy *= 0.9;
+                
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+
+            draw() {
+                // Particles are black, so they only show up against the spotlight
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticleGrid() {
+            particles = [];
+            for (let y = 0; y < canvas.height; y += particleGridGap) {
+                for (let x = 0; x < canvas.width; x += particleGridGap) {
+                    particles.push(new Particle(x, y));
+                }
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for(let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Initialize and run
+        setCanvasSize();
+        initParticleGrid();
+        animateParticles();
+
+        window.addEventListener('resize', () => {
+            setCanvasSize();
+            initParticleGrid();
+        });
+
     </script>
 </body>
 </html>
