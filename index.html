@@ -3,30 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby | Projects Vault</title>
+    <title>Cameron Halaby | Projects</title>
     <style>
         :root {
-            --bg-color: #e6e6e6;
-            --app-bg: linear-gradient(145deg, #2b2d2f, #1e1e1e);
-            --item-bg: #f5f5f5;
-            --text-dark: #1a1a1a;
-            --text-light: #e0e0e0;
-            --cyan-glow: rgba(0, 255, 200, 0.8);
-            --orange-glow: rgba(255, 165, 0, 0.8);
-            --md-text: #6ba7a5;
+            --bg-color: #0a0a0c;
+            --glass-bg: rgba(25, 27, 30, 0.4);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --text-main: #ffffff;
+            --text-muted: #8892b0;
+            --border-light: rgba(255, 255, 255, 0.08);
+            
+            /* These update via JS to track the mouse */
+            --mouse-x: 50vw;
+            --mouse-y: 50vh;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
             margin: 0;
             padding: 0;
             min-height: 100vh;
-            background: radial-gradient(circle at 50% 30%, #f0f0f0, #c8c8c8);
+            background-color: var(--bg-color);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
-            perspective: 1200px; /* Enables the 3D tilt effect */
+            perspective: 1200px;
+            color: var(--text-main);
+        }
+
+        /* 
+         * BACKGROUND PATTERN
+         * A subtle dot matrix that interacts with the lighting 
+         */
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+            z-index: -2;
+        }
+
+        /* 
+         * MOUSE LIGHTING EFFECT 
+         * A glowing orb that follows the mouse, illuminating the background
+         */
+        .cursor-light {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            background: radial-gradient(
+                600px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(120, 160, 255, 0.15), /* Soft blue-ish light */
+                transparent 40%
+            );
+            z-index: -1;
         }
 
         .container {
@@ -34,73 +75,70 @@
             flex-direction: column;
             align-items: center;
             transform-style: preserve-3d;
+            z-index: 10;
         }
 
-        /* Top Logo & Name */
+        /* Top Header */
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            transform: translateZ(50px); /* Pops off the background */
-        }
-
-        .crystal-logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 10px;
-            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.3));
-            animation: float 4s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            margin-bottom: 40px;
+            transform: translateZ(60px);
+            pointer-events: none;
         }
 
         .name-title {
             font-family: 'Georgia', Times, serif;
             font-size: 3.5rem;
             margin: 0;
-            color: var(--text-dark);
             letter-spacing: -1px;
-            /* Chromatic aberration effect from Image 1 */
-            text-shadow: 
-                -2px -2px 0px var(--cyan-glow),
-                2px 2px 0px var(--orange-glow);
+            /* Sleek silver/metallic gradient instead of the chromatic split */
+            background: linear-gradient(135deg, #ffffff 0%, #a0a5b5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
         }
 
         .subtitle {
-            margin-top: 5px;
+            margin-top: 10px;
             font-size: 1rem;
-            color: #555;
-            letter-spacing: 2px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
             text-transform: uppercase;
         }
 
-        /* The Main Vault Window */
+        /* 
+         * THE VAULT WINDOW
+         * Frosted glassmorphism effect (Refraction)
+         */
         .app-window {
-            background: var(--app-bg);
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             width: 480px;
-            border-radius: 20px;
-            padding: 20px 20px 30px 10px;
-            box-shadow: 
-                0 30px 60px rgba(0,0,0,0.5),
-                0 0 0 1px rgba(255,255,255,0.05);
+            border-radius: 24px;
+            padding: 25px 25px 35px 15px;
+            border: 1px solid var(--border-light);
             position: relative;
             display: flex;
             transition: transform 0.1s ease-out;
             transform-style: preserve-3d;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
 
-        /* Subtle glowing top border from Image 2 */
-        .app-window::before {
+        /* Surface Reflection Sheen on the vault */
+        .app-window::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 10%;
-            right: 10%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #ff9d00, transparent);
-            box-shadow: 0 2px 10px rgba(255, 157, 0, 0.5);
+            inset: 0;
+            border-radius: inherit;
+            background: radial-gradient(
+                800px circle at var(--mouse-x) var(--mouse-y), 
+                rgba(255, 255, 255, 0.05), 
+                transparent 40%
+            );
+            pointer-events: none;
+            z-index: 5;
         }
 
         /* Left Sidebar Icons */
@@ -111,8 +149,9 @@
             align-items: center;
             gap: 20px;
             padding-top: 10px;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            border-right: 1px solid var(--border-light);
             margin-right: 20px;
+            z-index: 10;
         }
 
         .sidebar-icon {
@@ -120,6 +159,7 @@
             height: 20px;
             background: rgba(255,255,255,0.1);
             border-radius: 4px;
+            transition: background 0.3s;
         }
 
         /* Project List */
@@ -128,100 +168,76 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            z-index: 10;
         }
 
+        /* 
+         * PROJECT CARDS 
+         */
         .project-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--item-bg);
-            padding: 14px 18px;
-            border-radius: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            padding: 16px 20px;
+            border-radius: 8px;
             text-decoration: none;
-            color: var(--text-dark);
+            color: var(--text-main);
             position: relative;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            /* Chromatic borders from Image 2 */
-            box-shadow: 
-                0 -2px 4px -2px rgba(255, 150, 0, 0.6), 
-                0 2px 4px -2px rgba(0, 200, 255, 0.6);
+            transform-style: preserve-3d;
             transform: translateZ(20px);
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s;
+            /* Default shadow, overridden by JS dynamically based on mouse position */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
-        /* 3D Pop Out Hover Effect (Image 1 style) */
         .project-item:hover {
-            transform: translateZ(40px) translateY(-5px);
-            background: #ffffff;
-            box-shadow: 
-                0 15px 25px rgba(0,0,0,0.3),
-                0 -2px 8px -2px rgba(255, 150, 0, 0.9), 
-                0 2px 8px -2px rgba(0, 200, 255, 0.9);
+            transform: translateZ(45px) translateY(-2px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .project-name {
-            font-weight: 600;
+            font-weight: 500;
             font-size: 1.05rem;
-            font-family: 'Georgia', Times, serif;
-        }
-
-        /* Adds the subtle chromatic text split on hover */
-        .project-item:hover .project-name {
-            text-shadow: 
-                -0.5px -0.5px 0px rgba(0, 255, 200, 0.8),
-                0.5px 0.5px 0px rgba(255, 165, 0, 0.8);
+            letter-spacing: 0.5px;
         }
 
         .project-meta {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-family: 'Courier New', Courier, monospace;
         }
 
         .file-icon {
-            opacity: 0.6;
-            color: var(--text-light);
+            opacity: 0.5;
         }
 
         .file-ext {
-            color: var(--md-text);
-            text-shadow: 0 0 5px rgba(107, 167, 165, 0.3);
+            color: var(--text-muted);
             letter-spacing: 1px;
         }
+
     </style>
 </head>
 <body>
 
+    <div class="background-pattern"></div>
+    <div class="cursor-light"></div>
+
     <div class="container">
         
         <div class="header">
-            <!-- Stylized CSS/SVG Crystal -->
-            <svg class="crystal-logo" viewBox="0 0 100 100">
-                <defs>
-                    <linearGradient id="purpleGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#b388ff;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#651fff;stop-opacity:1" />
-                    </linearGradient>
-                    <linearGradient id="purpleGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" style="stop-color:#e1bee7;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#7e57c2;stop-opacity:1" />
-                    </linearGradient>
-                </defs>
-                <path d="M 40 10 L 60 15 L 75 45 L 65 85 L 45 95 L 20 70 L 25 35 Z" fill="url(#purpleGrad1)"/>
-                <path d="M 40 10 L 60 15 L 50 50 Z" fill="url(#purpleGrad2)" opacity="0.9"/>
-                <path d="M 25 35 L 50 50 L 20 70 Z" fill="#d1c4e9" opacity="0.5"/>
-                <path d="M 60 15 L 75 45 L 50 50 Z" fill="#311b92" opacity="0.4"/>
-            </svg>
-            
             <h1 class="name-title">Cameron Halaby</h1>
-            <p class="subtitle">Software Engineer & Designer</p>
+            <p class="subtitle">Projects Vault</p>
         </div>
 
         <main class="app-window" id="vault-window">
             
             <div class="sidebar">
-                <!-- Abstract UI icons representing the sidebar -->
                 <div class="sidebar-icon" style="border-radius: 50%; opacity: 0.5;"></div>
                 <div class="sidebar-icon" style="height: 12px; width: 18px; opacity: 0.3;"></div>
                 <div class="sidebar-icon" style="height: 18px; width: 18px; opacity: 0.2;"></div>
@@ -230,46 +246,64 @@
 
             <div class="project-list">
                 
-                <!-- Project Item 1 -->
-                <!-- Change the href to point to your repos or live sites -->
                 <a href="#" class="project-item">
-                    <span class="project-name">Neural_Network_Viz</span>
+                    <span class="project-name">Project 1</span>
                     <div class="project-meta">
                         <span class="file-icon">📄</span>
                         <span class="file-ext">.MD FILE</span>
                     </div>
                 </a>
 
-                <!-- Project Item 2 -->
                 <a href="#" class="project-item">
-                    <span class="project-name">Fintech_Dashboard</span>
+                    <span class="project-name">Project 2</span>
                     <div class="project-meta">
                         <span class="file-icon">📄</span>
                         <span class="file-ext">.MD FILE</span>
                     </div>
                 </a>
 
-                <!-- Project Item 3 -->
                 <a href="#" class="project-item">
-                    <span class="project-name">Data_Scraper_Script</span>
+                    <span class="project-name">Project 3</span>
                     <div class="project-meta">
                         <span class="file-icon">📄</span>
                         <span class="file-ext">.MD FILE</span>
                     </div>
                 </a>
 
-                <!-- Project Item 4 -->
                 <a href="#" class="project-item">
-                    <span class="project-name">Portfolio_v1</span>
+                    <span class="project-name">Project 4</span>
                     <div class="project-meta">
                         <span class="file-icon">📄</span>
                         <span class="file-ext">.MD FILE</span>
                     </div>
                 </a>
 
-                <!-- Project Item 5 -->
                 <a href="#" class="project-item">
-                    <span class="project-name">Resume_2026</span>
+                    <span class="project-name">Project 5</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
+
+                <a href="#" class="project-item">
+                    <span class="project-name">Project 6</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
+
+                <a href="#" class="project-item">
+                    <span class="project-name">Project 7</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
+
+                <a href="#" class="project-item">
+                    <span class="project-name">Project 8</span>
                     <div class="project-meta">
                         <span class="file-icon">📄</span>
                         <span class="file-ext">.MD FILE</span>
@@ -280,27 +314,61 @@
         </main>
     </div>
 
-    <!-- Script to create a subtle 3D parallax effect on mouse movement -->
     <script>
         const vaultWindow = document.getElementById('vault-window');
         const container = document.querySelector('.container');
+        const projectItems = document.querySelectorAll('.project-item');
 
         document.addEventListener('mousemove', (e) => {
-            // Calculate mouse position relative to the center of the screen
-            let xAxis = (window.innerWidth / 2 - e.pageX) / 40;
-            let yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+            const x = e.clientX;
+            const y = e.clientY;
 
-            // Apply the 3D rotation
+            // 1. UPDATE LIGHTING POSITION
+            // This updates CSS variables to move the global light source and surface reflection
+            document.documentElement.style.setProperty('--mouse-x', `${x}px`);
+            document.documentElement.style.setProperty('--mouse-y', `${y}px`);
+
+            // 2. 3D TILT EFFECT
+            // Calculate tilt based on distance from center of screen
+            let xAxis = (window.innerWidth / 2 - x) / 50;
+            let yAxis = (window.innerHeight / 2 - y) / 50;
             vaultWindow.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
-            
-            // Give the container a slight opposing shift to increase depth perception
             container.style.transform = `translateX(${-xAxis}px) translateY(${-yAxis}px)`;
+
+            // 3. DYNAMIC SHADOWS FOR INDIVIDUAL CARDS
+            // Casts shadows away from the mouse to create physical depth
+            projectItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const itemCenterX = rect.left + rect.width / 2;
+                const itemCenterY = rect.top + rect.height / 2;
+                
+                // Calculate distance vector from card to mouse
+                const distanceX = (itemCenterX - x) / 10;
+                const distanceY = (itemCenterY - y) / 10;
+
+                // Apply dynamic drop shadow opposite to the light source
+                item.style.boxShadow = `${distanceX}px ${distanceY}px 15px rgba(0,0,0,0.5)`;
+            });
+
+            // Dynamic shadow for the main vault window
+            const vaultRect = vaultWindow.getBoundingClientRect();
+            const vaultCenterX = vaultRect.left + vaultRect.width / 2;
+            const vaultCenterY = vaultRect.top + vaultRect.height / 2;
+            const vaultDistX = (vaultCenterX - x) / 15;
+            const vaultDistY = (vaultCenterY - y) / 15;
+            
+            vaultWindow.style.boxShadow = `${vaultDistX}px ${vaultDistY}px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)`;
         });
 
-        // Reset transform when mouse leaves
+        // Reset elements when the mouse leaves the screen entirely
         document.addEventListener('mouseleave', () => {
             vaultWindow.style.transform = `rotateY(0deg) rotateX(0deg)`;
             container.style.transform = `translateX(0px) translateY(0px)`;
+            
+            vaultWindow.style.boxShadow = `0 25px 50px rgba(0,0,0,0.5)`;
+            projectItems.forEach(item => {
+                item.style.boxShadow = `0 10px 20px rgba(0,0,0,0.3)`;
+            });
         });
     </script>
 </body>
