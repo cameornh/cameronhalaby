@@ -3,327 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby | Art & Engineering</title>
+    <title>Cameron Halaby | Projects</title>
     <style>
-        /* RISOGRAPH COLOR PALETTE */
         :root {
-            --riso-black: #050508;
-            --riso-dark-blue: #0b1021;
-            --riso-magenta: #ff007f;
-            --riso-blue: #0088ff;
-            --riso-yellow: #ffea00;
+            --bg-color: #020203;
             --mouse-x: 50vw;
             --mouse-y: 50vh;
+            
+            /* Riso-inspired organic colors for the hidden background */
+            --color-magenta: #c91461;
+            --color-blue: #0f2c6b;
+            --color-gold: #c9a445;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background-color: var(--riso-black);
-            font-family: 'Courier New', Courier, monospace; /* Typewriter/Riso feel */
-            overflow-x: hidden;
-            color: white;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            color: #ececec;
             cursor: crosshair;
         }
 
-        /* 1. RISO GRAIN OVERLAY */
-        /* This simulates the textured paper and imperfect ink of a risograph printer */
-        .noise-overlay {
+        /* 1. HEAVY RISO GRAIN OVERLAY */
+        .grain-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            z-index: 9999;
-            opacity: 0.35;
+            z-index: 100;
+            opacity: 0.6;
             mix-blend-mode: overlay;
         }
 
-        /* 2. THE MOUSE FLASHLIGHT & HALFTONE REVEAL */
-        /* A halftone pattern that is ONLY visible where the mouse shines */
-        .halftone-jungle {
+        /* 2. THE SPOTLIGHT LAYER */
+        /* This layer is colorful but is completely hidden EXCEPT where the mouse is */
+        .spotlight-layer {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: var(--riso-dark-blue);
-            background-image: radial-gradient(var(--riso-magenta) 2px, transparent 2px), radial-gradient(var(--riso-blue) 2px, transparent 2px);
-            background-size: 16px 16px;
-            background-position: 0 0, 8px 8px;
-            mix-blend-mode: screen;
-            z-index: 0;
+            z-index: 1;
+            /* Organic, topographic wavy background using CSS gradients */
+            background: 
+                radial-gradient(circle at 30% 70%, var(--color-magenta) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, var(--color-blue) 0%, transparent 60%),
+                repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 10px, rgba(201, 164, 69, 0.1) 11px, transparent 12px),
+                var(--color-blue);
+            
             /* The flashlight mask */
-            -webkit-mask-image: radial-gradient(circle 250px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1), rgba(0,0,0,0));
-            mask-image: radial-gradient(circle 250px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1), rgba(0,0,0,0));
-            transition: -webkit-mask-image 0.1s ease-out;
+            -webkit-mask-image: radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            mask-image: radial-gradient(circle 350px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
         }
 
-        /* 3. PARALLAX JUNGLE LEAVES */
-        .jungle-container {
+        /* 3. CANVAS PARTICLES (Black spores) */
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* 4. BLACK SILHOUETTE LEAVES */
+        /* They sit above the spotlight but blend into the black background */
+        .jungle-foreground {
             position: fixed;
             top: -5%;
             left: -5%;
             width: 110vw;
             height: 110vh;
             pointer-events: none;
-            z-index: 1;
+            z-index: 3;
         }
 
         .leaf {
             position: absolute;
-            fill: var(--riso-black);
-            stroke: var(--riso-blue);
-            stroke-width: 2;
-            filter: drop-shadow(5px 5px 0px rgba(255,0,127,0.3)); /* Magenta offset shadow */
-            transition: transform 0.2s ease-out;
+            fill: var(--bg-color); /* Pitch black */
+            transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform-origin: center;
         }
 
-        /* 4. TRACKING EYES (Easter Eggs) */
-        .eye-pair {
+        /* 5. HIDDEN EYES */
+        .eye-container {
             position: absolute;
             display: flex;
-            gap: 15px;
-            z-index: 2;
+            gap: 8px;
+            z-index: 4;
+            /* Subtle glow so you can barely see them in the dark */
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.1));
         }
 
         .eye {
-            width: 30px;
-            height: 12px;
-            background: var(--riso-black);
-            border: 2px solid var(--riso-magenta);
-            border-radius: 50% 50% 0 0;
+            width: 16px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50% 50% 10% 10% / 80% 80% 20% 20%;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 15px rgba(255,0,127,0.2);
-            transition: border-color 0.3s;
+            transition: height 0.1s;
         }
 
         .pupil {
-            width: 8px;
-            height: 8px;
-            background: var(--riso-magenta);
+            width: 6px;
+            height: 6px;
+            background: var(--bg-color);
             border-radius: 50%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            transition: background 0.3s;
         }
 
-        /* 5. INTERACTIVE PARTICLES */
-        #particle-canvas {
+        /* 6. VIGNETTE */
+        .vignette {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: 3;
+            box-shadow: inset 0 0 200px rgba(0,0,0,1);
             pointer-events: none;
-            mix-blend-mode: screen;
+            z-index: 90;
         }
 
-        /* 6. MAIN CONTENT */
-        .content-wrapper {
+        /* 7. GLASSMORPHISM UI */
+        .ui-layer {
             position: relative;
-            z-index: 10;
+            z-index: 50;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10vh 20px;
+            justify-content: center;
             min-height: 100vh;
+            padding: 40px;
         }
 
-        /* Typography Misregistration Effect */
+        .glass-panel {
+            background: rgba(15, 15, 20, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 50px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        }
+
         h1 {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 900;
+            font-size: 2.8rem;
+            font-weight: normal;
+            margin-bottom: 5px;
+            text-align: center;
+            color: var(--color-gold); /* Subtle metallic gold */
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: -2px;
-            margin-bottom: 60px;
-            position: relative;
-            color: transparent;
-            -webkit-text-stroke: 2px var(--riso-blue);
         }
 
-        h1::before, h1::after {
-            content: "Cameron Halaby";
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            mix-blend-mode: screen;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        h1::before {
-            color: var(--riso-magenta);
-            -webkit-text-stroke: 0px;
-            transform: translate(-4px, -4px);
-            z-index: -1;
-        }
-
-        h1::after {
-            color: var(--riso-blue);
-            -webkit-text-stroke: 0px;
-            transform: translate(4px, 4px);
-            z-index: -2;
-        }
-
-        h1:hover::before { transform: translate(-8px, -8px); color: var(--riso-yellow); }
-        h1:hover::after { transform: translate(8px, 8px); color: var(--riso-magenta); }
-
-        /* Project List */
-        .projects-container {
+        .projects {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 600px;
+            gap: 15px;
         }
 
-        .project-card {
-            background: var(--riso-black);
-            border: 2px solid var(--riso-blue);
-            padding: 25px 30px;
-            text-decoration: none;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-            position: relative;
-            text-transform: uppercase;
+        .project-link {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.2s;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            text-decoration: none;
+            color: #ccc;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Riso offset block shadow */
-        .project-card::after {
+        /* Subtle Riso-color hover effect for projects */
+        .project-link::before {
             content: '';
             position: absolute;
-            top: 8px;
-            left: 8px;
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                45deg,
-                var(--riso-magenta),
-                var(--riso-magenta) 2px,
-                transparent 2px,
-                transparent 6px
-            );
-            z-index: -1;
-            transition: all 0.3s ease;
+            top: 0; left: 0; width: 2px; height: 100%;
+            background: var(--color-gold);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+            transform-origin: bottom;
         }
 
-        .project-card:hover {
-            transform: translate(-4px, -4px);
-            border-color: var(--riso-yellow);
-            color: var(--riso-yellow);
+        .project-link:hover {
+            background: rgba(255, 255, 255, 0.03);
+            color: #fff;
+            border-color: rgba(201, 164, 69, 0.3); /* Gold border */
+            transform: translateX(5px);
         }
 
-        /* The yellow is used sparingly—only appearing violently on hover */
-        .project-card:hover::after {
-            top: 15px;
-            left: 15px;
-            background: var(--riso-magenta); /* Fills solid on hover */
+        .project-link:hover::before {
+            transform: scaleY(1);
         }
 
-        .project-number {
-            font-size: 0.9rem;
-            color: var(--riso-magenta);
-            font-weight: normal;
-        }
-        
-        .project-card:hover .project-number {
-            color: var(--riso-black);
-            background: var(--riso-yellow);
-            padding: 2px 6px;
+        .project-meta {
+            font-size: 0.75rem;
+            color: #666;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- 1. SVG Filters for Paper Grain Texture -->
+    <!-- SVG Filter for organic paper/film grain -->
     <svg style="display: none;">
-        <filter id="noiseFilter">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/>
-            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.5 0" />
+        <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
+            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.4 0" />
         </filter>
     </svg>
-    <div class="noise-overlay" style="backdrop-filter: url(#noiseFilter);"></div>
+    <div class="grain-overlay" style="backdrop-filter: url(#noise);"></div>
 
-    <!-- 2. Interactive Halftone Background -->
-    <div class="halftone-jungle"></div>
+    <!-- The Vignette -->
+    <div class="vignette"></div>
 
-    <!-- 3. Parallax Jungle Leaves (SVGs) -->
-    <div class="jungle-container" id="jungle">
-        <!-- Leaf 1 -->
-        <svg class="leaf" style="top: -10%; left: -5%; width: 400px; transform-origin: top left;" viewBox="0 0 100 100" preserveAspectRatio="none" data-speed="0.05">
-            <path d="M0,0 C30,20 80,10 90,50 C80,30 50,60 10,90 Z" />
+    <!-- The Hidden Colorful Organic Background -->
+    <div class="spotlight-layer"></div>
+
+    <!-- Canvas for Black Spores -->
+    <canvas id="particles"></canvas>
+
+    <!-- The Black Foreground Jungle Elements -->
+    <div class="jungle-foreground">
+        
+        <!-- Monstera Leaf Top Left -->
+        <svg class="leaf" style="top: -10%; left: -5%; width: 45vw;" viewBox="0 0 200 200" data-parallax="0.03">
+            <path d="M20,20 C80,-10 160,20 180,80 C190,120 170,160 140,180 C135,160 150,130 130,120 C140,140 120,180 100,190 C95,160 110,120 80,110 C90,130 70,180 40,170 C45,140 60,100 30,90 C40,100 10,130 5,100 C-5,50 0,30 20,20 Z" />
         </svg>
-        <!-- Leaf 2 -->
-        <svg class="leaf" style="bottom: -10%; right: -5%; width: 500px; transform-origin: bottom right;" viewBox="0 0 100 100" preserveAspectRatio="none" data-speed="-0.03">
-            <path d="M100,100 C70,80 20,90 10,50 C20,70 50,40 90,10 Z" />
-            <path d="M80,80 L50,50" stroke-width="1"/>
+
+        <!-- Broad Banana Leaf Bottom Right -->
+        <svg class="leaf" style="bottom: -10%; right: -10%; width: 55vw;" viewBox="0 0 200 200" data-parallax="-0.04">
+            <path d="M180,180 C120,210 40,180 20,120 C10,80 30,40 60,20 C70,40 50,70 80,80 C70,60 100,20 120,10 C125,40 100,80 130,90 C120,70 150,30 170,40 C165,70 140,110 170,120 C160,110 190,80 195,110 C205,160 200,180 180,180 Z" />
         </svg>
-        <!-- Leaf 3 -->
-        <svg class="leaf" style="top: 30%; left: -10%; width: 250px; transform-origin: center left;" viewBox="0 0 100 100" preserveAspectRatio="none" data-speed="0.08">
-            <path d="M0,50 C40,20 90,40 100,50 C90,60 40,80 0,50 Z" />
+
+        <!-- Palm Fronds Top Right -->
+        <svg class="leaf" style="top: -5%; right: -5%; width: 40vw; transform: rotate(45deg);" viewBox="0 0 100 200" data-parallax="0.05">
+            <path d="M50,200 C45,150 40,100 50,0 C60,20 80,30 90,25 C70,45 60,60 55,70 C75,80 95,90 100,85 C80,105 60,120 55,130 C75,140 90,150 95,145 C70,165 60,180 50,200 Z" />
+            <path d="M50,200 C55,150 60,100 50,0 C40,20 20,30 10,25 C30,45 40,60 45,70 C25,80 5,90 0,85 C20,105 40,120 45,130 C25,140 10,150 5,145 C30,165 40,180 50,200 Z" />
         </svg>
+
+        <!-- Overhanging Vines Bottom Left -->
+        <svg class="leaf" style="bottom: 0%; left: -5%; width: 30vw; transform: rotate(-20deg);" viewBox="0 0 100 200" data-parallax="-0.02">
+            <path d="M20,200 C30,150 10,100 40,50 C50,60 70,50 80,40 C60,70 50,80 45,100 C60,110 80,100 90,90 C70,120 60,140 50,160 C70,170 80,160 90,150 C60,180 40,190 20,200 Z" />
+        </svg>
+
     </div>
 
-    <!-- 4. Hidden Eyes -->
-    <div class="eye-pair" style="top: 25%; right: 15%;">
-        <div class="eye"><div class="pupil"></div></div>
-        <div class="eye"><div class="pupil"></div></div>
-    </div>
-    <div class="eye-pair" style="bottom: 20%; left: 10%;">
-        <div class="eye"><div class="pupil"></div></div>
-        <div class="eye"><div class="pupil"></div></div>
-    </div>
-    <div class="eye-pair" style="top: 10%; left: 40%; transform: scale(0.6); opacity: 0.6;">
+    <!-- Hidden Eyes Peeking out -->
+    <div class="eye-container" style="top: 15%; left: 25%;">
         <div class="eye"><div class="pupil"></div></div>
         <div class="eye"><div class="pupil"></div></div>
     </div>
+    <div class="eye-container" style="bottom: 25%; right: 15%; transform: scale(0.8);">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+    </div>
+    <div class="eye-container" style="top: 40%; right: 5%; transform: scale(0.6) rotate(-15deg);">
+        <div class="eye"><div class="pupil"></div></div>
+        <div class="eye"><div class="pupil"></div></div>
+    </div>
 
-    <!-- 5. Particle Canvas -->
-    <canvas id="particle-canvas"></canvas>
+    <!-- Main UI Content -->
+    <div class="ui-layer">
+        <div class="glass-panel">
+            <h1>Cameron Halaby</h1>
+            <div class="subtitle">Creative Vault</div>
 
-    <!-- 6. Main Content -->
-    <div class="content-wrapper">
-        <h1 data-text="Cameron Halaby">Cameron Halaby</h1>
-
-        <div class="projects-container">
-            <a href="#" class="project-card">
-                <span>Project 1</span>
-                <span class="project-number">01</span>
-            </a>
-            <a href="#" class="project-card">
-                <span>Project 2</span>
-                <span class="project-number">02</span>
-            </a>
-            <a href="#" class="project-card">
-                <span>Project 3</span>
-                <span class="project-number">03</span>
-            </a>
-            <a href="#" class="project-card">
-                <span>Project 4</span>
-                <span class="project-number">04</span>
-            </a>
-            <a href="#" class="project-card">
-                <span>Project 5</span>
-                <span class="project-number">05</span>
-            </a>
+            <div class="projects">
+                <a href="#" class="project-link">
+                    <span>Project 1</span>
+                    <span class="project-meta">01</span>
+                </a>
+                <a href="#" class="project-link">
+                    <span>Project 2</span>
+                    <span class="project-meta">02</span>
+                </a>
+                <a href="#" class="project-link">
+                    <span>Project 3</span>
+                    <span class="project-meta">03</span>
+                </a>
+                <a href="#" class="project-link">
+                    <span>Project 4</span>
+                    <span class="project-meta">04</span>
+                </a>
+                <a href="#" class="project-link">
+                    <span>Project 5</span>
+                    <span class="project-meta">05</span>
+                </a>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- 1. GLOBAL MOUSE TRACKING ---
+        // --- 1. SPOTLIGHT & PARALLAX ---
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
 
@@ -331,84 +336,79 @@
             mouseX = e.clientX;
             mouseY = e.clientY;
 
-            // Update Flashlight Mask
+            // Move the spotlight mask
             document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
             document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
 
-            // --- 2. PARALLAX LEAVES ---
+            // Parallax effect on the black leaves
             document.querySelectorAll('.leaf').forEach(leaf => {
-                const speed = leaf.getAttribute('data-speed');
-                const x = (window.innerWidth - mouseX * speed) / 50;
-                const y = (window.innerHeight - mouseY * speed) / 50;
-                leaf.style.transform = `translateX(${x}px) translateY(${y}px) rotate(${x * 0.5}deg)`;
+                const speed = parseFloat(leaf.getAttribute('data-parallax'));
+                const x = (window.innerWidth / 2 - mouseX) * speed;
+                const y = (window.innerHeight / 2 - mouseY) * speed;
+                leaf.style.transform = `translate(${x}px, ${y}px)`;
             });
 
-            // --- 3. TRACKING EYES ---
+            // --- 2. EYE TRACKING ---
             document.querySelectorAll('.eye').forEach(eye => {
                 const rect = eye.getBoundingClientRect();
-                const eyeCenterX = rect.left + rect.width / 2;
-                const eyeCenterY = rect.top + rect.height / 2;
+                const eyeX = rect.left + rect.width / 2;
+                const eyeY = rect.top + rect.height / 2;
                 
-                // Calculate angle from eye to mouse
-                const angle = Math.atan2(mouseY - eyeCenterY, mouseX - eyeCenterX);
-                
-                // Max distance pupil can move from center
-                const distance = Math.min(6, Math.hypot(mouseX - eyeCenterX, mouseY - eyeCenterY) / 15);
+                const angle = Math.atan2(mouseY - eyeY, mouseX - eyeX);
+                const distance = Math.min(3, Math.hypot(mouseX - eyeX, mouseY - eyeY) / 30); // Max distance pupil moves
                 
                 const pupilX = Math.cos(angle) * distance;
                 const pupilY = Math.sin(angle) * distance;
                 
                 const pupil = eye.querySelector('.pupil');
-                // Adjusting translation since pupil is already -50% -50% centered
                 pupil.style.transform = `translate(calc(-50% + ${pupilX}px), calc(-50% + ${pupilY}px))`;
             });
         });
 
-        // --- 4. EASTER EGG: EYE BLINK & YELLOW FLASH ON CLICK ---
-        document.addEventListener('mousedown', () => {
-            document.querySelectorAll('.eye').forEach(eye => {
-                eye.style.height = '2px'; // Blink shut
-                eye.style.borderColor = 'var(--riso-yellow)';
-                eye.querySelector('.pupil').style.background = 'var(--riso-yellow)';
-            });
-            // Flash particles to yellow briefly
-            particles.forEach(p => p.color = '#ffea00');
-        });
+        // Blinking effect for eyes (Random intervals)
+        setInterval(() => {
+            const eyes = document.querySelectorAll('.eye');
+            // Pick a random eye pair to blink
+            const pairIndex = Math.floor(Math.random() * (eyes.length / 2)) * 2;
+            
+            eyes[pairIndex].style.height = '1px';
+            eyes[pairIndex+1].style.height = '1px';
+            
+            setTimeout(() => {
+                eyes[pairIndex].style.height = '10px';
+                eyes[pairIndex+1].style.height = '10px';
+            }, 150);
+        }, 3000);
 
-        document.addEventListener('mouseup', () => {
-            document.querySelectorAll('.eye').forEach(eye => {
-                eye.style.height = '12px'; // Open
-                eye.style.borderColor = 'var(--riso-magenta)';
-                eye.querySelector('.pupil').style.background = 'var(--riso-magenta)';
-            });
-            // Reset particle colors
-            particles.forEach(p => p.color = Math.random() > 0.5 ? '#ff007f' : '#0088ff');
-        });
-
-        // --- 5. INTERACTIVE INK PARTICLES ---
-        const canvas = document.getElementById('particle-canvas');
+        // --- 3. BLACK SPORE PARTICLES ---
+        const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        
+        let particlesArray =[];
 
-        let particles =[];
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        setCanvasSize();
+        window.addEventListener('resize', setCanvasSize);
 
         class Particle {
             constructor() {
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2.5 + 0.5;
-                this.speedX = Math.random() * 1 - 0.5;
-                this.speedY = Math.random() * 1 - 0.5;
-                // Alternate between Riso Magenta and Blue
-                this.color = Math.random() > 0.5 ? '#ff007f' : '#0088ff';
-                this.baseX = this.x;
-                this.baseY = this.y;
+                // Varying sizes for depth
+                this.size = Math.random() * 3 + 0.5; 
+                this.speedX = (Math.random() * 1) - 0.5;
+                this.speedY = (Math.random() * 1.5) - 0.75;
+                // Slight wobble offset
+                this.angle = Math.random() * Math.PI * 2; 
             }
 
             update() {
-                // Natural drift
-                this.x += this.speedX;
+                this.angle += 0.02;
+                // Drifting motion + wobble
+                this.x += this.speedX + Math.sin(this.angle) * 0.5;
                 this.y += this.speedY;
 
                 // Wrap around edges
@@ -416,23 +416,12 @@
                 if (this.x > canvas.width) this.x = 0;
                 if (this.y < 0) this.y = canvas.height;
                 if (this.y > canvas.height) this.y = 0;
-
-                // Mouse interaction: Particles scatter away from cursor
-                const dx = mouseX - this.x;
-                const dy = mouseY - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                
-                if (distance < 100) {
-                    const forceDirectionX = dx / distance;
-                    const forceDirectionY = dy / distance;
-                    // Push away
-                    this.x -= forceDirectionX * 5;
-                    this.y -= forceDirectionY * 5;
-                }
             }
 
             draw() {
-                ctx.fillStyle = this.color;
+                // Particles are black. They will only be visible when floating 
+                // over the bright spotlight area.
+                ctx.fillStyle = '#000000';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -440,27 +429,22 @@
         }
 
         function initParticles() {
-            particles =[];
-            const particleCount = (window.innerWidth * window.innerHeight) / 10000; // Density
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
+            particlesArray =[];
+            // High density of particles for that dusty, natural feel
+            const numberOfParticles = (canvas.width * canvas.height) / 4000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
             }
         }
 
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
             }
             requestAnimationFrame(animateParticles);
         }
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            initParticles();
-        });
 
         initParticles();
         animateParticles();
