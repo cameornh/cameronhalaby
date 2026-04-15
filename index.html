@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby</title>
+    <title>Cameron Halaby | Selected Works</title>
     
-    <!-- Clean, prestige geometric sans-serif font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Importing bespoke, professional fonts safely via Bunny Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=syne:400,600,700|archivo:300,400,500" rel="stylesheet" />
 
     <style>
         :root {
-            --bg-color: #030303;
-            --text-main: #ffffff;
-            --text-muted: #888888;
-            --glass-bg: rgba(18, 18, 20, 0.4);
+            --bg-color: #020202;
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            --glass-bg: rgba(15, 15, 18, 0.45);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-highlight: rgba(255, 255, 255, 0.15);
             --mouse-x: 50vw;
@@ -32,7 +31,7 @@
             width: 100vw;
             height: 100vh;
             background-color: var(--bg-color);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Archivo', sans-serif;
             overflow: hidden;
             color: var(--text-main);
             -webkit-font-smoothing: antialiased;
@@ -44,10 +43,10 @@
             inset: 0;
             z-index: 100;
             pointer-events: none;
-            opacity: 0.4;
+            opacity: 0.35;
         }
 
-        /* 2. THE PITCH-BLACK BASE */
+        /* 2. PITCH BLACK BASE */
         .base-darkness {
             position: fixed;
             inset: 0;
@@ -55,27 +54,46 @@
             z-index: 0;
         }
 
-        /* 3. ABSTRACT BACKGROUND MESH & SPOTLIGHT */
-        /* This layer contains the abstract pattern, but is masked out except where the mouse is */
-        .spotlight-layer {
+        /* 3. ABSTRACT FLUID MARBLE SPOTLIGHT */
+        .spotlight-wrapper {
             position: fixed;
             inset: 0;
             z-index: 1;
-            /* Abstract topographic/interference pattern using gradients */
-            background-image: 
-                radial-gradient(circle at center, rgba(30, 35, 45, 0.8) 0%, transparent 60%),
-                repeating-radial-gradient(circle at 20% 30%, transparent 0, transparent 30px, rgba(255, 255, 255, 0.03) 31px, transparent 32px),
-                repeating-radial-gradient(circle at 80% 70%, transparent 0, transparent 40px, rgba(255, 255, 255, 0.02) 41px, transparent 42px),
-                repeating-radial-gradient(circle at 50% 100%, transparent 0, transparent 25px, rgba(255, 255, 255, 0.04) 26px, transparent 27px);
-            background-blend-mode: screen;
-            
-            /* The flashlight mask following the mouse */
-            -webkit-mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
-            mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            /* Flashlight mask following the mouse */
+            -webkit-mask-image: radial-gradient(circle 400px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            mask-image: radial-gradient(circle 400px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
             transition: -webkit-mask-image 0.1s ease-out;
         }
 
-        /* 4. PRESTIGE GLASSMORPHISM UI */
+        .fluid-texture {
+            width: 120vw;
+            height: 120vh;
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            /* Base bands of Midnight Blue, Deep Violet, and Magenta */
+            background: repeating-linear-gradient(
+                45deg,
+                #07050f 0%,
+                #110a2b 10%,
+                #2d0b5e 20%,
+                #831568 30%,
+                #07050f 40%
+            );
+            /* The SVG filter warps these straight bands into highly detailed marbled swirls */
+            filter: url(#marble-warp);
+            opacity: 0.8;
+            /* Slow pan to keep the fluid feeling alive */
+            animation: fluidPan 40s linear infinite;
+        }
+
+        @keyframes fluidPan {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-2%, -2%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* 4. EDITORIAL GLASS UI */
         .ui-container {
             position: fixed;
             inset: 0;
@@ -88,185 +106,208 @@
 
         .glass-card {
             position: relative;
-            width: 360px;
-            padding: 45px 40px;
-            border-radius: 16px;
+            width: 400px;
+            padding: 50px 45px;
+            border-radius: 4px; /* Very sharp, straight, professional edges */
             background: var(--glass-bg);
-            backdrop-filter: blur(28px) saturate(1.1);
-            -webkit-backdrop-filter: blur(28px) saturate(1.1);
+            backdrop-filter: blur(35px) saturate(1.2);
+            -webkit-backdrop-filter: blur(35px) saturate(1.2);
             border: 1px solid var(--glass-border);
             border-top: 1px solid var(--glass-highlight);
             border-left: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.95);
             transform-style: preserve-3d;
             transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        /* Frosted / Dithery Texture baked strictly into the glass */
+        /* Frosted Dithery Texture baked inside the glass */
         .glass-card::before {
             content: '';
             position: absolute;
             inset: 0;
-            opacity: 0.12;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.15;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             z-index: -1;
             pointer-events: none;
         }
 
-        /* Ambient interior reflection on the glass */
-        .glass-reflection {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle 300px at var(--mouse-x-rel) var(--mouse-y-rel), rgba(255, 255, 255, 0.05), transparent 60%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
         /* 5. TYPOGRAPHY */
         h1 {
-            font-weight: 600;
-            font-size: 1.6rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: 1.8rem;
             letter-spacing: -0.5px;
-            margin-bottom: 6px;
-            color: #ffffff;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            text-align: center;
             position: relative;
             z-index: 1;
         }
 
         .subtitle {
-            font-weight: 400;
+            font-family: 'Archivo', sans-serif;
+            font-weight: 300;
             font-size: 0.75rem;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 40px;
+            margin-bottom: 45px;
+            text-align: center;
             position: relative;
             z-index: 1;
         }
 
-        /* 6. PROJECT LIST */
+        /* 6. EDITORIAL PROJECT LIST */
         .projects-list {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            width: 100%;
+            gap: 16px;
             position: relative;
             z-index: 1;
-            /* Pops the text off the glass slightly for 3D effect */
-            transform: translateZ(25px);
+            transform: translateZ(25px); /* Pops the text slightly off the glass */
         }
 
         .project-item {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 14px 0;
             text-decoration: none;
             color: var(--text-muted);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
-        }
-
-        .project-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Subtle indicator line on hover */
-        .project-item::before {
-            content: '';
-            position: absolute;
-            left: -15px;
-            top: 50%;
-            transform: translateY(-50%);
-            height: 0;
-            width: 2px;
-            background-color: #ffffff;
-            transition: height 0.3s ease;
-        }
-
-        .project-name {
-            font-weight: 500;
-            font-size: 0.8rem;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            transition: transform 0.3s ease, color 0.3s ease;
+            group: hover;
         }
 
         .project-number {
             font-weight: 300;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-right: 15px;
+            transition: color 0.4s ease;
+        }
+
+        .project-name {
+            font-weight: 500;
             letter-spacing: 1px;
-            opacity: 0.5;
-            transition: opacity 0.3s ease, color 0.3s ease;
+            text-transform: uppercase;
+            transition: color 0.4s ease, transform 0.4s ease;
         }
 
+        /* The straight, subtle connecting line */
+        .project-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--glass-border);
+            margin: 0 15px;
+            transform-origin: left;
+            transition: background-color 0.4s ease, transform 0.4s ease;
+        }
+
+        .project-type {
+            font-weight: 300;
+            font-size: 0.65rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.4;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Hover interactions */
         .project-item:hover {
-            color: #ffffff;
+            color: var(--text-main);
         }
-
-        .project-item:hover::before {
-            height: 50%;
+        
+        .project-item:hover .project-number {
+            color: #d156b8; /* Subtle magenta accent */
         }
 
         .project-item:hover .project-name {
-            transform: translateX(5px);
+            transform: translateX(4px);
         }
 
-        .project-item:hover .project-number {
+        .project-item:hover .project-line {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scaleX(0.95);
+        }
+
+        .project-item:hover .project-type {
             opacity: 1;
-            color: #ffffff;
         }
 
     </style>
 </head>
 <body>
 
-    <!-- SVG Filter for the global noise/grain -->
+    <!-- SVG Filters -->
     <svg style="display: none;">
-        <filter id="global-noise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
-            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.25 0" />
-        </filter>
+        <defs>
+            <!-- Global Noise Overlay -->
+            <filter id="global-noise">
+                <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
+                <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.25 0" />
+            </filter>
+
+            <!-- Complex Fluid/Marble Displacement Filter for Background -->
+            <filter id="marble-warp">
+                <feTurbulence type="fractalNoise" baseFrequency="0.006" numOctaves="4" result="noise" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 -0.5" in="noise" result="coloredNoise" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="250" in="SourceGraphic" in2="coloredNoise" />
+            </filter>
+        </defs>
     </svg>
 
     <!-- Pitch black base layer -->
     <div class="base-darkness"></div>
 
-    <!-- The masked abstract spotlight layer -->
-    <div class="spotlight-layer" id="spotlight"></div>
+    <!-- The masked fluid spotlight layer -->
+    <div class="spotlight-wrapper" id="spotlight">
+        <div class="fluid-texture"></div>
+    </div>
     
-    <!-- Global grain placed over everything -->
+    <!-- Global grain placed over everything for the editorial texture -->
     <div class="grain-overlay" style="backdrop-filter: url(#global-noise);"></div>
 
     <!-- Central Glass UI -->
     <div class="ui-container">
         <div class="glass-card" id="glass-card">
-            <div class="glass-reflection" id="glass-reflection"></div>
             
             <h1>Cameron Halaby</h1>
             <div class="subtitle">Engineering & Design</div>
 
             <nav class="projects-list">
                 <a href="#" class="project-item">
-                    <span class="project-name">Project One</span>
                     <span class="project-number">01</span>
+                    <span class="project-name">Project One</span>
+                    <span class="project-line"></span>
+                    <span class="project-type">Web</span>
                 </a>
                 <a href="#" class="project-item">
-                    <span class="project-name">Project Two</span>
                     <span class="project-number">02</span>
+                    <span class="project-name">Project Two</span>
+                    <span class="project-line"></span>
+                    <span class="project-type">System</span>
                 </a>
                 <a href="#" class="project-item">
-                    <span class="project-name">Project Three</span>
                     <span class="project-number">03</span>
+                    <span class="project-name">Project Three</span>
+                    <span class="project-line"></span>
+                    <span class="project-type">Data</span>
                 </a>
                 <a href="#" class="project-item">
-                    <span class="project-name">Project Four</span>
                     <span class="project-number">04</span>
+                    <span class="project-name">Project Four</span>
+                    <span class="project-line"></span>
+                    <span class="project-type">Design</span>
                 </a>
                 <a href="#" class="project-item">
-                    <span class="project-name">Project Five</span>
                     <span class="project-number">05</span>
+                    <span class="project-name">Project Five</span>
+                    <span class="project-line"></span>
+                    <span class="project-type">Archive</span>
                 </a>
             </nav>
         </div>
@@ -292,33 +333,22 @@
             let tiltY = (mouseX - centerX) / 45;
             
             // 3. DYNAMIC DROP SHADOW
-            // Shadow pushes away from the mouse
+            // Shadow pushes away from the mouse to create physical depth
             const cardRect = glassCard.getBoundingClientRect();
             const cardCenterX = cardRect.left + cardRect.width / 2;
             const cardCenterY = cardRect.top + cardRect.height / 2;
             
-            let shadowX = (cardCenterX - mouseX) / 20;
-            let shadowY = (cardCenterY - mouseY) / 20;
+            let shadowX = (cardCenterX - mouseX) / 25;
+            let shadowY = (cardCenterY - mouseY) / 25;
 
             glassCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-            glassCard.style.boxShadow = `${shadowX}px ${shadowY}px 50px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1)`;
-
-            // 4. INTERNAL GLASS SHEEN
-            // Coordinates relative to the card for the inner reflection
-            let relX = mouseX - cardRect.left;
-            let relY = mouseY - cardRect.top;
-            glassCard.style.setProperty('--mouse-x-rel', `${relX}px`);
-            glassCard.style.setProperty('--mouse-y-rel', `${relY}px`);
+            glassCard.style.boxShadow = `${shadowX}px ${shadowY}px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15)`;
         });
 
-        // Reset elements smoothly when mouse leaves the viewport
+        // Reset elements smoothly when mouse leaves the viewport entirely
         document.addEventListener('mouseleave', () => {
             glassCard.style.transform = `rotateX(0deg) rotateY(0deg)`;
-            glassCard.style.boxShadow = `0 25px 50px rgba(0, 0, 0, 0.9)`;
-            
-            // Move sheen off-screen smoothly
-            glassCard.style.setProperty('--mouse-x-rel', `-500px`);
-            glassCard.style.setProperty('--mouse-y-rel', `-500px`);
+            glassCard.style.boxShadow = `0 30px 60px rgba(0, 0, 0, 0.95)`;
         });
     </script>
 </body>
