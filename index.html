@@ -3,49 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby</title>
-    <meta name="description" content="Official website of Cameron Halaby. Explore my projects, experience, and professional background.">
+    <title>Cameron Halaby | Projects Vault</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 2rem; }
-        header { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 2rem; }
-        h1 { margin: 0; color: #222; }
-        .links a { margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold; }
-        section { margin-bottom: 3rem; }
-        .project { margin-bottom: 1rem; padding: 1rem; background: #f9f9f9; border-radius: 8px; }
+        :root {
+            --bg-color: #e6e6e6;
+            --app-bg: linear-gradient(145deg, #2b2d2f, #1e1e1e);
+            --item-bg: #f5f5f5;
+            --text-dark: #1a1a1a;
+            --text-light: #e0e0e0;
+            --cyan-glow: rgba(0, 255, 200, 0.8);
+            --orange-glow: rgba(255, 165, 0, 0.8);
+            --md-text: #6ba7a5;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 30%, #f0f0f0, #c8c8c8);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            perspective: 1200px; /* Enables the 3D tilt effect */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-style: preserve-3d;
+        }
+
+        /* Top Logo & Name */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            transform: translateZ(50px); /* Pops off the background */
+        }
+
+        .crystal-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 15px 20px rgba(0,0,0,0.3));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .name-title {
+            font-family: 'Georgia', Times, serif;
+            font-size: 3.5rem;
+            margin: 0;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            /* Chromatic aberration effect from Image 1 */
+            text-shadow: 
+                -2px -2px 0px var(--cyan-glow),
+                2px 2px 0px var(--orange-glow);
+        }
+
+        .subtitle {
+            margin-top: 5px;
+            font-size: 1rem;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* The Main Vault Window */
+        .app-window {
+            background: var(--app-bg);
+            width: 480px;
+            border-radius: 20px;
+            padding: 20px 20px 30px 10px;
+            box-shadow: 
+                0 30px 60px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+            display: flex;
+            transition: transform 0.1s ease-out;
+            transform-style: preserve-3d;
+        }
+
+        /* Subtle glowing top border from Image 2 */
+        .app-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff9d00, transparent);
+            box-shadow: 0 2px 10px rgba(255, 157, 0, 0.5);
+        }
+
+        /* Left Sidebar Icons */
+        .sidebar {
+            width: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding-top: 10px;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            margin-right: 20px;
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+
+        /* Project List */
+        .project-list {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .project-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--item-bg);
+            padding: 14px 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            color: var(--text-dark);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            /* Chromatic borders from Image 2 */
+            box-shadow: 
+                0 -2px 4px -2px rgba(255, 150, 0, 0.6), 
+                0 2px 4px -2px rgba(0, 200, 255, 0.6);
+            transform: translateZ(20px);
+        }
+
+        /* 3D Pop Out Hover Effect (Image 1 style) */
+        .project-item:hover {
+            transform: translateZ(40px) translateY(-5px);
+            background: #ffffff;
+            box-shadow: 
+                0 15px 25px rgba(0,0,0,0.3),
+                0 -2px 8px -2px rgba(255, 150, 0, 0.9), 
+                0 2px 8px -2px rgba(0, 200, 255, 0.9);
+        }
+
+        .project-name {
+            font-weight: 600;
+            font-size: 1.05rem;
+            font-family: 'Georgia', Times, serif;
+        }
+
+        /* Adds the subtle chromatic text split on hover */
+        .project-item:hover .project-name {
+            text-shadow: 
+                -0.5px -0.5px 0px rgba(0, 255, 200, 0.8),
+                0.5px 0.5px 0px rgba(255, 165, 0, 0.8);
+        }
+
+        .project-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .file-icon {
+            opacity: 0.6;
+            color: var(--text-light);
+        }
+
+        .file-ext {
+            color: var(--md-text);
+            text-shadow: 0 0 5px rgba(107, 167, 165, 0.3);
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Cameron Halaby</h1>
-        <p>MS in AI at UGA</p>
-        <div class="links">
-            <a href="https://linkedin.com/in/cameronhalaby" target="_blank">LinkedIn</a>
-            <a href="https://github.com/cameornh" target="_blank">GitHub</a>
-            <a href="mailto:crhalaby652@gmail.com">Email Me</a>
+    <div class="container">
+        
+        <div class="header">
+            <!-- Stylized CSS/SVG Crystal -->
+            <svg class="crystal-logo" viewBox="0 0 100 100">
+                <defs>
+                    <linearGradient id="purpleGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#b388ff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#651fff;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="purpleGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#e1bee7;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7e57c2;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <path d="M 40 10 L 60 15 L 75 45 L 65 85 L 45 95 L 20 70 L 25 35 Z" fill="url(#purpleGrad1)"/>
+                <path d="M 40 10 L 60 15 L 50 50 Z" fill="url(#purpleGrad2)" opacity="0.9"/>
+                <path d="M 25 35 L 50 50 L 20 70 Z" fill="#d1c4e9" opacity="0.5"/>
+                <path d="M 60 15 L 75 45 L 50 50 Z" fill="#311b92" opacity="0.4"/>
+            </svg>
+            
+            <h1 class="name-title">Cameron Halaby</h1>
+            <p class="subtitle">Software Engineer & Designer</p>
         </div>
-    </header>
 
-    <section id="about">
-        <h2>About Me</h2>
-        <p>I'm <strong>Cameron Halaby</strong>.</p>
-    </section>
+        <main class="app-window" id="vault-window">
+            
+            <div class="sidebar">
+                <!-- Abstract UI icons representing the sidebar -->
+                <div class="sidebar-icon" style="border-radius: 50%; opacity: 0.5;"></div>
+                <div class="sidebar-icon" style="height: 12px; width: 18px; opacity: 0.3;"></div>
+                <div class="sidebar-icon" style="height: 18px; width: 18px; opacity: 0.2;"></div>
+                <div class="sidebar-icon" style="height: 18px; width: 18px; opacity: 0.1;"></div>
+            </div>
 
-    <section id="projects">
-        <h2>Featured Work</h2>
-        <div class="project">
-            <h3>WIP</h3>
-            <p>Check back later.</p>
-        </div>
-        <div class="project">
-            <h3>WIP</h3>
-            <p>Check back later.</p>
-        </div>
-    </section>
+            <div class="project-list">
+                
+                <!-- Project Item 1 -->
+                <!-- Change the href to point to your repos or live sites -->
+                <a href="#" class="project-item">
+                    <span class="project-name">Neural_Network_Viz</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
 
-    <footer>
-        <p>&copy; 2026 Cameron Halaby</p>
-    </footer>
+                <!-- Project Item 2 -->
+                <a href="#" class="project-item">
+                    <span class="project-name">Fintech_Dashboard</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
 
+                <!-- Project Item 3 -->
+                <a href="#" class="project-item">
+                    <span class="project-name">Data_Scraper_Script</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
+
+                <!-- Project Item 4 -->
+                <a href="#" class="project-item">
+                    <span class="project-name">Portfolio_v1</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
+
+                <!-- Project Item 5 -->
+                <a href="#" class="project-item">
+                    <span class="project-name">Resume_2026</span>
+                    <div class="project-meta">
+                        <span class="file-icon">📄</span>
+                        <span class="file-ext">.MD FILE</span>
+                    </div>
+                </a>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script to create a subtle 3D parallax effect on mouse movement -->
+    <script>
+        const vaultWindow = document.getElementById('vault-window');
+        const container = document.querySelector('.container');
+
+        document.addEventListener('mousemove', (e) => {
+            // Calculate mouse position relative to the center of the screen
+            let xAxis = (window.innerWidth / 2 - e.pageX) / 40;
+            let yAxis = (window.innerHeight / 2 - e.pageY) / 40;
+
+            // Apply the 3D rotation
+            vaultWindow.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+            
+            // Give the container a slight opposing shift to increase depth perception
+            container.style.transform = `translateX(${-xAxis}px) translateY(${-yAxis}px)`;
+        });
+
+        // Reset transform when mouse leaves
+        document.addEventListener('mouseleave', () => {
+            vaultWindow.style.transform = `rotateY(0deg) rotateX(0deg)`;
+            container.style.transform = `translateX(0px) translateY(0px)`;
+        });
+    </script>
 </body>
 </html>
