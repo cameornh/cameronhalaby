@@ -3,329 +3,632 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cameron Halaby</title>
+    <title>Cameron Halaby | WIPe</title>
+    
+    <!-- Importing bespoke, professional fonts safely via Bunny Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:400,500,600,700|archivo:300,400,500" rel="stylesheet" />
+
     <style>
+        /* GLOBAL VARIABLES */
         :root {
-            --bg: #050507;
-            --accent: #fff;
-            --meta: #444;
-            --dim-light: rgba(255, 255, 255, 0.05);
+            --bg-light: #ecece9;
+            --text-dark: #111111;
+            
+            /* Hero specific variables */
+            --mouse-x: 50vw;
+            --mouse-y: 50vh;
+            --mouse-x-rel: 50%;
+            --mouse-y-rel: 50%;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            background: var(--bg);
-            color: var(--accent);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            width: 100vw;
+            background-color: var(--bg-light); /* The rest of the site is light cream */
+            font-family: 'Archivo', sans-serif;
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            height: 100%;
-            cursor: none; /* Custom light source replaces cursor */
         }
 
-        /* --- THE LIGHTING CANVAS --- */
-        #light-canvas {
+        /* =========================================
+           1. NAVIGATION (Blend Mode trick)
+           ========================================= */
+        .site-header {
             position: fixed;
             top: 0;
-            left: 0;
-            z-index: 1;
-            pointer-events: none;
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none; /* Let clicks pass through */
         }
 
-        /* --- UI OVERLAY --- */
-        .interface {
-            position: relative;
-            z-index: 10;
-            padding: 4vw;
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            grid-gap: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        header {
-            grid-column: 1 / -1;
-            margin-bottom: 10vh;
-        }
-
-        h1 {
+        .header-logo, .header-nav a {
+            pointer-events: auto;
+            text-decoration: none;
+            font-family: 'Archivo', sans-serif;
             font-size: 0.8rem;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            letter-spacing: 0.5rem;
-            font-weight: 300;
-            margin: 0;
-            color: var(--accent);
-            opacity: 0.8;
+            font-weight: 500;
+            /* This makes the text white on the black hero, and black on the cream body */
+            color: #ffffff;
+            mix-blend-mode: difference; 
         }
 
-        /* --- CAROUSEL (Main Observation) --- */
-        .carousel-container {
-            grid-column: 1 / 9;
-            aspect-ratio: 16 / 9;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.1);
+        .header-nav {
+            display: flex;
+            gap: 40px;
+        }
+
+        /* =========================================
+           2. HERO SECTION (The Dark Spotlight)
+           ========================================= */
+        .hero-section {
             position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .slide {
+        .hero-base-darkness {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 1s ease;
-            font-size: 0.7rem;
-            letter-spacing: 0.2rem;
-            text-transform: uppercase;
-            color: var(--meta);
+            inset: 0;
+            background-color: #000000;
+            z-index: 0;
         }
 
-        .slide.active { opacity: 1; }
-
-        /* --- THE FOUR SQUARES (Optical Obstacles) --- */
-        .square-grid {
-            grid-column: 9 / -1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 20px;
+        .spotlight-wrapper {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            /* Flashlight mask */
+            -webkit-mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            mask-image: radial-gradient(circle 450px at var(--mouse-x) var(--mouse-y), rgba(0,0,0,1) 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0) 100%);
+            transition: -webkit-mask-image 0.1s ease-out;
         }
 
-        .obstacle {
-            aspect-ratio: 1;
-            background: rgba(255,255,255,0.01);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            color: var(--meta);
-            text-transform: uppercase;
+        .fluid-texture {
+            width: 120vw;
+            height: 120vh;
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            /* Base bands of Midnight Blue and Deep Magenta */
+            background: repeating-linear-gradient(
+                45deg,
+                #020105 0%,
+                #08031a 10%,
+                #180536 20%,
+                #5c0d48 30%,
+                #020105 40%
+            );
+            /* The enhanced SVG dither filter */
+            filter: url(#dithered-marble);
+            opacity: 0.95;
+            animation: fluidPan 40s linear infinite;
+        }
+
+        @keyframes fluidPan {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-2%, -2%); }
+            100% { transform: translate(0, 0); }
+        }
+
+        /* Hero Editorial Glass UI */
+        .hero-ui {
             position: relative;
-            transition: border 0.3s ease;
+            z-index: 10;
+            perspective: 2000px;
         }
 
-        /* --- PROJECT LIST --- */
-        .projects-wrap {
-            grid-column: 1 / 5;
-            margin-top: 5vh;
+        .glass-card {
+            position: relative;
+            width: 420px;
+            padding: 55px 50px;
+            border-radius: 4px;
+            background: rgba(12, 12, 15, 0.4);
+            backdrop-filter: blur(35px) saturate(1.1);
+            -webkit-backdrop-filter: blur(35px) saturate(1.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.95);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .project-item {
-            padding: 1.5rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        /* Frosted texture inside the glass */
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.2;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* The Gleam Typography */
+        .hero-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 3rem;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            
+            /* Dynamic gleam gradient */
+            background-image: radial-gradient(
+                circle 140px at var(--mouse-x-rel) var(--mouse-y-rel),
+                #ffffff 0%,     
+                #d1d5db 20%,    
+                #52525b 60%,    
+                #27272a 100%    
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+        }
+
+        .hero-subtitle {
+            font-weight: 300;
+            font-size: 0.75rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #8a8a93;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .hero-projects {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 16px;
+            transform: translateZ(25px);
+        }
+
+        .hero-project-item {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #8a8a93;
+            font-size: 0.85rem;
+            transition: all 0.4s ease;
+        }
+
+        .hp-num { font-weight: 300; font-size: 0.7rem; opacity: 0.5; margin-right: 15px; transition: color 0.4s ease; }
+        .hp-name { font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; transition: transform 0.4s ease; }
+        .hp-line { flex-grow: 1; height: 1px; background-color: rgba(255, 255, 255, 0.08); margin: 0 15px; transform-origin: left; transition: background-color 0.4s ease, transform 0.4s ease; }
+        .hp-type { font-weight: 300; font-size: 0.65rem; letter-spacing: 1px; text-transform: uppercase; opacity: 0.3; transition: opacity 0.4s ease; }
+
+        .hero-project-item:hover { color: #f4f4f5; }
+        .hero-project-item:hover .hp-num { color: #d156b8; }
+        .hero-project-item:hover .hp-name { transform: translateX(4px); }
+        .hero-project-item:hover .hp-line { background-color: rgba(255, 255, 255, 0.25); transform: scaleX(0.95); }
+        .hero-project-item:hover .hp-type { opacity: 1; }
+
+        /* =========================================
+           3. TEMPLATE SECTIONS (Obsidian Style)
+           ========================================= */
+        .page-section {
+            padding: 120px 10%;
+            background: radial-gradient(circle at 50% 0%, #ffffff 0%, var(--bg-light) 70%);
+            min-height: 100vh;
+        }
+
+        .section-header {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3.5rem;
+            font-weight: 500;
+            color: #1a1a1c;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+        }
+
+        /* The Dark Floating Cards Layout */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+        }
+
+        /* The Obsidian Card Style */
+        .obs-card {
+            background: linear-gradient(145deg, #2b2b2e 0%, #161618 100%);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 35px 65px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15);
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.2s ease-out;
+        }
+
+        /* Glowing Top Sheen */
+        .obs-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 15%; right: 15%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.7), transparent);
+            box-shadow: 0 2px 12px rgba(255, 165, 0, 0.5);
+            z-index: 2;
+        }
+
+        /* Card Header */
+        .obs-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            transform: translateZ(20px); /* 3D pop */
+        }
+
+        .obs-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #a78bfa, #7c3aed);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .obs-title {
+            color: #ffffff;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Inner Light List Items (Chromatic Aberration Borders) */
+        .obs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transform: translateZ(10px);
+        }
+
+        .obs-item {
+            background: #f4f4f6;
+            padding: 12px 18px;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.4s ease;
-            position: relative;
+            color: #111;
+            font-weight: 500;
+            font-size: 0.9rem;
+            /* Subtly splits the shadow into Cyan (top) and Orange (bottom) */
+            box-shadow: 
+                0 -2px 4px -2px rgba(0, 200, 255, 0.7),
+                0 2px 4px -2px rgba(255, 120, 0, 0.7);
+            transition: transform 0.3s ease, background 0.3s ease;
+            cursor: pointer;
         }
 
-        .project-item:hover {
-            padding-left: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.4);
+        .obs-item:hover {
+            transform: translateY(-2px) scale(1.02);
+            background: #ffffff;
         }
 
-        .project-name {
-            font-size: 1.2rem;
-            font-weight: 300;
-        }
-
-        .project-meta {
+        .obs-item-meta {
             font-size: 0.7rem;
-            color: var(--meta);
+            color: #64748b;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        /* --- LIGHT EMITTER (CURSOR) --- */
-        #emitter {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            background: #fff;
-            border-radius: 50%;
-            z-index: 100;
-            pointer-events: none;
-            box-shadow: 0 0 20px #fff, 0 0 40px rgba(255,255,255,0.5);
+        /* Subtly chromatic text effect for the meta data */
+        .chromatic-text {
+            text-shadow: 
+                -0.5px -0.5px 0px rgba(0, 255, 200, 0.5),
+                0.5px 0.5px 0px rgba(255, 100, 0, 0.5);
         }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .carousel-container, .square-grid, .projects-wrap {
-                grid-column: 1 / -1;
-            }
+        /* =========================================
+           4. FOOTER
+           ========================================= */
+        .site-footer {
+            background-color: #111111;
+            color: #888;
+            padding: 60px 10%;
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
+
     </style>
 </head>
 <body>
 
-    <div id="emitter"></div>
-    <canvas id="light-canvas"></canvas>
+    <!-- =========================================
+         SVG FILTERS
+         ========================================= -->
+    <svg style="display: none;">
+        <defs>
+            <!-- Heavy Retro Dither Filter for the Hero -->
+            <filter id="dithered-marble" x="-20%" y="-20%" width="140%" height="140%">
+                <!-- 1. Generate Fluid Displacement -->
+                <feTurbulence type="fractalNoise" baseFrequency="0.003" numOctaves="2" result="fluidNoise" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 4 -1.5" in="fluidNoise" result="fluidContrast" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="400" in="SourceGraphic" in2="fluidContrast" result="marbled" />
 
-    <div class="interface">
-        <header>
-            <h1>Cameron Halaby</h1>
-        </header>
+                <!-- 2. Generate High-Frequency Noise for Dithering -->
+                <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="1" result="ditherNoise" />
+                <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 8 -3" in="ditherNoise" result="sharpDither" />
 
-        <!-- Dynamic Carousel -->
-        <div class="carousel-container obstacle" id="main-portal">
-            <div class="slide active">Observation_Node_01</div>
-            <div class="slide">Observation_Node_02</div>
-            <div class="slide">Observation_Node_03</div>
+                <!-- 3. Blend them together -->
+                <feComposite operator="arithmetic" k1="0" k2="0.8" k3="0.4" k4="0" in="marbled" in2="sharpDither" result="mixed" />
+                
+                <!-- 4. Strict Component Transfer crushes colors into discrete pixelated bands -->
+                <feComponentTransfer in="mixed">
+                    <feFuncR type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
+                    <feFuncG type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
+                    <feFuncB type="discrete" tableValues="0 0.15 0.4 0.7 1"/>
+                </feComponentTransfer>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- =========================================
+         SITE HEADER
+         ========================================= -->
+    <nav class="site-header">
+        <a href="#" class="header-logo">C. Halaby</a>
+        <div class="header-nav">
+            <a href="#work">Projects</a>
+            <a href="#about">About</a>
+            <a href="#contact">Contact</a>
         </div>
+    </nav>
 
-        <!-- Four Square Obstacles -->
-        <div class="square-grid">
-            <div class="obstacle">Sensor_A</div>
-            <div class="obstacle">Sensor_B</div>
-            <div class="obstacle">Sensor_C</div>
-            <div class="obstacle">Sensor_D</div>
-        </div>
+    <main>
+        <!-- =========================================
+             HERO SECTION (Dark)
+             ========================================= -->
+        <section class="hero-section" id="hero">
+            <div class="hero-base-darkness"></div>
+            
+            <div class="spotlight-wrapper" id="spotlight">
+                <div class="fluid-texture"></div>
+            </div>
 
-        <!-- Projects -->
-        <div class="projects-wrap">
-            <div class="project-item">
-                <span class="project-name">Project 1</span>
-                <span class="project-meta">2024 / TRACE</span>
-            </div>
-            <div class="project-item">
-                <span class="project-name">Project 2</span>
-                <span class="project-meta">2023 / SCATTER</span>
-            </div>
-            <div class="project-item">
-                <span class="project-name">Project 3</span>
-                <span class="project-meta">2023 / REFRACT</span>
-            </div>
-            <div class="project-item">
-                <span class="project-name">Project 4</span>
-                <span class="project-meta">2022 / PHASE</span>
-            </div>
-        </div>
-    </div>
+            <div class="hero-ui">
+                <div class="glass-card" id="glass-card">
+                    <h1 class="hero-name">Cameron Halaby</h1>
+                    <div class="hero-subtitle">AI, ML, DS, CS</div>
 
+                    <nav class="hero-projects">
+                        <a href="#" class="hero-project-item">
+                            <span class="hp-num">01</span>
+                            <span class="hp-name">Project One</span>
+                            <span class="hp-line"></span>
+                            <span class="hp-type">WIP, Check back later</span>
+                        </a>
+                        <a href="#" class="hero-project-item">
+                            <span class="hp-num">02</span>
+                            <span class="hp-name">Project Two</span>
+                            <span class="hp-line"></span>
+                            <span class="hp-type">WIP, Check back later</span>
+                        </a>
+                        <a href="#" class="hero-project-item">
+                            <span class="hp-num">03</span>
+                            <span class="hp-name">Project Three</span>
+                            <span class="hp-line"></span>
+                            <span class="hp-type">WIP, Check back later</span>
+                        </a>
+                        <a href="#" class="hero-project-item">
+                            <span class="hp-num">04</span>
+                            <span class="hp-name">Project Four</span>
+                            <span class="hp-line"></span>
+                            <span class="hp-type">WIP, Check back later</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- =========================================
+             GALLERY SECTION (Light Cream)
+             ========================================= -->
+        <section class="page-section" id="work">
+            <div class="section-header">
+                <h2 class="section-title">Template Gallery</h2>
+                <p class="section-subtitle">Components</p>
+            </div>
+
+            <div class="card-grid">
+                
+                <!-- Obsidian Card 1 -->
+                <div class="obs-card">
+                    <div class="obs-header">
+                        <div class="obs-icon"></div>
+                        <h3 class="obs-title">Vault Alpha</h3>
+                    </div>
+                    <div class="obs-list">
+                        <div class="obs-item">
+                            <span>New Note 1</span>
+                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
+                        </div>
+                        <div class="obs-item">
+                            <span>New Note 2</span>
+                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
+                        </div>
+                        <div class="obs-item">
+                            <span>New Note 3</span>
+                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
+                        </div>
+                        <div class="obs-item">
+                            <span>New Note 4</span>
+                            <span class="obs-item-meta chromatic-text">📄 .MD FILE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Obsidian Card 2 -->
+                <div class="obs-card">
+                    <div class="obs-header">
+                        <div class="obs-icon" style="background: linear-gradient(135deg, #60a5fa, #2563eb);"></div>
+                        <h3 class="obs-title">Vault Beta</h3>
+                    </div>
+                    <div class="obs-list">
+                        <div class="obs-item">
+                            <span>Component A</span>
+                            <span class="obs-item-meta chromatic-text">⚙️ CONFIG</span>
+                        </div>
+                        <div class="obs-item">
+                            <span>Component B</span>
+                            <span class="obs-item-meta chromatic-text">⚙️ CONFIG</span>
+                        </div>
+                        <div class="obs-item">
+                            <span>Component C</span>
+                            <span class="obs-item-meta chromatic-text">⚙️ CONFIG</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================================
+             FEATURES SECTION (Light Cream)
+             ========================================= -->
+        <section class="page-section" id="about">
+            <div class="section-header">
+                <h2 class="section-title">Another Section</h2>
+                <p class="section-subtitle">Additional Template Content</p>
+            </div>
+            
+            <div class="card-grid">
+                <div class="obs-card">
+                    <div class="obs-header">
+                        <div class="obs-icon" style="background: linear-gradient(135deg, #f43f5e, #e11d48);"></div>
+                        <h3 class="obs-title">Module X</h3>
+                    </div>
+                    <div class="obs-list">
+                        <div class="obs-item">
+                            <span>System Log 01</span>
+                            <span class="obs-item-meta chromatic-text">TXT</span>
+                        </div>
+                        <div class="obs-item">
+                            <span>System Log 02</span>
+                            <span class="obs-item-meta chromatic-text">TXT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- =========================================
+         FOOTER
+         ========================================= -->
+    <footer class="site-footer">
+        <p>2026 Cameron Halaby. No rights reserved.</p>
+    </footer>
+
+    <!-- =========================================
+         INTERACTION SCRIPTS
+         ========================================= -->
     <script>
-        const canvas = document.getElementById('light-canvas');
-        const ctx = canvas.getContext('2d');
-        const emitter = document.getElementById('emitter');
-        let obstacles = [];
-        let mouse = { x: -1000, y: -1000 };
+        // --- 1. HERO SECTION LOGIC ---
+        const heroSection = document.getElementById('hero');
+        const glassCard = document.getElementById('glass-card');
 
-        // Handle Resize
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            // Map the DOM elements as physical obstacles for the light engine
-            updateObstacles();
-        }
+        heroSection.addEventListener('mousemove', (e) => {
+            // Get coordinates relative to the hero section for the spotlight
+            const heroRect = heroSection.getBoundingClientRect();
+            const mouseX = e.clientX - heroRect.left;
+            const mouseY = e.clientY - heroRect.top;
+            
+            // Update Spotlight
+            heroSection.style.setProperty('--mouse-x', `${mouseX}px`);
+            heroSection.style.setProperty('--mouse-y', `${mouseY}px`);
 
-        function updateObstacles() {
-            const elements = document.querySelectorAll('.obstacle, .project-item');
-            obstacles = Array.from(elements).map(el => {
-                const rect = el.getBoundingClientRect();
-                return {
-                    x: rect.left,
-                    y: rect.top,
-                    w: rect.width,
-                    h: rect.height,
-                    center: { x: rect.left + rect.width/2, y: rect.top + rect.height/2 }
-                };
-            });
-        }
+            // Update Glass Gleam Text relative to the card itself
+            const cardRect = glassCard.getBoundingClientRect();
+            let relX = e.clientX - cardRect.left;
+            let relY = e.clientY - cardRect.top;
+            glassCard.style.setProperty('--mouse-x-rel', `${relX}px`);
+            glassCard.style.setProperty('--mouse-y-rel', `${relY}px`);
 
-        window.addEventListener('resize', resize);
-        window.addEventListener('mousemove', e => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-            emitter.style.left = mouse.x + 'px';
-            emitter.style.top = mouse.y + 'px';
+            // 3D Glass Tilt
+            const centerX = heroRect.width / 2;
+            const centerY = heroRect.height / 2;
+            let tiltX = (centerY - mouseY) / 60;
+            let tiltY = (mouseX - centerX) / 60;
+            
+            // Dynamic Drop Shadow
+            const cardCenterX = cardRect.left + cardRect.width / 2;
+            const cardCenterY = cardRect.top + cardRect.height / 2;
+            let shadowX = (cardCenterX - e.clientX) / 25;
+            let shadowY = (cardCenterY - e.clientY) / 25;
+
+            glassCard.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            glassCard.style.boxShadow = `${shadowX}px ${shadowY}px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15)`;
         });
 
-        // Simple Raycasting Logic for Geometric Shadows
-        function drawShadows() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Ambient background glow
-            const ambient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 800);
-            ambient.addColorStop(0, 'rgba(255,255,255,0.08)');
-            ambient.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = ambient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        heroSection.addEventListener('mouseleave', () => {
+            glassCard.style.transform = `rotateX(0deg) rotateY(0deg)`;
+            glassCard.style.boxShadow = `0 30px 60px rgba(0, 0, 0, 0.95)`;
+            glassCard.style.setProperty('--mouse-x-rel', `-500px`);
+            glassCard.style.setProperty('--mouse-y-rel', `-500px`);
+        });
 
-            obstacles.forEach(ob => {
-                // Calculate vector from light to obstacle
-                const points = [
-                    {x: ob.x, y: ob.y},
-                    {x: ob.x + ob.w, y: ob.y},
-                    {x: ob.x + ob.w, y: ob.y + ob.h},
-                    {x: ob.x, y: ob.y + ob.h}
-                ];
 
-                ctx.fillStyle = 'rgba(0,0,0,0.95)';
-                ctx.beginPath();
+        // --- 2. OBSIDIAN CARDS 3D LOGIC ---
+        // Adds a subtle, premium 3D tilt interaction to the dark gallery cards
+        document.querySelectorAll('.obs-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
                 
-                // For each edge of the rectangle, project a shadow volume
-                points.forEach((p, i) => {
-                    const nextP = points[(i + 1) % 4];
-                    
-                    // Project points away from mouse
-                    const angle1 = Math.atan2(p.y - mouse.y, p.x - mouse.x);
-                    const angle2 = Math.atan2(nextP.y - mouse.y, nextP.x - mouse.x);
-                    
-                    const dist = 3000; // Project shadows into "infinity"
-                    
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(p.x + Math.cos(angle1) * dist, p.y + Math.sin(angle1) * dist);
-                    ctx.lineTo(nextP.x + Math.cos(angle2) * dist, nextP.y + Math.sin(angle2) * dist);
-                    ctx.lineTo(nextP.x, nextP.y);
-                });
-                ctx.fill();
-
-                // Add a "specular" hit on the edge facing the mouse
-                ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(ob.x, ob.y, ob.w, ob.h);
+                // Calculate subtle rotation
+                const rotateX = ((y - centerY) / centerY) * -4;
+                const rotateY = ((x - centerX) / centerX) * 4;
+                
+                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
             });
 
-            // Chromatic Aberration - Red/Blue dispersion fringes
-            ctx.globalCompositeOperation = 'screen';
-            drawFringe(2, 'rgba(255,0,0,0.05)');
-            drawFringe(-2, 'rgba(0,100,255,0.05)');
-            ctx.globalCompositeOperation = 'source-over';
-
-            requestAnimationFrame(drawShadows);
-        }
-
-        function drawFringe(offset, color) {
-            ctx.fillStyle = color;
-            obstacles.forEach(ob => {
-                const angle = Math.atan2(ob.center.y - mouse.y, ob.center.x - mouse.x);
-                ctx.save();
-                ctx.translate(Math.cos(angle) * offset, Math.sin(angle) * offset);
-                ctx.fillRect(ob.x, ob.y, ob.w, ob.h);
-                ctx.restore();
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0)`;
             });
-        }
-
-        // Simple Carousel
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 4000);
-
-        // Init
-        resize();
-        drawShadows();
-        // Periodically update obstacle positions in case of layout shifts
-        setInterval(updateObstacles, 2000);
-
+        });
     </script>
 </body>
 </html>
