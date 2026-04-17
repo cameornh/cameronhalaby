@@ -44,6 +44,36 @@
         }
         .header-nav { display: flex; gap: 40px; }
 
+        /* FLOATING AUDIO PLAYER */
+        .audio-player {
+            position: fixed;
+            bottom: 30px;
+            right: 40px;
+            z-index: 9999;
+            font-family: 'Archivo', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ffffff;
+            mix-blend-mode: difference;
+            pointer-events: none;
+            opacity: 0; /* Fades in after user clicks the page */
+            transition: opacity 1.5s ease;
+        }
+        .audio-player a {
+            color: inherit;
+            text-decoration: none;
+            pointer-events: auto; /* Allow clicking the link */
+        }
+        .audio-player u {
+            text-underline-offset: 4px;
+            text-decoration-thickness: 1px;
+            transition: color 0.3s ease;
+        }
+        .audio-player a:hover u {
+            color: #a78bfa; /* Subtle highlight on hover */
+        }
+
         /* HERO SECTION */
         .hero-section {
             position: relative; width: 100vw; height: 100vh; background-color: #000000; overflow: hidden;
@@ -122,7 +152,7 @@
         .obs-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #a78bfa, #7c3aed); border-radius: 12px; }
         .obs-title { color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; }
 
-        /* 1:6 FULL WIDTH SLIDESHOW STRIP */
+        /* 1:6 FULL WIDTH IMAGE SLIDESHOW STRIP */
         .slideshow-section {
             width: 100vw;
             padding: 0;
@@ -135,6 +165,21 @@
             background: #000;
             overflow: hidden;
         }
+        
+        /* Enhanced Vignette & Darkening Layer */
+        .slideshow-wrapper::before {
+            content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+            background: linear-gradient(90deg, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.5) 20%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.98) 100%);
+            box-shadow: inset 0 30px 60px rgba(0,0,0,0.7), inset 0 -30px 60px rgba(0,0,0,0.7);
+        }
+        
+        /* Stronger Floyd-Steinberg Style Dither Overlay */
+        .slideshow-wrapper::after {
+            content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; 
+            opacity: 0.45; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 6 -2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
         .slide {
             position: absolute;
             inset: 0;
@@ -143,7 +188,7 @@
             display: flex;
             align-items: flex-end;
         }
-        .slide.active { opacity: 1; z-index: 5; }
+        .slide.active { opacity: 1; z-index: 2; }
         .slide img {
             position: absolute;
             inset: 0;
@@ -154,7 +199,7 @@
         }
         .slide-caption {
             position: relative;
-            z-index: 2;
+            z-index: 5;
             width: 100%;
             padding: 30px 40px 20px 40px;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
@@ -236,7 +281,11 @@
         /* CONTACT SECTION SPECIFICS */
         .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
         .contact-card { display: flex; align-items: center; gap: 20px; padding: 20px 25px; text-decoration: none; color: var(--text-color); }
-        .contact-card .obs-icon { width: 35px; height: 35px; flex-shrink: 0; border-radius: 8px; transform: translateZ(10px); }
+        .contact-card .obs-icon { 
+            width: 35px; height: 35px; flex-shrink: 0; border-radius: 8px; transform: translateZ(10px); 
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+        }
         .contact-card .obs-title { font-size: 1.4rem; transform: translateZ(10px); }
         .request-cv-btn {
             display: inline-block; font-family: 'Archivo', sans-serif; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px;
@@ -280,6 +329,11 @@
         </div>
     </nav>
 
+    <!-- FLOATING AUDIO PLAYER -->
+    <div class="audio-player" id="audio-player">
+        Playing <a href="#music"><u id="track-name">Loading...</u></a>
+    </div>
+
     <main>
         <section class="hero-section" id="hero">
             <div class="hero-base-darkness"></div>
@@ -290,10 +344,9 @@
                     <h1 class="hero-name">Cameron Halaby</h1>
                     <div class="hero-subtitle">AI, ML, DS, CS</div>
                     <nav class="hero-projects">
-                        <a href="#" class="hero-project-item"><span class="hp-num">01</span><span class="hp-name">Project One</span><span class="hp-line"></span><span class="hp-type">Under Construction</span></a>
-                        <a href="#" class="hero-project-item"><span class="hp-num">02</span><span class="hp-name">Project Two</span><span class="hp-line"></span><span class="hp-type">Under Construction</span></a>
-                        <a href="#" class="hero-project-item"><span class="hp-num">03</span><span class="hp-name">Project Three</span><span class="hp-line"></span><span class="hp-type">Under Construction</span></a>
-                        <a href="#" class="hero-project-item"><span class="hp-num">04</span><span class="hp-name">Project Four</span><span class="hp-line"></span><span class="hp-type">Under Construction</span></a>
+                        <a href="#projects" class="hero-project-item"><span class="hp-num">01</span><span class="hp-name">Project One</span><span class="hp-line"></span><span class="hp-type">Under Construction. Check Back Later</span></a>
+                        <a href="#projects" class="hero-project-item"><span class="hp-num">02</span><span class="hp-name">Project Two</span><span class="hp-line"></span><span class="hp-type">Under Construction. Check Back Later</span></a>
+                        <a href="#projects" class="hero-project-item"><span class="hp-num">03</span><span class="hp-name">Project Three</span><span class="hp-line"></span><span class="hp-type">Under Construction. Check Back Later</span></a>
                     </nav>
                 </div>
             </div>
@@ -417,9 +470,9 @@
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Guess my favorite song</p>
                     <div class="obs-list quiz-container">
-                        <div class="obs-item quiz-option" onclick="checkAnswer(this, true)"><span>September - Earth, Wind & Fire</span></div>
+                        <div class="obs-item quiz-option" data-correct="true" onclick="checkAnswer(this, true)"><span>September - Earth, Wind & Fire</span></div>
                         <div class="obs-item quiz-option" data-correct="true" onclick="checkAnswer(this, true)"><span>Tasogare - Mai Yamane</span></div>
-                        <div class="obs-item quiz-option" onclick="checkAnswer(this, true)"><span>What's Going On - Marvin Gaye</span></div>
+                        <div class="obs-item quiz-option" data-correct="true" onclick="checkAnswer(this, true)"><span>What's Going On - Marvin Gaye</span></div>
                     </div>
                 </div>
 
@@ -430,8 +483,8 @@
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">What is my preferred coding environment?</p>
                     <div class="obs-list quiz-container">
-                        <div class="obs-item quiz-option" onclick="checkAnswer(this, true)"><span>VS Code</span></div>
-                        <div class="obs-item quiz-option" data-correct="true" onclick="checkAnswer(this, false)"><span>Obsidian / Vim</span></div>
+                        <div class="obs-item quiz-option" data-correct="true" onclick="checkAnswer(this, true)"><span>VS Code</span></div>
+                        <div class="obs-item quiz-option" onclick="checkAnswer(this, false)"><span>Obsidian / Vim</span></div>
                         <div class="obs-item quiz-option" onclick="checkAnswer(this, false)"><span>Sublime Text</span></div>
                     </div>
                 </div>
@@ -460,23 +513,41 @@
             </div>
             
             <div class="contact-grid">
-                <a href="mailto:crhalaby652@gmail.com" class="obs-card contact-card">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #10b981, #047857);"></div><h3 class="obs-title">Email</h3>
+                <a href="https://www.linkedin.com/in/cameronhalaby/" class="obs-card contact-card">
+                    <div class="obs-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                    </div>
+                    <h3 class="obs-title">LinkedIn</h3>
                 </a>
                 <a href="https://www.youtube.com/@cameronhalaby" class="obs-card contact-card">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #ef4444, #be123c);"></div><h3 class="obs-title">YouTube</h3>
+                    <div class="obs-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+                    </div>
+                    <h3 class="obs-title">YouTube</h3>
                 </a>
                 <a href="https://github.com/cameornh" class="obs-card contact-card">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #4b5563, #1f2937);"></div><h3 class="obs-title">GitHub</h3>
+                    <div class="obs-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                    </div>
+                    <h3 class="obs-title">GitHub</h3>
                 </a>
                 <a href="https://cara.app/cameornh" class="obs-card contact-card">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #d946ef, #9333ea);"></div><h3 class="obs-title">Cara</h3>
+                    <div class="obs-icon">
+                        <span style="color:#fff; font-family:'Cormorant Garamond',serif; font-weight:700; font-size:22px;">C</span>
+                    </div>
+                    <h3 class="obs-title">Cara</h3>
                 </a>
                 <a href="https://musescore.com/user/29944764" class="obs-card contact-card">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);"></div><h3 class="obs-title">Musescore</h3>
+                    <div class="obs-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                    </div>
+                    <h3 class="obs-title">Musescore</h3>
                 </a>
                 <a href="https://www.instagram.com/cameronhalaby" class="obs-card contact-card">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #f59e0b, #b45309);"></div><h3 class="obs-title">Instagram</h3>
+                    <div class="obs-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </div>
+                    <h3 class="obs-title">Instagram</h3>
                 </a>
             </div>
 
@@ -530,16 +601,87 @@
         const months =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         footerDate.innerText = `Updated ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
-        // --- 3. SLIDESHOW LOGIC ---
+        // --- 3. BACKGROUND AUDIO PLAYER LOGIC WITH CROSSFADE ---
+        // Add your repository MP3 paths here:
+        const playlist =[
+            { name: "SoundHelix_01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "SoundHelix_02", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+        ];
+        
+        let currentTrack = 0;
+        let hasStartedAudio = false;
+        let isFadingOut = false;
+        let fadeInterval;
+        const fadeDurationMs = 2000; // 2 seconds fade in/out
+        
+        const audioObj = new Audio();
+        const playerUI = document.getElementById('audio-player');
+        const trackNameUI = document.getElementById('track-name');
+
+        function playTrack(index) {
+            currentTrack = index;
+            audioObj.src = playlist[currentTrack].src;
+            trackNameUI.innerText = playlist[currentTrack].name;
+            audioObj.volume = 0; // Start at 0 for fade-in
+            isFadingOut = false;
+            
+            audioObj.play().then(() => {
+                playerUI.style.opacity = 1;
+                
+                // Fade In
+                clearInterval(fadeInterval);
+                fadeInterval = setInterval(() => {
+                    if (audioObj.volume < 0.95) {
+                        audioObj.volume += 0.05;
+                    } else {
+                        audioObj.volume = 1;
+                        clearInterval(fadeInterval);
+                    }
+                }, fadeDurationMs / 20);
+
+            }).catch(e => console.log("Audio prevented by browser rules."));
+        }
+
+        // Monitor time to trigger Fade Out
+        audioObj.addEventListener('timeupdate', () => {
+            if (!isFadingOut && audioObj.duration && (audioObj.duration - audioObj.currentTime) <= (fadeDurationMs / 1000)) {
+                isFadingOut = true;
+                clearInterval(fadeInterval);
+                
+                fadeInterval = setInterval(() => {
+                    if (audioObj.volume > 0.05) {
+                        audioObj.volume -= 0.05;
+                    } else {
+                        audioObj.volume = 0;
+                        clearInterval(fadeInterval);
+                    }
+                }, fadeDurationMs / 20);
+            }
+        });
+
+        audioObj.addEventListener('ended', () => {
+            playTrack((currentTrack + 1) % playlist.length);
+        });
+
+        // Initiate audio on first user click anywhere
+        document.body.addEventListener('click', () => {
+            if(!hasStartedAudio) {
+                hasStartedAudio = true;
+                playTrack(currentTrack);
+            }
+        }, { once: true });
+
+
+        // --- 4. SLIDESHOW LOGIC ---
         const slides = document.querySelectorAll('.slide');
         let currentSlide = 0;
         setInterval(() => {
             slides[currentSlide].classList.remove('active');
             currentSlide = (currentSlide + 1) % slides.length;
             slides[currentSlide].classList.add('active');
-        }, 8000); // Transitions smoothly every 8 seconds
+        }, 8000); 
 
-        // --- 4. LIGHTBOX LOGIC ---
+        // --- 5. LIGHTBOX LOGIC ---
         function openLightbox(src) {
             document.getElementById('lightbox-img').src = src;
             document.getElementById('lightbox').classList.add('active');
@@ -548,10 +690,10 @@
             document.getElementById('lightbox').classList.remove('active');
         }
 
-        // --- 5. QUIZ LOGIC ---
+        // --- 6. QUIZ LOGIC (UPDATED: Only highlights guessed option) ---
         function checkAnswer(element, isCorrect) {
             const container = element.parentElement;
-            if(container.classList.contains('answered')) return; // Prevent multiple clicks
+            if(container.classList.contains('answered')) return; 
             
             container.classList.add('answered');
             const options = container.querySelectorAll('.quiz-option');
@@ -559,13 +701,12 @@
             options.forEach(opt => {
                 if (opt === element) {
                     opt.classList.add(isCorrect ? 'correct' : 'wrong');
-                } else if (opt.dataset.correct === "true") {
-                    opt.classList.add('correct'); // Highlight the right answer if they got it wrong
                 }
+                // (Removed the code that revealed the correct answer)
             });
         }
 
-        // --- 6. HERO SECTION & 3D TILT LOGIC ---
+        // --- 7. HERO SECTION & 3D TILT LOGIC ---
         const heroSection = document.getElementById('hero'), glassCard = document.getElementById('glass-card');
         let heroMX = window.innerWidth / 2, heroMY = window.innerHeight / 2;
 
@@ -598,7 +739,7 @@
             c.addEventListener('mouseleave', () => c.style.transform = 'none');
         });
 
-        // --- 7. PARTICLES LOGIC ---
+        // --- 8. PARTICLES LOGIC ---
         const pCanvas = document.getElementById('particle-canvas'), pCtx = pCanvas.getContext('2d');
         let parts =[];
         const initP = () => {
@@ -619,7 +760,7 @@
         };
         initP(); animP(); window.addEventListener('resize', initP);
 
-        // --- 8. GENERATIVE ART LOGIC ---
+        // --- 9. GENERATIVE ART LOGIC ---
         const aCanv = document.getElementById('function-art-canvas'), aCtx = aCanv.getContext('2d');
         let t = 0;
         const resArt = () => { aCanv.width = aCanv.clientWidth / 2; aCanv.height = aCanv.clientHeight / 2; };
