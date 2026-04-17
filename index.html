@@ -166,15 +166,15 @@
             overflow: hidden;
         }
         
-        /* Enhanced Vignette & Darkening Layer */
-        .slideshow-wrapper::before {
+        /* Apply the vignette directly to the individual slides */
+        .slide::before {
             content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
             background: linear-gradient(90deg, rgba(0,0,0,0.98) 0%, rgba(0,0,0,0.5) 20%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.98) 100%);
             box-shadow: inset 0 30px 60px rgba(0,0,0,0.7), inset 0 -30px 60px rgba(0,0,0,0.7);
         }
         
-        /* Stronger Floyd-Steinberg Style Dither Overlay */
-        .slideshow-wrapper::after {
+        /* Apply the dither directly to the individual slides */
+        .slide::after {
             content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; 
             opacity: 0.45; mix-blend-mode: overlay;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 6 -2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -199,11 +199,11 @@
         }
         .slide-caption {
             position: relative;
-            z-index: 15;
+            z-index: 5;
             width: 100%;
             padding: 30px 40px 20px 40px;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            color: #ffffff;
+            color: #dbdbdb;
             font-family: 'Archivo', sans-serif;
             font-size: 0.75rem;
             letter-spacing: 2px;
