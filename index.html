@@ -655,24 +655,22 @@
     <script>
         // --- 1. DYNAMIC TIME-OF-DAY THEME ---
         function updateTheme() {
-            const d = new Date();
-            const h = d.getHours() + d.getMinutes() / 60;
-            
-            // Sine wave calculation: 0 = midnight (dark), 1 = noon (light)
+            const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
             
-            // Interpolate colors between dark (#050508) and cream (#ecece9)
+            // Smoothly transition the background
             const r = Math.round(5 + (236-5) * intensity);
             const g = Math.round(5 + (236-5) * intensity);
             const b = Math.round(8 + (233-8) * intensity);
             
-            // Text color transition (opposite to background)
-            const textR = Math.round(244 + (17-244) * intensity);
-            const textG = Math.round(244 + (17-244) * intensity);
-            const textB = Math.round(245 + (17-245) * intensity);
+            // Sharp transition for text to guarantee contrast
+            const isDay = intensity > 0.5;
+            const textR = isDay ? 17 : 244;
+            const textG = isDay ? 17 : 244;
+            const textB = isDay ? 17 : 245;
 
-            document.documentElement.style.setProperty('--bg-color', `rgb(${r},${g},${b})`);
-            document.documentElement.style.setProperty('--text-color', `rgb(${textR},${textG},${textB})`);
+            document.documentElement.style.setProperty('--bg-color', 'rgb(' + r + ',' + g + ',' + b + ')');
+            document.documentElement.style.setProperty('--text-color', 'rgb(' + textR + ',' + textG + ',' + textB + ')');
         }
         setInterval(updateTheme, 60000); // Check every minute
         updateTheme(); // Initial load
