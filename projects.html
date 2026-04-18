@@ -138,8 +138,8 @@
         let mouseX = -1000, mouseY = -1000;
 
         function initLatent() {
-            width = lCanvas.parentElement.clientWidth;
-            height = lCanvas.parentElement.clientHeight;
+            width = lCanvas.parentElement.clientWidth / 3;
+            height = lCanvas.parentElement.clientHeight / 3;
             lCanvas.width = width; lCanvas.height = height;
             nodes = new Array();
             for(let i=0; i<24000; i++) {
@@ -150,7 +150,7 @@
                     z: Math.random() * 2,
                     isMain: isMain,
                     name: isMain ? projectNames.at(i) : "Data Node",
-                    color: isMain ? '#4ec2e6' : '#333333'
+                    color: isMain ? '#4ec2e6' : '#555555'
                 });
             }
         }
