@@ -506,7 +506,7 @@
                         <div class="obs-icon" style="background: linear-gradient(135deg, #22d3ee, #0f766e);"></div>
                         <h3 class="obs-title">Question 04</h3>
                     </div>
-                    <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Guess my daily-driver operating system/p>
+                    <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Guess my daily-driver operating system</p>
                     <div class="obs-list quiz-container">
                         <div class="obs-item quiz-option" data-correct="true" onclick="checkAnswer(this, true)"><span>macOS</span></div>
                         <div class="obs-item quiz-option" onclick="checkAnswer(this, false)"><span>Arch Linux</span></div>
@@ -605,6 +605,16 @@
             <div style="text-align: center;">
                 <a href="mailto:crhalaby652@gmail.com?subject=CV%20Request&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20viewing%20your%20portfolio%20and%20would%20love%20to%20request%20a%20copy%20of%20your%20latest%20CV.%0D%0A%0D%0AThank%20you!" class="request-cv-btn">Request CV</a>
             </div>
+
+            <!-- Site Views -->
+            <div style="text-align: center; margin-top: 50px; display: flex; flex-direction: column; align-items: center;">
+                <a href="javascript:void(0)" id="toggle-visitors-btn" style="color: var(--text-color); font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; opacity: 0.4; transition: opacity 0.3s ease;">Site Views</a>
+                
+                <div id="visitors-map-container" style="display: none; opacity: 0; transition: opacity 0.4s ease; margin-top: 25px; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=dlo_efDbXyeA4tG4KGj5Qa2GjvXJeB_PqYgnNzrS-4c&cl=ffffff&w=a"></script>
+                </div>
+            </div>
+            
         </section>
     </main>
 
@@ -845,6 +855,24 @@
             requestAnimationFrame(drawA);
         };
         drawA();
+
+        // --- 10. SITE VIEWS TOGGLE LOGIC ---
+        const toggleBtn = document.getElementById('toggle-visitors-btn');
+        const mapContainer = document.getElementById('visitors-map-container');
+        
+        toggleBtn.addEventListener('click', () => {
+            if (mapContainer.style.display === 'none') {
+                mapContainer.style.display = 'block';
+                // Slight timeout allows the display:block to render before fading opacity
+                setTimeout(() => mapContainer.style.opacity = '1', 10);
+                toggleBtn.style.opacity = '0.8';
+            } else {
+                mapContainer.style.opacity = '0';
+                setTimeout(() => mapContainer.style.display = 'none', 400); // Waits for fade to finish
+                toggleBtn.style.opacity = '0.4';
+            }
+        });
+        
     </script>
 </body>
 </html>
