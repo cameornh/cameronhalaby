@@ -6,53 +6,44 @@
     <title>Cameron Halaby | Projects</title>
     
     <link rel="icon" href="./assets/favicon.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:400,500,600,700|archivo:300,400,500" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --bg-color: #ecece9;
-            --text-color: #111111;
-        }
-
+        :root { --bg-color: #ecece9; --text-color: #111111; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body, html {
-            width: 100vw; min-height: 100vh;
-            background-color: var(--bg-color); font-family: 'Archivo', sans-serif;
-            color: var(--text-color); -webkit-font-smoothing: antialiased; overflow-x: hidden;
-            transition: background-color 2s ease, color 2s ease;
-        }
+        body, html { width: 100vw; min-height: 100vh; background-color: var(--bg-color); font-family: 'Archivo', sans-serif; color: var(--text-color); -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: background-color 2s ease, color 2s ease; }
 
         /* NAVIGATION */
-        .site-header { position: fixed; top: 0; width: 100%; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
-        .header-logo, .header-nav a { text-decoration: none; font-family: 'Archivo', sans-serif; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--text-color); transition: opacity 0.3s; }
+        .site-header { position: fixed; top: 0; width: 100%; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; pointer-events: none; }
+        .header-logo, .header-nav a { pointer-events: auto; text-decoration: none; font-family: 'Archivo', sans-serif; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: #ffffff; mix-blend-mode: difference; transition: opacity 0.3s; }
         .header-nav a:hover, .header-logo:hover { opacity: 0.5; }
         .header-nav { display: flex; gap: 40px; }
 
-        /* AUDIO PLAYER */
-        .audio-player { position: fixed; bottom: 30px; right: 40px; z-index: 9999; font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-color); opacity: 0; transition: opacity 1.5s ease; }
-        .audio-player a { color: inherit; text-decoration: none; }
-        .audio-player u { text-underline-offset: 4px; text-decoration-thickness: 1px; transition: color 0.3s ease; }
+        /* LATENT SPACE NAVIGATOR HERO */
+        .latent-hero { position: relative; width: 100vw; height: 75vh; background-color: #050508; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #latent-canvas { position: absolute; inset: 0; z-index: 1; cursor: crosshair; }
+        .latent-ui { position: relative; z-index: 10; pointer-events: none; text-align: center; color: #fff; }
+        .latent-title { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 500; margin-bottom: 10px; }
+        .latent-subtitle { font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: #888; }
+        .latent-tooltip { position: absolute; padding: 10px 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; z-index: 20; }
 
-        /* MINIMAL PAGE LAYOUT */
-        .page-container { padding: 150px 10% 100px 10%; min-height: 90vh; }
-        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 500; margin-bottom: 10px; color: var(--text-color); }
-        .page-subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-color); opacity: 0.6; margin-bottom: 60px; }
-
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
+        /* PROJECTS LIST */
+        .page-section { padding: 100px 10%; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
         
-        /* OBSIDIAN CARDS */
-        .obs-card { background: linear-gradient(145deg, #2b2b2e 0%, #161618 100%); border-radius: 18px; padding: 30px; position: relative; box-shadow: 0 35px 65px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15); transform-style: preserve-3d; transition: transform 0.2s ease-out; text-decoration: none; }
+        .obs-card { background: linear-gradient(145deg, #2b2b2e 0%, #161618 100%); border-radius: 18px; padding: 30px; position: relative; box-shadow: 0 35px 65px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15); transform-style: preserve-3d; transition: transform 0.2s ease-out; }
         .obs-card::before { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.7), transparent); box-shadow: 0 2px 12px rgba(255, 165, 0, 0.5); z-index: 2; }
-        .obs-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; transform: translateZ(20px); }
-        .obs-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #a78bfa, #7c3aed); border-radius: 12px; }
-        .obs-title { color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; }
-        .obs-list { display: flex; flex-direction: column; gap: 10px; transform: translateZ(10px); }
-        .obs-item { background: #f4f4f6; padding: 12px 18px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; color: #111; font-weight: 500; font-size: 0.9rem; box-shadow: 0 -2px 4px -2px rgba(0, 200, 255, 0.7), 0 2px 4px -2px rgba(255, 120, 0, 0.7); }
+        
+        .project-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: translateZ(15px); }
+        .obs-title { color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 10px; transform: translateZ(20px); }
+        .project-desc { color: #a1a1aa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 30px; transform: translateZ(10px); }
+        
+        .request-cv-btn { display: inline-block; font-family: 'Archivo', sans-serif; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 500; color: #fff; padding: 15px 30px; border: 1px solid rgba(255,255,255,0.2); text-decoration: none; border-radius: 4px; transition: all 0.3s ease; transform: translateZ(25px); }
+        .request-cv-btn:hover { background: #fff; color: #000; }
 
-        /* FOOTER */
-        .site-footer { border-top: 1px solid rgba(128,128,128,0.2); color: var(--text-color); opacity: 0.6; padding: 40px 10%; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+        .site-footer { background-color: #111111; color: #888; padding: 60px 10%; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -66,45 +57,42 @@
         </div>
     </nav>
 
-    <div class="audio-player" id="audio-player">
-        Playing <a href="music.html"><u id="track-name">Loading...</u></a>
-    </div>
+    <main>
+        <!-- Latent Space Navigator -->
+        <section class="latent-hero">
+            <canvas id="latent-canvas"></canvas>
+            <div class="latent-ui">
+                <h1 class="latent-title">Latent Space</h1>
+                <p class="latent-subtitle">Drag to navigate project clusters</p>
+            </div>
+            <div class="latent-tooltip" id="latent-tooltip">Project Node</div>
+        </section>
 
-    <main class="page-container">
-        <h1 class="page-title">Projects</h1>
-        <p class="page-subtitle">System Architecture & Engineering</p>
-
-        <div class="card-grid">
-            <div class="obs-card">
-                <div class="obs-header">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #60a5fa, #2563eb);"></div>
+        <!-- Project Cards -->
+        <section class="page-section">
+            <div class="card-grid">
+                <div class="obs-card">
+                    <img src="./assets/p1.jpg" alt="Project 1" class="project-img">
                     <h3 class="obs-title">Geospatial NeRF</h3>
+                    <p class="project-desc">A deep dive into geospatial 3D reconstruction using Neural Radiance Fields. This project maps topological data into highly accurate 3D spatial models.</p>
+                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Geospatial%20NeRF&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Geospatial%20NeRF%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks!" class="request-cv-btn">I'm Interested</a>
                 </div>
-                <div class="obs-list">
-                    <div class="obs-item"><span>3D Reconstruction Data</span></div>
-                </div>
-            </div>
 
-            <div class="obs-card">
-                <div class="obs-header">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #34d399, #059669);"></div>
+                <div class="obs-card">
+                    <img src="./assets/p2.jpg" alt="Project 2" class="project-img">
                     <h3 class="obs-title">Semantic Course Map</h3>
+                    <p class="project-desc">Mapping the landscape of UGA's courses using advanced NLP and semantic vector embeddings to visually cluster related fields of study.</p>
+                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Semantic%20Course%20Map&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Semantic%20Course%20Map%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks!" class="request-cv-btn">I'm Interested</a>
                 </div>
-                <div class="obs-list">
-                    <div class="obs-item"><span>UGA Landscape Mapping</span></div>
-                </div>
-            </div>
 
-            <div class="obs-card">
-                <div class="obs-header">
-                    <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #d97706);"></div>
-                    <h3 class="obs-title">EEG ML</h3>
-                </div>
-                <div class="obs-list">
-                    <div class="obs-item"><span>Canine Brain Scan (Inky)</span></div>
+                <div class="obs-card">
+                    <img src="./assets/p3.jpg" alt="Project 3" class="project-img">
+                    <h3 class="obs-title">EEG ML (Inky)</h3>
+                    <p class="project-desc">A machine learning classification project utilizing EEG brain scan data to interpret and categorize canine neural patterns.</p>
+                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20EEG%20ML&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20EEG%20ML%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks!" class="request-cv-btn">I'm Interested</a>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <footer class="site-footer">
@@ -117,60 +105,95 @@
         function updateTheme() {
             const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
-            
-            // Smoothly transition the background
-            const r = Math.round(5 + (236-5) * intensity);
-            const g = Math.round(5 + (236-5) * intensity);
-            const b = Math.round(8 + (233-8) * intensity);
-            
-            // Sharp transition for text to guarantee contrast
-            const isDay = intensity > 0.5;
-            const textR = isDay ? 17 : 244;
-            const textG = isDay ? 17 : 244;
-            const textB = isDay ? 17 : 245;
-
+            const r = Math.round(5 + (236-5) * intensity), g = Math.round(5 + (236-5) * intensity), b = Math.round(8 + (233-8) * intensity);
+            const textR = Math.round(244 + (17-244) * intensity), textG = Math.round(244 + (17-244) * intensity), textB = Math.round(245 + (17-245) * intensity);
             document.documentElement.style.setProperty('--bg-color', 'rgb(' + r + ',' + g + ',' + b + ')');
             document.documentElement.style.setProperty('--text-color', 'rgb(' + textR + ',' + textG + ',' + textB + ')');
         }
         setInterval(updateTheme, 60000); updateTheme();
 
         // FOOTER DATE
-        const d = new Date(), months =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        document.getElementById('dynamic-date').innerText = `Updated ${months[d.getMonth()]} ${d.getFullYear()}`;
-
-        // AUDIO PLAYER LOGIC
-        const playlist = new Array(
-            { name: "SoundHelix_01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "SoundHelix_02", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
-        );
-        let currentTrack = 0, hasStartedAudio = false, isFadingOut = false, fadeInterval;
-        const fadeDurationMs = 2000, audioObj = new Audio(), playerUI = document.getElementById('audio-player'), trackNameUI = document.getElementById('track-name');
-
-        function playTrack(index) {
-            currentTrack = index; audioObj.src = playlist[currentTrack].src; trackNameUI.innerText = playlist[currentTrack].name;
-            audioObj.volume = 0; isFadingOut = false;
-            audioObj.play().then(() => {
-                playerUI.style.opacity = 1; clearInterval(fadeInterval);
-                fadeInterval = setInterval(() => { if (audioObj.volume < 0.95) audioObj.volume += 0.05; else { audioObj.volume = 1; clearInterval(fadeInterval); } }, fadeDurationMs / 20);
-            }).catch(e => console.log("Audio prevented."));
-        }
-        audioObj.addEventListener('timeupdate', () => {
-            if (!isFadingOut && audioObj.duration && (audioObj.duration - audioObj.currentTime) <= (fadeDurationMs / 1000)) {
-                isFadingOut = true; clearInterval(fadeInterval);
-                fadeInterval = setInterval(() => { if (audioObj.volume > 0.05) audioObj.volume -= 0.05; else { audioObj.volume = 0; clearInterval(fadeInterval); } }, fadeDurationMs / 20);
-            }
-        });
-        audioObj.addEventListener('ended', () => { playTrack((currentTrack + 1) % playlist.length); });
-        document.body.addEventListener('click', () => { if(!hasStartedAudio) { hasStartedAudio = true; playTrack(currentTrack); } }, { once: true });
+        const dObj = new Date();
+        const monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        document.getElementById('dynamic-date').innerText = 'Updated ' + monthNames.at(dObj.getMonth()) + ' ' + dObj.getFullYear();
 
         // 3D CARD TILT
         document.querySelectorAll('.obs-card').forEach(c => {
             c.addEventListener('mousemove', e => {
                 const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, cx = r.width / 2, cy = r.height / 2;
-                c.style.transform = `perspective(1200px) rotateX(${(cy-y)/30}deg) rotateY(${(x-cx)/30}deg) translateY(-2px)`;
+                c.style.transform = 'perspective(1200px) rotateX(' + ((cy-y)/30) + 'deg) rotateY(' + ((x-cx)/30) + 'deg) translateY(-2px)';
             });
             c.addEventListener('mouseleave', () => c.style.transform = 'none');
         });
+
+        // LATENT SPACE NAVIGATOR LOGIC
+        const lCanvas = document.getElementById('latent-canvas');
+        const lCtx = lCanvas.getContext('2d');
+        const tooltip = document.getElementById('latent-tooltip');
+        let width, height;
+        let nodes = new Array();
+        const projectNames = new Array("Geospatial NeRF", "Semantic Course Map", "EEG Neural Net", "Latent Visualizer", "Data Architecture", "Topology Engine");
+        
+        let camX = 0, camY = 0, isDragging = false, startX, startY;
+        let mouseX = -1000, mouseY = -1000;
+
+        function initLatent() {
+            width = lCanvas.parentElement.clientWidth;
+            height = lCanvas.parentElement.clientHeight;
+            lCanvas.width = width; lCanvas.height = height;
+            nodes = new Array();
+            for(let i=0; i<60; i++) {
+                const isMain = i < projectNames.length;
+                nodes.push({
+                    x: (Math.random() - 0.5) * width * 2,
+                    y: (Math.random() - 0.5) * height * 2,
+                    z: Math.random() * 2,
+                    isMain: isMain,
+                    name: isMain ? projectNames.at(i) : "Data Node",
+                    color: isMain ? '#a78bfa' : '#333333'
+                });
+            }
+        }
+
+        lCanvas.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX - camX; startY = e.clientY - camY; lCanvas.style.cursor = 'grabbing'; });
+        window.addEventListener('mouseup', () => { isDragging = false; lCanvas.style.cursor = 'crosshair'; });
+        lCanvas.addEventListener('mousemove', e => {
+            mouseX = e.clientX; mouseY = e.clientY;
+            if(isDragging) { camX = e.clientX - startX; camY = e.clientY - startY; }
+        });
+
+        function drawLatent() {
+            lCtx.clearRect(0, 0, width, height);
+            let hoveredNode = null;
+
+            nodes.forEach(node => {
+                const drawX = width/2 + node.x + (camX * node.z);
+                const drawY = height/2 + node.y + (camY * node.z);
+                const size = node.isMain ? 4 : 1.5;
+                
+                const dist = Math.hypot(mouseX - drawX, mouseY - (drawY + lCanvas.parentElement.getBoundingClientRect().top));
+                if(dist < 20 && node.isMain) hoveredNode = node;
+
+                lCtx.beginPath();
+                lCtx.arc(drawX, drawY, size + (dist < 20 ? 2 : 0), 0, Math.PI * 2);
+                lCtx.fillStyle = dist < 20 && node.isMain ? '#ffffff' : node.color;
+                lCtx.fill();
+            });
+
+            if(hoveredNode && !isDragging) {
+                tooltip.style.opacity = 1;
+                tooltip.innerText = hoveredNode.name;
+                tooltip.style.left = (mouseX + 15) + 'px';
+                tooltip.style.top = (mouseY + 15) + 'px';
+            } else {
+                tooltip.style.opacity = 0;
+            }
+
+            requestAnimationFrame(drawLatent);
+        }
+
+        initLatent(); drawLatent();
+        window.addEventListener('resize', initLatent);
     </script>
 </body>
 </html>
