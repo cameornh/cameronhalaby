@@ -150,7 +150,7 @@
                     z: Math.random() * 2,
                     isMain: isMain,
                     name: isMain ? projectNames.at(i) : "Data Node",
-                    color: isMain ? '#4ec2e6' : '#555555'
+                    color: isMain ? '#4ec2e6' : '#222222'
                 });
             }
         }
@@ -169,7 +169,7 @@
             nodes.forEach(node => {
                 const drawX = width/2 + node.x + (camX * node.z);
                 const drawY = height/2 + node.y + (camY * node.z);
-                const size = node.isMain ? 2 : 1.5;
+                const size = node.isMain ? 6 : 1.5;
                 
                 const dist = Math.hypot(mouseX - drawX, mouseY - (drawY + lCanvas.parentElement.getBoundingClientRect().top));
                 if(dist < 20 && node.isMain) hoveredNode = node;
