@@ -161,7 +161,7 @@
             </div>
         </section>
 
-        <!-- ENHANCED GENERATIVE SYNTHESIS SECTION -->
+        <!-- ENHANCED  SYNTHESIS SECTION -->
         <section class="page-section" style="padding-top: 40px;">
             <div class="section-header">
                 <h2 class="section-title">Write me a song</h2>
@@ -352,9 +352,24 @@
         
         let audioCtx, isSeqPlaying = false, currentStep = 0, seqTimerId;
         let activeTrack = 1, totalTracks = 1;
-        let streamDest, mediaRecorder, recordedChunks;
+        let mainOut, streamDest, mediaRecorder, recordedChunks;
         let isRecording = false;
 
+        function ensureAudio() {
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create a master volume/mixer node
+                mainOut = audioCtx.createGain();
+                mainOut.connect(audioCtx.destination); // Connect to speakers
+                
+                // Create the recording destination
+                streamDest = audioCtx.createMediaStreamDestination();
+                mainOut.connect(streamDest); // Connect mixer to recorder
+            }
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        
         // Centralized State Management Map (Safely avoids array bracket parsing)
         const trackData = new Map();
 
@@ -564,9 +579,6 @@
                 modGain.gain.value = fmX * 1000; // Modulation Index
                 modOsc.connect(modGain);
                 modGain.connect(osc.frequency);
-                if (typeof streamDest !== 'undefined' && streamDest) {
-                    masterGain.connect(streamDest);
-                }
                 modOsc.start();
                 modOsc.stop(now + 3);
             }
@@ -587,7 +599,7 @@
 
             osc.connect(filter);
             filter.connect(masterGain);
-            masterGain.connect(audioCtx.destination);
+            masterGain.connect(mainOut); // Route every note to the permanent main mixer
 
             // Envelopes & Percussion
             const atk = trackData.get(tId + "-atk");
@@ -652,8 +664,7 @@
         }
 
         document.getElementById('download-btn').addEventListener('click', (e) => {
-            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if(!streamDest) streamDest = audioCtx.createMediaStreamDestination();
+            ensureAudio();
         
             if(!isRecording) {
                 isRecording = true;
@@ -661,22 +672,35 @@
                 e.target.classList.add('primary');
                 recordedChunks = new Array();
                 
+                // Let the browser choose its preferred audio codec to prevent unplayable files
                 mediaRecorder = new MediaRecorder(streamDest.stream);
+                
                 mediaRecorder.ondataavailable = event => {
                     if (event.data.size > 0) recordedChunks.push(event.data);
                 };
+                
                 mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    // Use the recorder's actual mimeType (Safari often defaults to mp4/aac)
+                    const mime = mediaRecorder.mimeType || 'audio/webm'; 
+                    const blob = new Blob(recordedChunks, { type: mime });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = 'Cameron_Halaby_Generative_Track.webm';
+                    
+                    // Dynamically set file extension based on browser
+                    let ext = 'webm';
+                    if (mime.includes('mp4')) ext = 'mp4';
+                    else if (mime.includes('ogg')) ext = 'ogg';
+                    
+                    a.download = 'Cameron_Halaby_Track.' + ext;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                 };
-                mediaRecorder.start();
+                
+                // Adding 100ms timeslice forces data to flush regularly
+                mediaRecorder.start(100); 
             } else {
                 isRecording = false;
                 e.target.innerText = "Record Audio";
@@ -686,8 +710,7 @@
         });
         
         document.getElementById('play-btn').addEventListener('click', (e) => {
-            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if(audioCtx.state === 'suspended') audioCtx.resume();
+            ensureAudio();
             
             isSeqPlaying = !isSeqPlaying;
             e.target.innerText = isSeqPlaying ? "Pause Sequence" : "Play Sequence";
