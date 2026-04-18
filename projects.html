@@ -117,10 +117,20 @@
         function updateTheme() {
             const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
-            const r = Math.round(5 + (236-5) * intensity), g = Math.round(5 + (236-5) * intensity), b = Math.round(8 + (233-8) * intensity);
-            const textR = Math.round(244 + (17-244) * intensity), textG = Math.round(244 + (17-244) * intensity), textB = Math.round(245 + (17-245) * intensity);
-            document.documentElement.style.setProperty('--bg-color', `rgb(${r},${g},${b})`);
-            document.documentElement.style.setProperty('--text-color', `rgb(${textR},${textG},${textB})`);
+            
+            // Smoothly transition the background
+            const r = Math.round(5 + (236-5) * intensity);
+            const g = Math.round(5 + (236-5) * intensity);
+            const b = Math.round(8 + (233-8) * intensity);
+            
+            // Sharp transition for text to guarantee contrast
+            const isDay = intensity > 0.5;
+            const textR = isDay ? 17 : 244;
+            const textG = isDay ? 17 : 244;
+            const textB = isDay ? 17 : 245;
+
+            document.documentElement.style.setProperty('--bg-color', 'rgb(' + r + ',' + g + ',' + b + ')');
+            document.documentElement.style.setProperty('--text-color', 'rgb(' + textR + ',' + textG + ',' + textB + ')');
         }
         setInterval(updateTheme, 60000); updateTheme();
 
