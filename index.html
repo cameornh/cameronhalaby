@@ -339,6 +339,21 @@
             <div class="hero-base-darkness"></div>
             <div class="spotlight-wrapper" id="spotlight"><div class="fluid-texture"></div></div>
             <canvas id="particle-canvas"></canvas>
+
+            <!-- NEW: The Observer (ML Ghost Cursor) -->
+            <svg id="observer-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;">
+                <!-- The tether line connecting your cursor to the ghost -->
+                <path id="observer-tether" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1.5" stroke-dasharray="4,4" />
+                <!-- The glowing ghost cursor -->
+                <circle id="observer-ghost" cx="-50" cy="-50" r="5" fill="rgba(209, 86, 184, 0.8)" filter="url(#ghost-glow)" />
+                <defs>
+                    <filter id="ghost-glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                </defs>
+            </svg>
+            
             <div class="hero-ui">
                 <div class="glass-card" id="glass-card">
                     <h1 class="hero-name">Cameron Halaby</h1>
@@ -883,6 +898,111 @@
                 toggleBtn.style.opacity = '0.4';
             }
         });
+
+        // --- 11. THE OBSERVER (REAL-TIME ML PREDICTIVE CURSOR) ---
+        // A lightweight, online-learning Neural Network (Single-Layer Perceptron)
+        // that learns your mouse kinematics to predict future positions.
+        
+        class PredictiveModel {
+            constructor() {
+                // Initial Weights (avoiding arrays to prevent parser bugs)
+                this.wx0 = 0.5; this.wx1 = 0.0; this.wx2 = 0.1; this.wx3 = 0.0;
+                this.wy0 = 0.0; this.wy1 = 0.5; this.wy2 = 0.0; this.wy3 = 0.1;
+                this.learningRate = 0.00005; // Low learning rate for stability
+            }
+            
+            predict(vx, vy, ax, ay) {
+                // Predicts X and Y delta based on velocity and acceleration
+                const px = (vx * this.wx0) + (vy * this.wx1) + (ax * this.wx2) + (ay * this.wx3);
+                const py = (vx * this.wy0) + (vy * this.wy1) + (ax * this.wy2) + (ay * this.wy3);
+                return { px, py };
+            }
+            
+            train(vx, vy, ax, ay, targetDx, targetDy) {
+                const { px, py } = this.predict(vx, vy, ax, ay);
+                
+                // Calculate error (Prediction vs Actual future movement)
+                let errorX = targetDx - px;
+                let errorY = targetDy - py;
+                
+                // Gradient clipping to prevent exploding weights during erratic movements
+                errorX = Math.max(-100, Math.min(100, errorX));
+                errorY = Math.max(-100, Math.min(100, errorY));
+                
+                // Update weights (Stochastic Gradient Descent)
+                this.wx0 += this.learningRate * errorX * vx;
+                this.wx1 += this.learningRate * errorX * vy;
+                this.wx2 += this.learningRate * errorX * ax;
+                this.wx3 += this.learningRate * errorX * ay;
+
+                this.wy0 += this.learningRate * errorY * vx;
+                this.wy1 += this.learningRate * errorY * vy;
+                this.wy2 += this.learningRate * errorY * ax;
+                this.wy3 += this.learningRate * errorY * ay;
+            }
+        }
+
+        const observerNet = new PredictiveModel();
+        const tether = document.getElementById('observer-tether');
+        const ghost = document.getElementById('observer-ghost');
+        
+        let ghostX = window.innerWidth / 2;
+        let ghostY = window.innerHeight / 2;
+        let lastMx = heroMX, lastMy = heroMY;
+        let lastVx = 0, lastVy = 0;
+        
+        // A ring buffer constructed safely without array brackets
+        let historyQueue = new Array();
+
+        function updateObserver() {
+            // Calculate current kinematics
+            let vx = heroMX - lastMx;
+            let vy = heroMY - lastMy;
+            let ax = vx - lastVx;
+            let ay = vy - lastVy;
+
+            // Save current state to history queue (State: position, velocity, acceleration)
+            historyQueue.push({ mx: heroMX, my: heroMY, vx: vx, vy: vy, ax: ax, ay: ay });
+
+            // If we have enough history, train the model on what ACTUALLY happened 12 frames later
+            if (historyQueue.length > 12) {
+                const pastState = historyQueue.shift();
+                const actualDx = heroMX - pastState.mx;
+                const actualDy = heroMY - pastState.my;
+
+                observerNet.train(pastState.vx, pastState.vy, pastState.ax, pastState.ay, actualDx, actualDy);
+            }
+
+            // Predict future movement 12 frames out
+            const prediction = observerNet.predict(vx, vy, ax, ay);
+
+            // Target ghost position (current mouse + predicted delta)
+            let targetGhostX = heroMX + prediction.px * 12;
+            let targetGhostY = heroMY + prediction.py * 12;
+
+            // Smoothly move ghost cursor to target
+            ghostX += (targetGhostX - ghostX) * 0.15;
+            ghostY += (targetGhostY - ghostY) * 0.15;
+
+            // Update SVG DOM elements
+            if (ghost && tether) {
+                ghost.setAttribute('cx', ghostX);
+                ghost.setAttribute('cy', ghostY);
+                // Draw a beautiful curved bezier line from the mouse to the prediction
+                tether.setAttribute('d', 'M ' + heroMX + ' ' + heroMY + ' Q ' + ((heroMX + ghostX)/2) + ' ' + ((heroMY + ghostY)/2 - 50) + ' ' + ghostX + ' ' + ghostY);
+            }
+
+            // Store lasts for next frame calculation
+            lastMx = heroMX;
+            lastMy = heroMY;
+            lastVx = vx;
+            lastVy = vy;
+
+            requestAnimationFrame(updateObserver);
+        }
+        
+        // Start the observer loop
+        requestAnimationFrame(updateObserver);
         
     </script>
 </body>
