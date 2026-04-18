@@ -341,13 +341,13 @@
             <canvas id="particle-canvas"></canvas>
 
             <!-- The Observer (ML Ghost Cursor) -->
-            <svg id="observer-canvas" style="position: absolute; inset: 0; width: 60%; height: 60%; z-index: 5; pointer-events: none;">
+            <svg id="observer-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;">
                 <!-- Straight tether line -->
-                <path id="observer-tether" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1.5" stroke-dasharray="3,3" />
+                <!--path id="observer-tether" fill="none" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1.5" stroke-dasharray="3,3" />
                 
                 <!-- Transparent Ghost Mouse Icon -->
                 <g id="observer-ghost" style="transform: translate(-50px, -50px); transition: opacity 0.2s;">
-                    <path d="M0,0 L8,22 L11.5,14 L19,16.5 Z" fill="rgba(255, 255, 255, 0.1)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="1" filter="url(#ghost-glow)" />
+                    <path d="M0,0 L8,22 L11.5,14 L19,16.5 Z" fill="rgba(255, 255, 255, 0.1)" stroke="rgba(255, 255, 255, 0.1)" stroke-width="0" filter="url(#ghost-glow)" />
                 </g>
                 
                 <defs>
