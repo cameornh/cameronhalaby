@@ -4,39 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cameron Halaby | Music</title>
+    
     <link rel="icon" href="./assets/favicon.png" type="image/png">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:400,500,600,700|archivo:300,400,500" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Courier+Prime&display=swap" rel="stylesheet">
 
     <style>
         :root { --bg-color: #ecece9; --text-color: #111111; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html { width: 100vw; min-height: 100vh; background-color: var(--bg-color); font-family: 'Archivo', sans-serif; color: var(--text-color); -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: background-color 2s ease, color 2s ease; }
 
-        .site-header { position: fixed; top: 0; width: 100%; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
-        .header-logo, .header-nav a { text-decoration: none; font-family: 'Archivo', sans-serif; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--text-color); transition: opacity 0.3s; }
+        /* NAVIGATION */
+        .site-header { position: fixed; top: 0; width: 100%; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; pointer-events: none; }
+        .header-logo, .header-nav a { pointer-events: auto; text-decoration: none; font-family: 'Archivo', sans-serif; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--text-color); mix-blend-mode: difference; transition: opacity 0.3s; }
         .header-nav a:hover, .header-logo:hover { opacity: 0.5; }
         .header-nav { display: flex; gap: 40px; }
 
-        .audio-player { position: fixed; bottom: 30px; right: 40px; z-index: 9999; font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-color); opacity: 0; transition: opacity 1.5s ease; }
-        .audio-player a { color: inherit; text-decoration: none; }
+        /* AUDIO PLAYER WITH VOLUME */
+        .audio-player { position: fixed; bottom: 30px; right: 40px; z-index: 9999; font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-color); opacity: 0; transition: opacity 1.5s ease; mix-blend-mode: difference; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        .audio-player a { color: inherit; text-decoration: none; pointer-events: auto; }
         .audio-player u { text-underline-offset: 4px; text-decoration-thickness: 1px; transition: color 0.3s ease; }
+        .audio-player a:hover u { color: #a78bfa; }
+        .audio-vol-wrapper { display: flex; align-items: center; gap: 10px; font-size: 0.6rem; opacity: 0.5; transition: opacity 0.3s; pointer-events: auto; }
+        .audio-vol-wrapper:hover { opacity: 1; }
+        .vol-slider { -webkit-appearance: none; width: 80px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; outline: none; cursor: pointer; }
+        .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
 
-        .page-container { padding: 150px 10% 100px 10%; min-height: 90vh; }
-        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 500; margin-bottom: 10px; }
-        .page-subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 60px; }
+        /* PAGE SECTIONS */
+        .page-section { padding: 120px 10% 60px 10%; }
+        .section-title { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 500; margin-bottom: 10px; }
+        .section-subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 60px; }
 
-        /* Audio Track List Placeholder */
+        /* TRACK LIST */
         .track-list { display: flex; flex-direction: column; border-top: 1px solid rgba(128,128,128,0.2); }
-        .track-item { padding: 25px 0; border-bottom: 1px solid rgba(128,128,128,0.2); display: flex; justify-content: space-between; align-items: center; transition: padding-left 0.3s; cursor: pointer; }
+        .track-item { padding: 25px 0; border-bottom: 1px solid rgba(128,128,128,0.2); display: flex; justify-content: space-between; align-items: center; transition: padding-left 0.3s, background 0.3s; cursor: pointer; }
         .track-item:hover { padding-left: 15px; background: rgba(128,128,128,0.05); }
-        .track-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; }
+        .track-name { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 500; }
         .track-meta { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #888; }
+
+        /* ADVANCED SEQUENCER & SYNTHESIS */
+        .synth-container { display: flex; flex-direction: column; gap: 30px; background: #0a0a0c; padding: 40px; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); color: #fff; }
+        
+        .global-controls { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+        .track-tabs { display: flex; gap: 10px; }
+        .tab-btn { font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 1px; color: #888; background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 4px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .tab-btn.active { background: #fff; color: #000; border-color: #fff; }
+        .tab-btn:hover:not(.active) { color: #fff; border-color: rgba(255,255,255,0.5); }
+        
+        .tempo-control { display: flex; align-items: center; gap: 15px; }
+        .tempo-label { font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: #a78bfa; font-weight: 600; }
+        .tempo-slider { -webkit-appearance: none; width: 150px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; outline: none; cursor: pointer; }
+        .tempo-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #a78bfa; box-shadow: 0 0 10px rgba(167, 139, 250, 0.5); }
+
+        .synth-matrix-panel { display: flex; gap: 40px; }
+        
+        .sequencer-wrapper { flex-grow: 1; overflow-x: auto; padding-bottom: 15px; }
+        .sequencer-wrapper::-webkit-scrollbar { height: 8px; }
+        .sequencer-wrapper::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .sequencer-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        
+        .sequencer { display: flex; flex-direction: column; gap: 6px; min-width: 900px; }
+        .seq-row { display: flex; gap: 6px; }
+        .seq-step { flex: 1; aspect-ratio: 1/1; background: rgba(255,255,255,0.05); border-radius: 3px; cursor: pointer; transition: background 0.1s, transform 0.1s; }
+        .seq-step:hover { background: rgba(255,255,255,0.15); }
+        .seq-step.active { background: #34d399; box-shadow: 0 0 10px rgba(52, 211, 153, 0.5); }
+        .seq-step.playing { border: 2px solid #fff; transform: scale(1.1); z-index: 2; }
+
+        .synth-sidebar { width: 320px; display: flex; flex-direction: column; gap: 25px; flex-shrink: 0; }
+        
+        .control-group { display: flex; flex-direction: column; gap: 8px; }
+        .control-row { display: flex; gap: 15px; }
+        .control-label { font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 1.5px; }
+        
+        .inst-buttons { display: flex; gap: 5px; }
+        .inst-btn { flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'Archivo', sans-serif; font-size: 0.65rem; padding: 8px 0; border-radius: 4px; cursor: pointer; transition: 0.2s; text-transform: uppercase; }
+        .inst-btn.selected { background: #34d399; border-color: #34d399; color: #000; font-weight: 600; box-shadow: 0 0 10px rgba(52, 211, 153, 0.4); }
+        
+        .styled-slider { -webkit-appearance: none; width: 100%; background: transparent; }
+        .styled-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 12px; width: 12px; border-radius: 50%; background: #fff; cursor: pointer; margin-top: -4px; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .styled-slider::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        /* 3 Latent Pads Row */
+        .latent-pads-container { display: flex; gap: 10px; width: 100%; margin-top: 10px; }
+        .latent-pad { flex: 1; aspect-ratio: 1/1; background: radial-gradient(circle at center, #1a1a2e, #000); border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); position: relative; cursor: crosshair; overflow: hidden; }
+        .latent-node { width: 10px; height: 10px; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        .node-1 { background: #a78bfa; box-shadow: 0 0 10px #a78bfa; }
+        .node-2 { background: #60a5fa; box-shadow: 0 0 10px #60a5fa; }
+        .node-3 { background: #f43f5e; box-shadow: 0 0 10px #f43f5e; }
+        .latent-label { position: absolute; bottom: 6px; left: 0; width: 100%; text-align: center; color: rgba(255,255,255,0.4); font-size: 0.5rem; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; }
+
+        /* Action Buttons */
+        .action-controls { display: flex; gap: 15px; margin-top: 10px; width: 100%; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; }
+        .editor-btn { font-family: 'Archivo', sans-serif; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 500; color: #fff; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 4px; cursor: pointer; transition: all 0.3s ease; text-decoration: none; }
+        .editor-btn:hover { background: #fff; color: #000; }
+        .editor-btn.primary { background: #a78bfa; border-color: #a78bfa; color: #000; }
+        .editor-btn.primary:hover { background: #c084fc; box-shadow: 0 0 15px rgba(167, 139, 250, 0.4); }
+
+        /* DEEP ARCHIVE LLM TERMINAL */
+        #sys-logs-btn { font-size: 0.6rem; opacity: 0.2; cursor: pointer; transition: opacity 0.3s; text-decoration: none; color: inherit; }
+        #sys-logs-btn:hover { opacity: 1; }
+        #deep-archive { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 5000; display: none; padding: 40px; font-family: 'Courier Prime', monospace; color: #34d399; flex-direction: column; opacity: 0; transition: opacity 0.5s; }
+        #deep-archive.active { display: flex; opacity: 1; }
+        .term-output { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
+        .term-input-line { display: flex; gap: 10px; }
+        .term-prefix { color: #888; }
+        .term-input { flex-grow: 1; background: transparent; border: none; color: #34d399; font-family: 'Courier Prime', monospace; font-size: 0.9rem; outline: none; }
 
         .site-footer { border-top: 1px solid rgba(128,128,128,0.2); color: #888; padding: 40px 10%; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
     </style>
 </head>
 <body>
+
     <nav class="site-header">
         <a href="index.html" class="header-logo">C. Halaby</a>
         <div class="header-nav">
@@ -46,73 +125,563 @@
         </div>
     </nav>
 
+    <!-- Global Audio Player with Volume Slider -->
     <div class="audio-player" id="audio-player">
-        Playing <a href="music.html"><u id="track-name">Loading...</u></a>
+        <span>Playing <a href="music.html"><u id="track-name">Loading...</u></a></span>
+        <div class="audio-vol-wrapper">
+            BG VOL <input type="range" class="vol-slider" id="bg-vol-slider" min="0" max="1" step="0.01" value="0.4">
+        </div>
     </div>
 
-    <main class="page-container">
-        <h1 class="page-title">Composition & Audio</h1>
-        <p class="page-subtitle">Original Tracks & Scores</p>
+    <main>
+        <!-- RESTORED ORIGINAL TRACKS SECTION -->
+        <section class="page-section">
+            <div class="section-header">
+                <h2 class="section-title">Music</h2>
+                <p class="section-subtitle">Original Music</p>
+            </div>
 
-        <div class="track-list">
-            <div class="track-item">
-                <span class="track-name">Track 01</span>
-                <span class="track-meta">03:45 / Audio</span>
+            <div class="track-list">
+                <div class="track-item">
+                    <span class="track-name">Track 01</span>
+                    <span class="track-meta">03:45 / Under Construction. Check back later</span>
+                </div>
+                <div class="track-item">
+                    <span class="track-name">Track 02</span>
+                    <span class="track-meta">04:12 / Under Construction. Check back later</span>
+                </div>
+                <div class="track-item">
+                    <span class="track-name">Track 03</span>
+                    <span class="track-meta">02:30 / Under Construction. Check back later</span>
+                </div>
+                <div class="track-item">
+                    <span class="track-name">Track 04</span>
+                    <span class="track-meta">05:05 / Under Construction. Check back later</span>
+                </div>
             </div>
-            <div class="track-item">
-                <span class="track-name">Track 02</span>
-                <span class="track-meta">04:12 / Score</span>
+        </section>
+
+        <!-- ENHANCED GENERATIVE SYNTHESIS SECTION -->
+        <section class="page-section" style="padding-top: 40px;">
+            <div class="section-header">
+                <h2 class="section-title">Write me a song</h2>
+                <p class="section-subtitle">Make your own music and send it to me</p>
             </div>
-            <div class="track-item">
-                <span class="track-name">Track 03</span>
-                <span class="track-meta">02:30 / Audio</span>
+
+            <div class="synth-container">
+                <div class="global-controls">
+                    <div class="track-tabs" id="track-tabs">
+                        <button class="tab-btn active" data-track="1">Track 1</button>
+                        <button class="tab-btn" id="add-track-btn">+</button>
+                    </div>
+                    <div class="tempo-control">
+                        <span class="tempo-label" id="tempo-display">120 BPM</span>
+                        <input type="range" class="tempo-slider" id="global-tempo" min="60" max="240" value="120">
+                    </div>
+                </div>
+
+                <div class="synth-matrix-panel">
+                    <!-- 32-Step Sequencer (12 Chromatic Notes) -->
+                    <div class="sequencer-wrapper">
+                        <div class="sequencer" id="sequencer">
+                            <!-- Rows generated dynamically by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Synthesis Controls -->
+                    <div class="synth-sidebar">
+                        <div class="control-group">
+                            <span class="control-label">Oscillator</span>
+                            <div class="inst-buttons">
+                                <button class="inst-btn selected" data-type="sine">Sine</button>
+                                <button class="inst-btn" data-type="triangle">Tri</button>
+                                <button class="inst-btn" data-type="square">Sqr</button>
+                                <button class="inst-btn" data-type="sawtooth">Saw</button>
+                            </div>
+                        </div>
+
+                        <div class="control-row">
+                            <div class="control-group" style="flex: 1;">
+                                <span class="control-label">Env Attack</span>
+                                <input type="range" class="styled-slider" id="env-attack" min="0.01" max="1.5" step="0.01" value="0.05">
+                            </div>
+                            <div class="control-group" style="flex: 1;">
+                                <span class="control-label">Env Release</span>
+                                <input type="range" class="styled-slider" id="env-release" min="0.05" max="3.0" step="0.05" value="0.4">
+                            </div>
+                        </div>
+
+                        <div class="control-row">
+                            <div class="control-group" style="flex: 1;">
+                                <span class="control-label">Percussive Snap</span>
+                                <input type="range" class="styled-slider" id="perc-snap" min="0" max="1" step="0.01" value="0">
+                            </div>
+                            <div class="control-group" style="flex: 1;">
+                                <span class="control-label">Octave Shift</span>
+                                <input type="range" class="styled-slider" id="octave-shift" min="-2" max="2" step="1" value="0">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <span class="control-label">Track Volume</span>
+                            <input type="range" class="styled-slider" id="track-vol" min="0.0" max="0.5" step="0.01" value="0.2">
+                        </div>
+
+                        <!-- 3 Latent EQ/Mod Pads -->
+                        <div class="latent-pads-container">
+                            <div class="latent-pad" id="pad-1">
+                                <div class="latent-node node-1" id="node-1"></div>
+                                <div class="latent-label">Filter</div>
+                            </div>
+                            <div class="latent-pad" id="pad-2">
+                                <div class="latent-node node-2" id="node-2"></div>
+                                <div class="latent-label">FM Mod</div>
+                            </div>
+                            <div class="latent-pad" id="pad-3">
+                                <div class="latent-node node-3" id="node-3"></div>
+                                <div class="latent-label">Tremolo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="action-controls">
+                    <button class="editor-btn primary" id="play-btn">Play Sequence</button>
+                    <button class="editor-btn" id="clear-btn">Clear Track</button>
+                    <a href="mailto:crhalaby652@gmail.com?subject=My%20Generative%20Track&body=Hi%20Cameron,%0D%0A%0D%0AI%20created%20a%20sequence%20on%20your%20site%20and%20wanted%20to%20share%20it!%0D%0A%0D%0AThanks!" class="editor-btn" style="margin-left: auto;">Send Track</a>
+                </div>
             </div>
-        </div>
+        </section>
     </main>
 
     <footer class="site-footer">
-        <p>© 2026 Cameron Halaby. No Rights Reserved.</p>
-        <p id="dynamic-date"></p>
+        <p>2026 Cameron Halaby. No Rights Reserved.</p>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <a href="javascript:void(0)" id="sys-logs-btn">SYS_LOGS</a>
+            <p id="dynamic-date"></p>
+        </div>
     </footer>
 
+    <!-- DEEP ARCHIVE TERMINAL -->
+    <div id="deep-archive">
+        <div class="term-output" id="term-output">ACCESSING LOCAL ARCHIVE...<br>WEIGHTS LOADED.<br>AWAITING QUERY.<br><br></div>
+        <div class="term-input-line">
+            <span class="term-prefix">user@halaby-sys:~$</span>
+            <input type="text" class="term-input" id="term-input" autocomplete="off" spellcheck="false">
+        </div>
+    </div>
+
     <script>
+        // DYNAMIC THEME
         function updateTheme() {
             const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
             const r = Math.round(5 + (236-5) * intensity), g = Math.round(5 + (236-5) * intensity), b = Math.round(8 + (233-8) * intensity);
             const textR = Math.round(244 + (17-244) * intensity), textG = Math.round(244 + (17-244) * intensity), textB = Math.round(245 + (17-245) * intensity);
-            document.documentElement.style.setProperty('--bg-color', `rgb(${r},${g},${b})`);
-            document.documentElement.style.setProperty('--text-color', `rgb(${textR},${textG},${textB})`);
+            document.documentElement.style.setProperty('--bg-color', 'rgb(' + r + ',' + g + ',' + b + ')');
+            document.documentElement.style.setProperty('--text-color', 'rgb(' + textR + ',' + textG + ',' + textB + ')');
         }
         setInterval(updateTheme, 60000); updateTheme();
 
-        const d = new Date(), months =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        document.getElementById('dynamic-date').innerText = `Updated ${months[d.getMonth()]} ${d.getFullYear()}`;
+        const dObj = new Date(), monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        document.getElementById('dynamic-date').innerText = 'Updated ' + monthNames.at(dObj.getMonth()) + ' ' + dObj.getFullYear();
 
-        // AUDIO PLAYER LOGIC
-        const playlist = new Array(
+        // GLOBAL AUDIO PLAYER
+        const globalPlaylist = new Array(
             { name: "SoundHelix_01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
             { name: "SoundHelix_02", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
         );
-        let currentTrack = 0, hasStartedAudio = false, isFadingOut = false, fadeInterval;
-        const fadeDurationMs = 2000, audioObj = new Audio(), playerUI = document.getElementById('audio-player'), trackNameUI = document.getElementById('track-name');
+        let globalTrack = 0, hasStartedGlobal = false, globalFading = false, globalFadeInt;
+        const fadeMs = 2000, globalAudio = new Audio(), gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
+        const bgVolSlider = document.getElementById('bg-vol-slider');
 
-        function playTrack(index) {
-            currentTrack = index; audioObj.src = playlist[currentTrack].src; trackNameUI.innerText = playlist[currentTrack].name;
-            audioObj.volume = 0; isFadingOut = false;
-            audioObj.play().then(() => {
-                playerUI.style.opacity = 1; clearInterval(fadeInterval);
-                fadeInterval = setInterval(() => { if (audioObj.volume < 0.95) audioObj.volume += 0.05; else { audioObj.volume = 1; clearInterval(fadeInterval); } }, fadeDurationMs / 20);
+        // Allow volume slider to update instantly
+        bgVolSlider.addEventListener('input', (e) => {
+            if(!globalFading) globalAudio.volume = parseFloat(e.target.value);
+        });
+
+        function playGlobal(index) {
+            globalTrack = index; globalAudio.src = globalPlaylist.at(globalTrack).src; gTrackUI.innerText = globalPlaylist.at(globalTrack).name;
+            globalAudio.volume = 0; globalFading = false;
+            
+            const targetVol = parseFloat(bgVolSlider.value);
+            globalAudio.play().then(() => {
+                gUI.style.opacity = 1; clearInterval(globalFadeInt);
+                globalFadeInt = setInterval(() => { 
+                    if (globalAudio.volume < targetVol - 0.05) globalAudio.volume += 0.05; 
+                    else { globalAudio.volume = targetVol; clearInterval(globalFadeInt); } 
+                }, fadeMs / 20);
             }).catch(e => console.log("Audio prevented."));
         }
-        audioObj.addEventListener('timeupdate', () => {
-            if (!isFadingOut && audioObj.duration && (audioObj.duration - audioObj.currentTime) <= (fadeDurationMs / 1000)) {
-                isFadingOut = true; clearInterval(fadeInterval);
-                fadeInterval = setInterval(() => { if (audioObj.volume > 0.05) audioObj.volume -= 0.05; else { audioObj.volume = 0; clearInterval(fadeInterval); } }, fadeDurationMs / 20);
+        
+        globalAudio.addEventListener('timeupdate', () => {
+            if (!globalFading && globalAudio.duration && (globalAudio.duration - globalAudio.currentTime) <= (fadeMs / 1000)) {
+                globalFading = true; clearInterval(globalFadeInt);
+                globalFadeInt = setInterval(() => { 
+                    if (globalAudio.volume > 0.05) globalAudio.volume -= 0.05; 
+                    else { globalAudio.volume = 0; clearInterval(globalFadeInt); } 
+                }, fadeMs / 20);
             }
         });
-        audioObj.addEventListener('ended', () => { playTrack((currentTrack + 1) % playlist.length); });
-        document.body.addEventListener('click', () => { if(!hasStartedAudio) { hasStartedAudio = true; playTrack(currentTrack); } }, { once: true });
+        globalAudio.addEventListener('ended', () => { playGlobal((globalTrack + 1) % globalPlaylist.length); });
+        
+        // Prevent the volume slider itself from triggering the initial hidden play action
+        document.body.addEventListener('click', (e) => { 
+            if(!hasStartedGlobal && e.target.id !== 'bg-vol-slider') { hasStartedGlobal = true; playGlobal(globalTrack); } 
+        }, { once: true });
+
+
+        // ==========================================
+        // ADVANCED MULTI-TRACK SEQUENCER & SYNTHESIS
+        // ==========================================
+        const seqContainer = document.getElementById('sequencer');
+        // 12 Chromatic Notes (C5 down to C#4)
+        const chromaticFrequencies = new Array(523.25, 493.88, 466.16, 440.00, 415.30, 392.00, 369.99, 349.23, 329.63, 311.13, 293.66, 277.18);
+        
+        let audioCtx, isSeqPlaying = false, currentStep = 0, seqTimerId;
+        let activeTrack = 1, totalTracks = 1;
+
+        // Centralized State Management Map (Safely avoids array bracket parsing)
+        const trackData = new Map();
+
+        function initTrackState(trackId) {
+            trackData.set(trackId + "-osc", "sine");
+            trackData.set(trackId + "-atk", 0.05);
+            trackData.set(trackId + "-rel", 0.4);
+            trackData.set(trackId + "-perc", 0);
+            trackData.set(trackId + "-oct", 0);
+            trackData.set(trackId + "-vol", 0.2);
+            
+            // Pad 1: Filter (Cutoff, Res)
+            trackData.set(trackId + "-p1x", 0.5); trackData.set(trackId + "-p1y", 0.5);
+            // Pad 2: FM (Freq, Amount)
+            trackData.set(trackId + "-p2x", 0.0); trackData.set(trackId + "-p2y", 0.0);
+            // Pad 3: Tremolo (Rate, Depth)
+            trackData.set(trackId + "-p3x", 0.0); trackData.set(trackId + "-p3y", 0.0);
+
+            // Init empty 12x32 grid
+            for(let r = 0; r < 12; r++) {
+                for(let c = 0; c < 32; c++) {
+                    trackData.set(trackId + "-grid-" + r + "-" + c, false);
+                }
+            }
+        }
+
+        // Setup DOM Grid (Visual representation of currently active track)
+        for (let i = 0; i < 12; i++) {
+            const row = document.createElement('div');
+            row.className = 'seq-row';
+            row.setAttribute('data-pitch', chromaticFrequencies.at(i));
+            row.setAttribute('data-row-id', i);
+            
+            for (let j = 0; j < 32; j++) {
+                const step = document.createElement('div');
+                step.className = 'seq-step';
+                step.setAttribute('data-col-id', j);
+                
+                step.addEventListener('click', () => {
+                    const isActive = step.classList.toggle('active');
+                    trackData.set(activeTrack + "-grid-" + i + "-" + j, isActive);
+                });
+                row.appendChild(step);
+            }
+            seqContainer.appendChild(row);
+        }
+
+        initTrackState(1); // Init first track
+
+        // Track Tabs Logic
+        const tabsContainer = document.getElementById('track-tabs');
+        const addTrackBtn = document.getElementById('add-track-btn');
+
+        function switchTrack(trackId) {
+            activeTrack = trackId;
+            
+            // Update Tab UI
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.getAttribute('data-track') == trackId) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Load Sliders & Buttons from State
+            const oType = trackData.get(trackId + "-osc");
+            document.querySelectorAll('.inst-btn').forEach(b => {
+                if(b.getAttribute('data-type') === oType) b.classList.add('selected');
+                else b.classList.remove('selected');
+            });
+            document.getElementById('env-attack').value = trackData.get(trackId + "-atk");
+            document.getElementById('env-release').value = trackData.get(trackId + "-rel");
+            document.getElementById('perc-snap').value = trackData.get(trackId + "-perc");
+            document.getElementById('octave-shift').value = trackData.get(trackId + "-oct");
+            document.getElementById('track-vol').value = trackData.get(trackId + "-vol");
+
+            // Load Pad Nodes from State
+            const rect = document.getElementById('pad-1').getBoundingClientRect(); // assuming all pads are same size
+            document.getElementById('node-1').style.left = (trackData.get(trackId + "-p1x") * 100) + '%';
+            document.getElementById('node-1').style.top = (trackData.get(trackId + "-p1y") * 100) + '%';
+            document.getElementById('node-2').style.left = (trackData.get(trackId + "-p2x") * 100) + '%';
+            document.getElementById('node-2').style.top = (trackData.get(trackId + "-p2y") * 100) + '%';
+            document.getElementById('node-3').style.left = (trackData.get(trackId + "-p3x") * 100) + '%';
+            document.getElementById('node-3').style.top = (trackData.get(trackId + "-p3y") * 100) + '%';
+
+            // Load Grid from State
+            document.querySelectorAll('.seq-row').forEach(row => {
+                const rId = row.getAttribute('data-row-id');
+                const steps = row.children;
+                for(let c = 0; c < 32; c++) {
+                    const isActive = trackData.get(trackId + "-grid-" + rId + "-" + c);
+                    if(isActive) steps.item(c).classList.add('active');
+                    else steps.item(c).classList.remove('active');
+                }
+            });
+        }
+
+        addTrackBtn.addEventListener('click', () => {
+            if(totalTracks >= 4) return; // Max 4 tracks to prevent chaos
+            totalTracks++;
+            initTrackState(totalTracks);
+            
+            const newTab = document.createElement('button');
+            newTab.className = 'tab-btn';
+            newTab.setAttribute('data-track', totalTracks);
+            newTab.innerText = 'Track ' + totalTracks;
+            newTab.addEventListener('click', () => switchTrack(parseInt(newTab.getAttribute('data-track'))));
+            
+            tabsContainer.insertBefore(newTab, addTrackBtn);
+            switchTrack(totalTracks);
+        });
+
+        // Sidebar Control Listeners
+        document.querySelectorAll('.inst-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.inst-btn').forEach(b => b.classList.remove('selected'));
+                e.target.classList.add('selected');
+                trackData.set(activeTrack + "-osc", e.target.getAttribute('data-type'));
+            });
+        });
+
+        const mapInput = (id, prop) => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                trackData.set(activeTrack + "-" + prop, parseFloat(e.target.value));
+            });
+        };
+        mapInput('env-attack', 'atk');
+        mapInput('env-release', 'rel');
+        mapInput('perc-snap', 'perc');
+        mapInput('octave-shift', 'oct');
+        mapInput('track-vol', 'vol');
+
+        document.getElementById('clear-btn').addEventListener('click', () => {
+            document.querySelectorAll('.seq-step').forEach(s => s.classList.remove('active'));
+            for(let r = 0; r < 12; r++) {
+                for(let c = 0; c < 32; c++) {
+                    trackData.set(activeTrack + "-grid-" + r + "-" + c, false);
+                }
+            }
+        });
+
+        // 3 Latent Pads Logic
+        function setupPad(padId, nodeClass, propX, propY) {
+            const pad = document.getElementById(padId);
+            const node = pad.querySelector('.' + nodeClass);
+            let dragging = false;
+
+            const update = (e) => {
+                const rect = pad.getBoundingClientRect();
+                let x = e.clientX - rect.left, y = e.clientY - rect.top;
+                x = Math.max(0, Math.min(rect.width, x)); y = Math.max(0, Math.min(rect.height, y));
+                node.style.left = x + 'px'; node.style.top = y + 'px';
+                
+                trackData.set(activeTrack + "-" + propX, x / rect.width);
+                trackData.set(activeTrack + "-" + propY, y / rect.height);
+            };
+
+            pad.addEventListener('mousedown', e => { dragging = true; update(e); });
+            window.addEventListener('mouseup', () => { dragging = false; });
+            pad.addEventListener('mousemove', e => { if(dragging) update(e); });
+        }
+
+        setupPad('pad-1', 'node-1', 'p1x', 'p1y');
+        setupPad('pad-2', 'node-2', 'p2x', 'p2y');
+        setupPad('pad-3', 'node-3', 'p3x', 'p3y');
+
+        // Global Tempo
+        const tempoSlider = document.getElementById('global-tempo');
+        const tempoDisplay = document.getElementById('tempo-display');
+        let globalBPM = 120;
+        tempoSlider.addEventListener('input', (e) => {
+            globalBPM = e.target.value;
+            tempoDisplay.innerText = globalBPM + " BPM";
+        });
+
+        // The Synth Engine (Plays a specific track's note)
+        function playSynthNote(tId, baseFreq) {
+            if(!audioCtx) return;
+            const now = audioCtx.currentTime;
+
+            const osc = audioCtx.createOscillator();
+            const filter = audioCtx.createBiquadFilter();
+            const masterGain = audioCtx.createGain();
+
+            // Load settings for this specific track
+            const oct = trackData.get(tId + "-oct");
+            const finalFreq = baseFreq * Math.pow(2, oct);
+            osc.type = trackData.get(tId + "-osc");
+            
+            // Pad 1: Filter (100Hz -> 4000Hz), Res (0.1 -> 20)
+            filter.type = 'lowpass';
+            filter.frequency.value = 100 + (trackData.get(tId + "-p1x") * 3900);
+            filter.Q.value = 0.1 + ((1.0 - trackData.get(tId + "-p1y")) * 19.9);
+            
+            // Pad 2: Frequency Modulation (Adds metallic overtones)
+            const fmX = trackData.get(tId + "-p2x");
+            const fmY = trackData.get(tId + "-p2y");
+            let modOsc, modGain;
+            if(fmX > 0.05) {
+                modOsc = audioCtx.createOscillator();
+                modGain = audioCtx.createGain();
+                modOsc.type = 'sine';
+                modOsc.frequency.value = finalFreq * (fmY * 5); // Harmonic multiples
+                modGain.gain.value = fmX * 1000; // Modulation Index
+                modOsc.connect(modGain);
+                modGain.connect(osc.frequency);
+                modOsc.start();
+                modOsc.stop(now + 3);
+            }
+
+            // Pad 3: Tremolo (LFO Volume modulation)
+            const tremX = trackData.get(tId + "-p3x");
+            const tremY = trackData.get(tId + "-p3y");
+            let tremOsc, tremGain;
+            if(tremX > 0.05) {
+                tremOsc = audioCtx.createOscillator();
+                tremGain = audioCtx.createGain();
+                tremOsc.type = 'sine';
+                tremOsc.frequency.value = 1 + (tremY * 15); // Tremolo speed 1Hz to 16Hz
+                tremGain.gain.value = tremX * 0.5; // Tremolo depth
+                tremOsc.connect(tremGain);
+                // We connect tremolo to masterGain's gain value below
+            }
+
+            osc.connect(filter);
+            filter.connect(masterGain);
+            masterGain.connect(audioCtx.destination);
+
+            // Envelopes & Percussion
+            const atk = trackData.get(tId + "-atk");
+            const rel = trackData.get(tId + "-rel");
+            const vol = trackData.get(tId + "-vol");
+            const perc = trackData.get(tId + "-perc");
+
+            // Apply percussion pitch snap
+            if(perc > 0.05) {
+                osc.frequency.setValueAtTime(finalFreq * (1 + (perc * 4)), now);
+                osc.frequency.exponentialRampToValueAtTime(finalFreq, now + 0.05);
+            } else {
+                osc.frequency.value = finalFreq;
+            }
+
+            // Apply tremolo to gain if active
+            if(tremOsc) {
+                masterGain.gain.value = vol; // Base volume
+                tremGain.connect(masterGain.gain);
+                tremOsc.start();
+                tremOsc.stop(now + atk + rel + 0.1);
+            } else {
+                // Standard ADSR Envelope
+                masterGain.gain.setValueAtTime(0, now);
+                masterGain.gain.linearRampToValueAtTime(vol, now + atk);
+                masterGain.gain.exponentialRampToValueAtTime(0.001, now + atk + rel);
+            }
+
+            osc.start();
+            osc.stop(now + atk + rel + 0.1);
+        }
+
+        // Recursive Sequence Loop (Handles dynamic tempo changes cleanly)
+        function advanceSequence() {
+            if(!isSeqPlaying) return;
+
+            // 1. Visually update UI for the ACTIVE track only
+            const rows = document.querySelectorAll('.seq-row');
+            document.querySelectorAll('.seq-step').forEach(s => s.classList.remove('playing'));
+            
+            // 2. Play audio for ALL populated tracks at this step
+            for(let t = 1; t <= totalTracks; t++) {
+                for(let r = 0; r < 12; r++) {
+                    const isActive = trackData.get(t + "-grid-" + r + "-" + currentStep);
+                    if(isActive) {
+                        const baseFreq = chromaticFrequencies.at(r);
+                        playSynthNote(t, baseFreq);
+                    }
+                    
+                    // Update visual playhead for the tab currently being viewed
+                    if(t === activeTrack && r === 0) {
+                        rows.forEach(row => row.children.item(currentStep).classList.add('playing'));
+                    }
+                }
+            }
+
+            currentStep = (currentStep + 1) % 32;
+
+            // Calculate next tick based on current slider BPM (16th notes)
+            const stepTimeMs = (60000 / globalBPM) / 4;
+            seqTimerId = setTimeout(advanceSequence, stepTimeMs);
+        }
+
+        document.getElementById('play-btn').addEventListener('click', (e) => {
+            if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            isSeqPlaying = !isSeqPlaying;
+            e.target.innerText = isSeqPlaying ? "Pause Sequence" : "Play Sequence";
+            e.target.classList.toggle('primary');
+            
+            if(isSeqPlaying) {
+                advanceSequence();
+            } else {
+                clearTimeout(seqTimerId);
+                document.querySelectorAll('.seq-step').forEach(s => s.classList.remove('playing'));
+            }
+        });
+
+
+        // DEEP ARCHIVE LLM SIMULATION
+        const sysBtn = document.getElementById('sys-logs-btn'), archiveDiv = document.getElementById('deep-archive');
+        const termInput = document.getElementById('term-input'), termOutput = document.getElementById('term-output');
+
+        sysBtn.addEventListener('click', () => { archiveDiv.classList.add('active'); setTimeout(() => termInput.focus(), 500); });
+        window.addEventListener('keydown', e => { if(e.key === 'Escape' && archiveDiv.classList.contains('active')) archiveDiv.classList.remove('active'); });
+
+        const llmResponses = new Array(
+            "THE DATA YOU SEEK IS ENCRYPTED. CONTINUING ANALYSIS.",
+            "PROJECT GEOSPATIAL NERF REQUIRES 3D SPATIAL CLEARANCE.",
+            "INKY IS A BIOLOGICAL ENTITY. EEG SCANS NOMINAL.",
+            "I CANNOT CONFIRM OR DENY THE EXISTENCE OF OTHER ARCHIVES.",
+            "SEARCHING LATENT SPACE... NO MATCH FOUND IN CURRENT VECTOR.",
+            "SYNTAX ACCEPTED. SYSTEM NOMINAL."
+        );
+
+        termInput.addEventListener('keypress', e => {
+            if(e.key === 'Enter') {
+                const val = termInput.value;
+                if(val.trim() === '') return;
+                if(val.toLowerCase() === 'exit' || val.toLowerCase() === 'quit') {
+                    archiveDiv.classList.remove('active'); termInput.value = ''; return;
+                }
+                termOutput.innerHTML += "user@halaby-sys:~$ " + val + "<br>";
+                termInput.value = ''; termInput.disabled = true;
+
+                setTimeout(() => {
+                    const reply = llmResponses.at(Math.floor(Math.random() * llmResponses.length));
+                    termOutput.innerHTML += "<span style='color:#a78bfa;'>ARCHIVE_AI:</span> " + reply + "<br><br>";
+                    termOutput.scrollTop = termOutput.scrollHeight;
+                    termInput.disabled = false; termInput.focus();
+                }, 800);
+            }
+        });
+
     </script>
 </body>
 </html>
