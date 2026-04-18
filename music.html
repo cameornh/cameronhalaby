@@ -104,7 +104,7 @@
         /* DEEP ARCHIVE LLM TERMINAL */
         #sys-logs-btn { font-size: 0.6rem; opacity: 0.2; cursor: pointer; transition: opacity 0.3s; text-decoration: none; color: inherit; }
         #sys-logs-btn:hover { opacity: 1; }
-        #deep-archive { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 5000; display: none; padding: 40px; font-family: 'Courier Prime', monospace; color: #34d399; flex-direction: column; opacity: 0; transition: opacity 0.5s; }
+        #deep-archive { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); z-index: 5000; display: none; padding: 40px; font-family: 'Courier Prime', monospace; color: #34d399; flex-direction: column; opacity: 0; transition: opacity 0.1s; }
         #deep-archive.active { display: flex; opacity: 1; }
         .term-output { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; }
         .term-input-line { display: flex; gap: 10px; }
@@ -249,7 +249,7 @@
                 <div class="action-controls">
                     <button class="editor-btn primary" id="play-btn">Play Sequence</button>
                     <button class="editor-btn" id="clear-btn">Clear Track</button>
-                    <a href="mailto:crhalaby652@gmail.com?subject=My%20Generative%20Track&body=Hi%20Cameron,%0D%0A%0D%0AI%20created%20a%20sequence%20on%20your%20site%20and%20wanted%20to%20share%20it!%0D%0A%0D%0AThanks!" class="editor-btn" style="margin-left: auto;">Send Track</a>
+                    <a href="mailto:crhalaby652@gmail.com?subject=My%20Song&body=Hi%20Cameron,%0D%0A%0D%0AI%20created%20a%20song%20on%20your%20site%20and%20wanted%20to%20share%20it%0D%0A%0D%0AThanks" class="editor-btn" style="margin-left: auto;">Send Song</a>
                 </div>
             </div>
         </section>
@@ -265,9 +265,9 @@
 
     <!-- DEEP ARCHIVE TERMINAL -->
     <div id="deep-archive">
-        <div class="term-output" id="term-output">ACCESSING LOCAL ARCHIVE...<br>WEIGHTS LOADED.<br>AWAITING QUERY.<br><br></div>
+        <div class="term-output" id="term-output">ACCESSING LOCAL ARCHIVE...<br>AWAITING QUERY.<br><br></div>
         <div class="term-input-line">
-            <span class="term-prefix">user@halaby-sys:~$</span>
+            <span class="term-prefix">user@sys:~$</span>
             <input type="text" class="term-input" id="term-input" autocomplete="off" spellcheck="false">
         </div>
     </div>
@@ -277,8 +277,18 @@
         function updateTheme() {
             const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
-            const r = Math.round(5 + (236-5) * intensity), g = Math.round(5 + (236-5) * intensity), b = Math.round(8 + (233-8) * intensity);
-            const textR = Math.round(244 + (17-244) * intensity), textG = Math.round(244 + (17-244) * intensity), textB = Math.round(245 + (17-245) * intensity);
+            
+            // Smoothly transition the background
+            const r = Math.round(5 + (236-5) * intensity);
+            const g = Math.round(5 + (236-5) * intensity);
+            const b = Math.round(8 + (233-8) * intensity);
+            
+            // Sharp transition for text to guarantee contrast
+            const isDay = intensity > 0.5;
+            const textR = isDay ? 17 : 244;
+            const textG = isDay ? 17 : 244;
+            const textB = isDay ? 17 : 245;
+
             document.documentElement.style.setProperty('--bg-color', 'rgb(' + r + ',' + g + ',' + b + ')');
             document.documentElement.style.setProperty('--text-color', 'rgb(' + textR + ',' + textG + ',' + textB + ')');
         }
@@ -391,6 +401,11 @@
 
         initTrackState(1); // Init first track
 
+        // Attach the click listener to the hardcoded first tab
+        document.querySelector('.tab-btn.active').addEventListener('click', (e) => {
+            switchTrack(parseInt(e.target.getAttribute('data-track')));
+        });
+
         // Track Tabs Logic
         const tabsContainer = document.getElementById('track-tabs');
         const addTrackBtn = document.getElementById('add-track-btn');
@@ -438,7 +453,7 @@
         }
 
         addTrackBtn.addEventListener('click', () => {
-            if(totalTracks >= 4) return; // Max 4 tracks to prevent chaos
+            if(totalTracks >= 6) return; // Max 4 tracks to prevent chaos
             totalTracks++;
             initTrackState(totalTracks);
             
@@ -655,12 +670,8 @@
         window.addEventListener('keydown', e => { if(e.key === 'Escape' && archiveDiv.classList.contains('active')) archiveDiv.classList.remove('active'); });
 
         const llmResponses = new Array(
-            "THE DATA YOU SEEK IS ENCRYPTED. CONTINUING ANALYSIS.",
-            "PROJECT GEOSPATIAL NERF REQUIRES 3D SPATIAL CLEARANCE.",
-            "INKY IS A BIOLOGICAL ENTITY. EEG SCANS NOMINAL.",
-            "I CANNOT CONFIRM OR DENY THE EXISTENCE OF OTHER ARCHIVES.",
-            "SEARCHING LATENT SPACE... NO MATCH FOUND IN CURRENT VECTOR.",
-            "SYNTAX ACCEPTED. SYSTEM NOMINAL."
+            "SYSTEM DOWN. CHECK BACK LATER.",
+            "NO RESPONSE"
         );
 
         termInput.addEventListener('keypress', e => {
