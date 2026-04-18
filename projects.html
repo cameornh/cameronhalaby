@@ -138,8 +138,8 @@
         let mouseX = -1000, mouseY = -1000;
 
         function initLatent() {
-            width = lCanvas.parentElement.clientWidth / 3;
-            height = lCanvas.parentElement.clientHeight / 3;
+            width = lCanvas.parentElement.clientWidth;
+            height = lCanvas.parentElement.clientHeight;
             lCanvas.width = width; lCanvas.height = height;
             nodes = new Array();
             for(let i=0; i<24000; i++) {
@@ -169,7 +169,7 @@
             nodes.forEach(node => {
                 const drawX = width/2 + node.x + (camX * node.z);
                 const drawY = height/2 + node.y + (camY * node.z);
-                const size = node.isMain ? 4 : 1.5;
+                const size = node.isMain ? 2 : 1.5;
                 
                 const dist = Math.hypot(mouseX - drawX, mouseY - (drawY + lCanvas.parentElement.getBoundingClientRect().top));
                 if(dist < 20 && node.isMain) hoveredNode = node;
