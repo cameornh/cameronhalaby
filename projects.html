@@ -72,31 +72,31 @@
         <section class="page-section">
             <div class="card-grid">
                 <div class="obs-card">
-                    <img src="./assets/p1.jpg" alt="Project 1" class="project-img">
+                    <img src="./assets/pr1.jpg" alt="Project 1" class="project-img">
                     <h3 class="obs-title">Geospatial NeRF</h3>
                     <p class="project-desc">A deep dive into geospatial 3D reconstruction using Neural Radiance Fields. This project maps topological data into highly accurate 3D spatial models.</p>
-                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Geospatial%20NeRF&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Geospatial%20NeRF%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks!" class="request-cv-btn">I'm Interested</a>
+                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Geospatial%20NeRF&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Geospatial%20NeRF%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
                 </div>
 
                 <div class="obs-card">
-                    <img src="./assets/p2.jpg" alt="Project 2" class="project-img">
+                    <img src="./assets/pr2.jpg" alt="Project 2" class="project-img">
                     <h3 class="obs-title">Semantic Course Map</h3>
                     <p class="project-desc">Mapping the landscape of UGA's courses using advanced NLP and semantic vector embeddings to visually cluster related fields of study.</p>
-                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Semantic%20Course%20Map&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Semantic%20Course%20Map%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks!" class="request-cv-btn">I'm Interested</a>
+                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Semantic%20Course%20Map&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Semantic%20Course%20Map%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
                 </div>
 
                 <div class="obs-card">
-                    <img src="./assets/p3.jpg" alt="Project 3" class="project-img">
-                    <h3 class="obs-title">EEG ML (Inky)</h3>
+                    <img src="./assets/pr3.jpg" alt="Project 3" class="project-img">
+                    <h3 class="obs-title">EEG ML</h3>
                     <p class="project-desc">A machine learning classification project utilizing EEG brain scan data to interpret and categorize canine neural patterns.</p>
-                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20EEG%20ML&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20EEG%20ML%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks!" class="request-cv-btn">I'm Interested</a>
+                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20EEG%20ML&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20EEG%20ML%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
                 </div>
             </div>
         </section>
     </main>
 
     <footer class="site-footer">
-        <p>© 2026 Cameron Halaby. No Rights Reserved.</p>
+        <p>2026 Cameron Halaby. No Rights Reserved.</p>
         <p id="dynamic-date"></p>
     </footer>
 
@@ -132,7 +132,7 @@
         const tooltip = document.getElementById('latent-tooltip');
         let width, height;
         let nodes = new Array();
-        const projectNames = new Array("Geospatial NeRF", "Semantic Course Map", "EEG Neural Net", "Latent Visualizer", "Data Architecture", "Topology Engine");
+        const projectNames = new Array("Geospatial NeRF", "Semantic Course Map", "EEG Neural Net", "Project 4", "Project 5", "Project 6", "Project 7", "Project 8", "Project 9", "Project 10", "Project 11", "Project 12", "Project 13", "Project 14", "Project 15");
         
         let camX = 0, camY = 0, isDragging = false, startX, startY;
         let mouseX = -1000, mouseY = -1000;
@@ -150,7 +150,7 @@
                     z: Math.random() * 2,
                     isMain: isMain,
                     name: isMain ? projectNames.at(i) : "Data Node",
-                    color: isMain ? '#a78bfa' : '#333333'
+                    color: isMain ? '#4ec2e6' : '#333333'
                 });
             }
         }
