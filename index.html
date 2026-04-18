@@ -906,94 +906,104 @@
         // --- 11. THE OBSERVER (REAL-TIME ML PREDICTIVE CURSOR) ---
         // A lightweight, online-learning Neural Network (Single-Layer Perceptron)
         // that learns your mouse kinematics to predict future positions.
-        class PredictiveModel {
+        class MimicModel {
             constructor() {
-                // Initial Weights (safely mapped to individual properties)
-                this.wx0 = 0.5; this.wx1 = 0.0; this.wx2 = 0.1; this.wx3 = 0.0;
-                this.wy0 = 0.0; this.wy1 = 0.5; this.wy2 = 0.0; this.wy3 = 0.1;
+                // Weights mapping distance and velocity to future acceleration
+                this.wdx = 0.05; 
+                this.wvx = 0.85; 
+                this.wdy = 0.05;
+                this.wvy = 0.85;
                 this.learningRate = 0.00005;
             }
             
-            predict(vx, vy, ax, ay) {
-                const px = (vx * this.wx0) + (vy * this.wx1) + (ax * this.wx2) + (ay * this.wx3);
-                const py = (vx * this.wy0) + (vy * this.wy1) + (ax * this.wy2) + (ay * this.wy3);
-                return { px: px, py: py };
+            predict(dx, dy, vx, vy) {
+                const nextVx = (dx * this.wdx) + (vx * this.wvx);
+                const nextVy = (dy * this.wdy) + (vy * this.wvy);
+                return { vx: nextVx, vy: nextVy };
             }
             
-            train(vx, vy, ax, ay, targetDx, targetDy) {
-                const prediction = this.predict(vx, vy, ax, ay);
+            train(dx, dy, vx, vy, actualNextVx, actualNextVy) {
+                const pred = this.predict(dx, dy, vx, vy);
                 
-                let errorX = targetDx - prediction.px;
-                let errorY = targetDy - prediction.py;
+                let errX = actualNextVx - pred.vx;
+                let errY = actualNextVy - pred.vy;
                 
-                errorX = Math.max(-100, Math.min(100, errorX));
-                errorY = Math.max(-100, Math.min(100, errorY));
+                // Gradient clipping to prevent the math from exploding during wild mouse swings
+                errX = Math.max(-50, Math.min(50, errX));
+                errY = Math.max(-50, Math.min(50, errY));
                 
-                this.wx0 += this.learningRate * errorX * vx;
-                this.wx1 += this.learningRate * errorX * vy;
-                this.wx2 += this.learningRate * errorX * ax;
-                this.wx3 += this.learningRate * errorX * ay;
+                // Update weights using Stochastic Gradient Descent
+                this.wdx += this.learningRate * errX * dx;
+                this.wvx += this.learningRate * errX * vx;
+                this.wdy += this.learningRate * errY * dy;
+                this.wvy += this.learningRate * errY * vy;
 
-                this.wy0 += this.learningRate * errorY * vx;
-                this.wy1 += this.learningRate * errorY * vy;
-                this.wy2 += this.learningRate * errorY * ax;
-                this.wy3 += this.learningRate * errorY * ay;
+                // Enforce physical boundaries so the ghost doesn't fly off screen
+                this.wdx = Math.max(0.001, Math.min(0.2, this.wdx));
+                this.wvx = Math.max(0.5, Math.min(0.98, this.wvx));
+                this.wdy = Math.max(0.001, Math.min(0.2, this.wdy));
+                this.wvy = Math.max(0.5, Math.min(0.98, this.wvy));
             }
         }
 
-        const observerNet = new PredictiveModel();
+        const mimicNet = new MimicModel();
         const tether = document.getElementById('observer-tether');
         const ghost = document.getElementById('observer-ghost');
         
         let ghostX = window.innerWidth / 2;
         let ghostY = window.innerHeight / 2;
-        let lastMx = heroMX;
-        let lastMy = heroMY;
-        let lastVx = 0;
-        let lastVy = 0;
+        let ghostVx = 0;
+        let ghostVy = 0;
+
+        let lastUserX = heroMX;
+        let lastUserY = heroMY;
         
-        // Safely instantiated history queue
-        let historyQueue = new Array();
+        // Creating history queue purely with object methods 
+        let userHistory = new Array();
 
         function updateObserver() {
-            let vx = heroMX - lastMx;
-            let vy = heroMY - lastMy;
-            let ax = vx - lastVx;
-            let ay = vy - lastVy;
+            // 1. Calculate current user kinematics
+            let userVx = heroMX - lastUserX;
+            let userVy = heroMY - lastUserY;
 
-            historyQueue.push({ mx: heroMX, my: heroMY, vx: vx, vy: vy, ax: ax, ay: ay });
+            userHistory.push({ x: heroMX, y: heroMY, vx: userVx, vy: userVy });
 
-            // Reduced to 5 frames so the ghost hovers much closer to the cursor
-            if (historyQueue.length > 5) {
-                const pastState = historyQueue.shift();
-                const actualDx = heroMX - pastState.mx;
-                const actualDy = heroMY - pastState.my;
+            // 2. Train on 8-frame delayed history
+            if (userHistory.length > 8) {
+                const past = userHistory.shift();
+                
+                // How far did the user have to go 8 frames ago?
+                const gapX = heroMX - past.x;
+                const gapY = heroMY - past.y;
 
-                observerNet.train(pastState.vx, pastState.vy, pastState.ax, pastState.ay, actualDx, actualDy);
+                // What was their average velocity to close that gap?
+                const actualVx = gapX / 8;
+                const actualVy = gapY / 8;
+
+                // Train the model to map (gap, past_velocity) -> actual_resulting_velocity
+                mimicNet.train(gapX, gapY, past.vx, past.vy, actualVx, actualVy);
             }
 
-            const prediction = observerNet.predict(vx, vy, ax, ay);
+            // 3. Ghost applies the user's learned physics to its own movement!
+            let ghostGapX = heroMX - ghostX;
+            let ghostGapY = heroMY - ghostY;
 
-            // Predict 5 frames out instead of 12
-            let targetGhostX = heroMX + prediction.px * 5;
-            let targetGhostY = heroMY + prediction.py * 5;
+            const gPred = mimicNet.predict(ghostGapX, ghostGapY, ghostVx, ghostVy);
+            
+            ghostVx = gPred.vx;
+            ghostVy = gPred.vy;
+            
+            ghostX += ghostVx;
+            ghostY += ghostVy;
 
-            // Move the ghost smoothly
-            ghostX += (targetGhostX - ghostX) * 0.2;
-            ghostY += (targetGhostY - ghostY) * 0.2;
-
+            // 4. Update the SVG graphics
             if (ghost && tether) {
-                // Translate the SVG group instead of cx/cy so the mouse icon moves properly
                 ghost.style.transform = 'translate(' + ghostX + 'px, ' + ghostY + 'px)';
-                
-                // Draw a direct, straight line from real cursor to ghost cursor
                 tether.setAttribute('d', 'M ' + heroMX + ' ' + heroMY + ' L ' + ghostX + ' ' + ghostY);
             }
 
-            lastMx = heroMX;
-            lastMy = heroMY;
-            lastVx = vx;
-            lastVy = vy;
+            lastUserX = heroMX;
+            lastUserY = heroMY;
 
             requestAnimationFrame(updateObserver);
         }
