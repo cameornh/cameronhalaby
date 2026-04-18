@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cameron Halaby | Art</title>
+    <link rel="icon" href="./assets/favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=cormorant-garamond:400,500,600,700|archivo:300,400,500" rel="stylesheet" />
+
+    <style>
+        :root { --bg-color: #ecece9; --text-color: #111111; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100vw; min-height: 100vh; background-color: var(--bg-color); font-family: 'Archivo', sans-serif; color: var(--text-color); -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: background-color 2s ease, color 2s ease; }
+
+        .site-header { position: fixed; top: 0; width: 100%; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        .header-logo, .header-nav a { text-decoration: none; font-family: 'Archivo', sans-serif; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: var(--text-color); transition: opacity 0.3s; }
+        .header-nav a:hover, .header-logo:hover { opacity: 0.5; }
+        .header-nav { display: flex; gap: 40px; }
+
+        .audio-player { position: fixed; bottom: 30px; right: 40px; z-index: 9999; font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-color); opacity: 0; transition: opacity 1.5s ease; }
+        .audio-player a { color: inherit; text-decoration: none; }
+        .audio-player u { text-underline-offset: 4px; text-decoration-thickness: 1px; transition: color 0.3s ease; }
+
+        .page-container { padding: 150px 10% 100px 10%; min-height: 90vh; }
+        .page-title { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 500; margin-bottom: 10px; }
+        .page-subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: #888; margin-bottom: 60px; }
+
+        /* Minimal Image Grid Placeholder */
+        .art-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .art-item { width: 100%; aspect-ratio: 1/1; background-color: rgba(128,128,128,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; letter-spacing: 2px; color: #888; text-transform: uppercase; }
+
+        .site-footer { border-top: 1px solid rgba(128,128,128,0.2); color: #888; padding: 40px 10%; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+    <nav class="site-header">
+        <a href="index.html" class="header-logo">C. Halaby</a>
+        <div class="header-nav">
+            <a href="projects.html">Projects</a>
+            <a href="art.html" style="opacity: 0.5;">Art</a>
+            <a href="music.html">Music</a>
+        </div>
+    </nav>
+
+    <div class="audio-player" id="audio-player">
+        Playing <a href="music.html"><u id="track-name">Loading...</u></a>
+    </div>
+
+    <main class="page-container">
+        <h1 class="page-title">Art & Photography</h1>
+        <p class="page-subtitle">Generative Math & Visuals</p>
+
+        <div class="art-grid">
+            <div class="art-item">Art Frame 01</div>
+            <div class="art-item">Art Frame 02</div>
+            <div class="art-item">Art Frame 03</div>
+            <div class="art-item">Art Frame 04</div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>© 2026 Cameron Halaby. No Rights Reserved.</p>
+        <p id="dynamic-date"></p>
+    </footer>
+
+    <script>
+        function updateTheme() {
+            const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+            const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
+            const r = Math.round(5 + (236-5) * intensity), g = Math.round(5 + (236-5) * intensity), b = Math.round(8 + (233-8) * intensity);
+            const textR = Math.round(244 + (17-244) * intensity), textG = Math.round(244 + (17-244) * intensity), textB = Math.round(245 + (17-245) * intensity);
+            document.documentElement.style.setProperty('--bg-color', `rgb(${r},${g},${b})`);
+            document.documentElement.style.setProperty('--text-color', `rgb(${textR},${textG},${textB})`);
+        }
+        setInterval(updateTheme, 60000); updateTheme();
+
+        const d = new Date(), months =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        document.getElementById('dynamic-date').innerText = `Updated ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+        // AUDIO PLAYER LOGIC
+        const playlist = new Array(
+            { name: "SoundHelix_01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+            { name: "SoundHelix_02", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+        );
+        let currentTrack = 0, hasStartedAudio = false, isFadingOut = false, fadeInterval;
+        const fadeDurationMs = 2000, audioObj = new Audio(), playerUI = document.getElementById('audio-player'), trackNameUI = document.getElementById('track-name');
+
+        function playTrack(index) {
+            currentTrack = index; audioObj.src = playlist[currentTrack].src; trackNameUI.innerText = playlist[currentTrack].name;
+            audioObj.volume = 0; isFadingOut = false;
+            audioObj.play().then(() => {
+                playerUI.style.opacity = 1; clearInterval(fadeInterval);
+                fadeInterval = setInterval(() => { if (audioObj.volume < 0.95) audioObj.volume += 0.05; else { audioObj.volume = 1; clearInterval(fadeInterval); } }, fadeDurationMs / 20);
+            }).catch(e => console.log("Audio prevented."));
+        }
+        audioObj.addEventListener('timeupdate', () => {
+            if (!isFadingOut && audioObj.duration && (audioObj.duration - audioObj.currentTime) <= (fadeDurationMs / 1000)) {
+                isFadingOut = true; clearInterval(fadeInterval);
+                fadeInterval = setInterval(() => { if (audioObj.volume > 0.05) audioObj.volume -= 0.05; else { audioObj.volume = 0; clearInterval(fadeInterval); } }, fadeDurationMs / 20);
+            }
+        });
+        audioObj.addEventListener('ended', () => { playTrack((currentTrack + 1) % playlist.length); });
+        document.body.addEventListener('click', () => { if(!hasStartedAudio) { hasStartedAudio = true; playTrack(currentTrack); } }, { once: true });
+    </script>
+</body>
+</html>
