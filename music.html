@@ -144,23 +144,39 @@
             <div class="track-list">
                 <div class="track-item">
                     <span class="track-name">Song 01</span>
-                    <span class="track-meta">03:45 / Under Construction. Check back later</span>
+                    <span class="track-meta">02:28</span>
                 </div>
                 <div class="track-item">
                     <span class="track-name">Song 02</span>
-                    <span class="track-meta">04:12 / Under Construction. Check back later</span>
+                    <span class="track-meta">00:40</span>
                 </div>
                 <div class="track-item">
                     <span class="track-name">Song 03</span>
-                    <span class="track-meta">02:30 / Under Construction. Check back later</span>
+                    <span class="track-meta">01:36</span>
                 </div>
                 <div class="track-item">
                     <span class="track-name">Song 04</span>
-                    <span class="track-meta">05:05 / Under Construction. Check back later</span>
+                    <span class="track-meta">01:39</span>
+                </div>
+                <div class="track-item">
+                    <span class="track-name">Song 05</span>
+                    <span class="track-meta">02:42</span>
+                </div>
+                <div class="track-item">
+                    <span class="track-name">Song 06</span>
+                    <span class="track-meta">02:11</span>
                 </div>
             </div>
         </section>
 
+        <section class="page-section" style="padding-top: 40px;">
+            <div class="section-header">
+                <a href="https://musescore.com/user/29944764" class="obs-card contact-card">
+                    <h3 class="obs-title">More on Musescore</h3>
+                </a>
+            </div>
+        </section>
+        
         <!-- ENHANCED  SYNTHESIS SECTION -->
         <section class="page-section" style="padding-top: 40px;">
             <div class="section-header">
@@ -303,7 +319,9 @@
             { name: "Song 01", src: "./assets/song1.mp3" },
             { name: "Song 02", src: "./assets/song2.mp3" },
             { name: "Song 03", src: "./assets/song3.mp3" },
-            { name: "Song 04", src: "./assets/song4.mp3" }
+            { name: "Song 04", src: "./assets/song4.mp3" },
+            { name: "Song 04", src: "./assets/song5.mp3" },
+            { name: "Song 04", src: "./assets/song6.mp3" }
         );
         let globalTrack = 0, hasStartedGlobal = false, globalFading = false, globalFadeInt;
         const fadeMs = 2000, globalAudio = new Audio(), gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
