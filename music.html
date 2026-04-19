@@ -300,8 +300,8 @@
 
         // GLOBAL AUDIO PLAYER
         const globalPlaylist = new Array(
-            { name: "SoundHelix_01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "SoundHelix_02", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
+            { name: "Song_01", src: "./assets/song1.mp3" },
+            { name: "Song_02", src: "./assets/song2.mp3" }
         );
         let globalTrack = 0, hasStartedGlobal = false, globalFading = false, globalFadeInt;
         const fadeMs = 2000, globalAudio = new Audio(), gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
@@ -744,7 +744,7 @@
                 if(val.toLowerCase() === 'exit' || val.toLowerCase() === 'quit') {
                     archiveDiv.classList.remove('active'); termInput.value = ''; return;
                 }
-                termOutput.innerHTML += "user@halaby-sys:~$ " + val + "<br>";
+                termOutput.innerHTML += "user@sys:~$ " + val + "<br>";
                 termInput.value = ''; termInput.disabled = true;
 
                 setTimeout(() => {
