@@ -45,35 +45,15 @@
         }
         .header-nav { display: flex; gap: 40px; }
 
-        /* FLOATING AUDIO PLAYER */
-        .audio-player {
-            position: fixed;
-            bottom: 30px;
-            right: 40px;
-            z-index: 9999;
-            font-family: 'Archivo', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #ffffff;
-            mix-blend-mode: difference;
-            pointer-events: none;
-            opacity: 0; /* Fades in after user clicks the page */
-            transition: opacity 1.5s ease;
-        }
-        .audio-player a {
-            color: inherit;
-            text-decoration: none;
-            pointer-events: auto; /* Allow clicking the link */
-        }
-        .audio-player u {
-            text-underline-offset: 4px;
-            text-decoration-thickness: 1px;
-            transition: color 0.3s ease;
-        }
-        .audio-player a:hover u {
-            color: #a78bfa; /* Subtle highlight on hover */
-        }
+        /* FLOATING AUDIO PLAYER WITH VOLUME */
+        .audio-player { position: fixed; bottom: 30px; right: 40px; z-index: 9999; font-family: 'Archivo', sans-serif; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-color); opacity: 0; transition: opacity 1.5s ease; mix-blend-mode: difference; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+        .audio-player a { color: inherit; text-decoration: none; pointer-events: auto; }
+        .audio-player u { text-underline-offset: 4px; text-decoration-thickness: 1px; transition: color 0.3s ease; }
+        .audio-player a:hover u { color: #a78bfa; }
+        .audio-vol-wrapper { display: flex; align-items: center; gap: 10px; font-size: 0.6rem; opacity: 0.5; transition: opacity 0.3s; pointer-events: auto; }
+        .audio-vol-wrapper:hover { opacity: 1; }
+        .vol-slider { -webkit-appearance: none; width: 80px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; outline: none; cursor: pointer; }
+        .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
 
         /* HERO SECTION */
         .hero-section {
@@ -685,12 +665,12 @@
         const months =["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         footerDate.innerText = `Updated ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
-        // --- 3. BACKGROUND AUDIO PLAYER LOGIC WITH CROSSFADE ---
+        // --- 3. BACKGROUND AUDIO PLAYER LOGIC WITH CROSSFADE & VOLUME ---
         // Add your repository MP3 paths here:
-        const playlist =[
-            { name: "SoundHelix_01", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
-            { name: "SoundHelix_02", src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" }
-        ];
+        const playlist = new Array(
+            { name: "Song_01", src: "./assets/song1.mp3" },
+            { name: "Song_02", src: "./assets/song2.mp3" }
+        );
         
         let currentTrack = 0;
         let hasStartedAudio = false;
@@ -701,13 +681,22 @@
         const audioObj = new Audio();
         const playerUI = document.getElementById('audio-player');
         const trackNameUI = document.getElementById('track-name');
+        const bgVolSlider = document.getElementById('bg-vol-slider');
+
+        // Allow volume slider to update instantly
+        bgVolSlider.addEventListener('input', (e) => {
+            if(!isFadingOut) audioObj.volume = parseFloat(e.target.value);
+        });
 
         function playTrack(index) {
             currentTrack = index;
-            audioObj.src = playlist[currentTrack].src;
-            trackNameUI.innerText = playlist[currentTrack].name;
+            audioObj.src = playlist.at(currentTrack).src;
+            trackNameUI.innerText = playlist.at(currentTrack).name;
             audioObj.volume = 0; // Start at 0 for fade-in
             isFadingOut = false;
+            
+            // Read target volume from slider
+            const targetVol = parseFloat(bgVolSlider.value);
             
             audioObj.play().then(() => {
                 playerUI.style.opacity = 1;
@@ -715,10 +704,10 @@
                 // Fade In
                 clearInterval(fadeInterval);
                 fadeInterval = setInterval(() => {
-                    if (audioObj.volume < 0.95) {
+                    if (audioObj.volume < targetVol - 0.05) {
                         audioObj.volume += 0.05;
                     } else {
-                        audioObj.volume = 1;
+                        audioObj.volume = targetVol;
                         clearInterval(fadeInterval);
                     }
                 }, fadeDurationMs / 20);
@@ -747,9 +736,9 @@
             playTrack((currentTrack + 1) % playlist.length);
         });
 
-        // Initiate audio on first user click anywhere
-        document.body.addEventListener('click', () => {
-            if(!hasStartedAudio) {
+        // Initiate audio on first user click anywhere, EXCEPT if they are just dragging the slider
+        document.body.addEventListener('click', (e) => {
+            if(!hasStartedAudio && e.target.id !== 'bg-vol-slider') {
                 hasStartedAudio = true;
                 playTrack(currentTrack);
             }
