@@ -376,7 +376,7 @@
             if (btn.innerText === "Processing...") return;
             
             if (STABILITY_API_KEY === "YOUR_API_KEY_HERE") {
-                alert("Please add your Stability API key to the script to enable genuine Image-to-Image generation.");
+                alert("Please add your Stability API key to the script.");
                 return;
             }
 
@@ -389,16 +389,21 @@
             function resolveDiffusion() {
                 frame++;
                 dCtx.fillStyle = 'rgba(0,0,0,0.05)'; 
-                dCtx.fillRect(0,0, drawCanv.width, drawCanv.height);
-                
-                if (frame < 60) {
-                    requestAnimationFrame(resolveDiffusion);
-                }
+                dCtx.fillRect(0, 0, drawCanv.width, drawCanv.height);
+                if (frame < 60) requestAnimationFrame(resolveDiffusion);
             }
             requestAnimationFrame(resolveDiffusion);
             
-            // 2. Convert canvas to a Blob and send to V2 Beta Sketch API
-            drawCanv.toBlob(async (blob) => {
+            // 2. Create a compliant Off-Screen Canvas (1024x410 = 2.49 ratio)
+            const offscreen = document.createElement('canvas');
+            offscreen.width = 1024;
+            offscreen.height = 410;
+            const oCtx = offscreen.getContext('2d');
+            // Draw your current drawing into the compliant resolution
+            oCtx.drawImage(drawCanv, 0, 0, 1024, 410);
+
+            // 3. Send the compliant Off-Screen blob
+            offscreen.toBlob(async (blob) => {
                 const formData = new FormData();
                 formData.append("image", blob);
                 formData.append("prompt", "A masterpiece");
@@ -409,7 +414,6 @@
                     const response = await fetch("https://api.stability.ai/v2beta/stable-image/control/sketch", {
                         method: "POST",
                         headers: {
-                            // Tell the API we want the raw image back, not JSON
                             "Accept": "image/*",
                             "Authorization": "Bearer " + STABILITY_API_KEY
                         },
@@ -417,23 +421,21 @@
                     });
 
                     if (response.status !== 200) {
-                        const errData = await response.text();
-                        console.error("API Error Data: ", errData);
-                        throw new Error("API Error: " + response.status);
+                        const errText = await response.text();
+                        console.error("API Error Data: ", errText);
+                        throw new Error("Status " + response.status);
                     }
 
-                    // 3. Receive the raw image blob directly
                     const resultBlob = await response.blob();
                     const objectUrl = URL.createObjectURL(resultBlob);
 
-                    // 4. Render result back to canvas
                     const genImg = new Image();
                     genImg.onload = () => {
                         dCtx.globalAlpha = 1.0;
                         dCtx.globalCompositeOperation = 'source-over';
+                        // Draw result back to main canvas, scaling to fit UI
                         dCtx.drawImage(genImg, 0, 0, drawCanv.width, drawCanv.height);
                         
-                        // Reset UI and clean up memory
                         drawCanv.style.filter = "none";
                         btn.innerText = "Generate Img2Img";
                         URL.revokeObjectURL(objectUrl);
@@ -442,7 +444,7 @@
 
                 } catch (err) {
                     console.error(err);
-                    alert("API Request Failed. Check console for details.");
+                    alert("API Request Failed. Ensure aspect ratio is valid.");
                     drawCanv.style.filter = "none";
                     btn.innerText = "Generate Img2Img";
                 }
