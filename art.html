@@ -361,7 +361,7 @@
         // Download PNG
         document.getElementById('btn-download').addEventListener('click', () => {
             const link = document.createElement('a');
-            link.download = 'Cameron_Halaby_Generative_Art.png';
+            link.download = 'Picture_for_Cameron.png';
             link.href = drawCanv.toDataURL("image/png");
             link.click();
         });
@@ -478,7 +478,6 @@
             // ONLY seed if hovering directly over the background space (not UI cards or editors)
             //const targetTag = e.target.tagName.toLowerCase();
             //if (targetTag !== 'body' && targetTag !== 'html' && targetTag !== 'main') return;
-            return
 
             const gx = Math.floor((e.clientX / window.innerWidth) * simW);
             const gy = Math.floor((e.clientY / window.innerHeight) * simH);
