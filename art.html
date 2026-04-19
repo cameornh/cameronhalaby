@@ -476,8 +476,9 @@
         // Hover Seeding Interaction (No click required)
         window.addEventListener('mousemove', e => {
             // ONLY seed if hovering directly over the background space (not UI cards or editors)
-            const targetTag = e.target.tagName.toLowerCase();
-            if (targetTag !== 'body' && targetTag !== 'html' && targetTag !== 'main') return;
+            //const targetTag = e.target.tagName.toLowerCase();
+            //if (targetTag !== 'body' && targetTag !== 'html' && targetTag !== 'main') return;
+            return
 
             const gx = Math.floor((e.clientX / window.innerWidth) * simW);
             const gy = Math.floor((e.clientY / window.innerHeight) * simH);
