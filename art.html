@@ -129,10 +129,12 @@
         <!-- Gallery Section -->
         <section class="page-section" id="photos">
             <div class="card-grid">
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p1.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar1.jpg" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p2.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar2.jpg" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p3.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar3.jpg" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p4.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar4.jpg" class="photo-img"></div></div>
+                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar1.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar1.jpg" class="photo-img"></div></div>
+                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar2.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar2.jpg" class="photo-img"></div></div>
+                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar3.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar3.jpg" class="photo-img"></div></div>
+                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar4.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar4.jpg" class="photo-img"></div></div>
+                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar5.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar5.jpg" class="photo-img"></div></div>
+                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar6.jpg')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar6.jpg" class="photo-img"></div></div>
             </div>
         </section>
 
@@ -369,7 +371,7 @@
         // ==========================================
         // GENUINE STABLE DIFFUSION API INTEGRATION
         // ==========================================
-        document.getElementById('btn-diffusion').addEventListener('click', async (e) => {
+        document.getElementById('btn-diffusion').addEventListener('click', (e) => {
             const btn = e.target;
             if (btn.innerText === "Processing...") return;
             
@@ -379,60 +381,72 @@
             }
 
             btn.innerText = "Processing...";
+
+            // 1. Start the visual animation
+            let frame = 0;
+            drawCanv.style.filter = 'url(#diffusion-filter) contrast(1.5) saturate(1.5)';
             
-            // Extract pure base64 string safely without brackets
-            const fullDataUrl = drawCanv.toDataURL("image/png");
-            const b64Data = fullDataUrl.split(",").at(1);
-
-            // Construct JSON payload for Stability AI REST API (Bracket-Free)
-            const promptObj = new Object();
-            Reflect.set(promptObj, "text", "A highly detailed, intricate biomechanical masterpiece, trending on artstation, glowing neon");
-            Reflect.set(promptObj, "weight", 1);
-            
-            const promptsArray = new Array();
-            promptsArray.push(promptObj);
-
-            const payloadObj = new Object();
-            Reflect.set(payloadObj, "init_image", b64Data);
-            Reflect.set(payloadObj, "init_image_mode", "IMAGE_STRENGTH");
-            Reflect.set(payloadObj, "image_strength", 0.45); // 0.45 strength means significant transformation
-            Reflect.set(payloadObj, "text_prompts", promptsArray);
-            Reflect.set(payloadObj, "cfg_scale", 7);
-            Reflect.set(payloadObj, "samples", 1);
-            Reflect.set(payloadObj, "steps", 30);
-
-            try {
-                const response = await fetch("https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/image-to-image", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "Authorization": "Bearer " + STABILITY_API_KEY
-                    },
-                    body: JSON.stringify(payloadObj)
-                });
-
-                if (!response.ok) throw new Error("API Error");
-
-                const jsonResponse = await response.json();
-                const artifacts = Reflect.get(jsonResponse, "artifacts");
-                const finalImgData = Reflect.get(artifacts.at(0), "base64");
-
-                // Render result back to canvas
-                const genImg = new Image();
-                genImg.onload = () => {
-                    dCtx.globalAlpha = 1.0;
-                    dCtx.globalCompositeOperation = 'source-over';
-                    dCtx.drawImage(genImg, 0, 0, drawCanv.width, drawCanv.height);
-                    btn.innerText = "Generate Img2Img";
-                };
-                genImg.src = "data:image/png;base64," + finalImgData;
-
-            } catch (err) {
-                console.error(err);
-                alert("API Request Failed. Check console for details.");
-                btn.innerText = "Generate Img2Img";
+            function resolveDiffusion() {
+                frame++;
+                dCtx.fillStyle = 'rgba(0,0,0,0.05)'; 
+                dCtx.fillRect(0,0, drawCanv.width, drawCanv.height);
+                
+                if (frame < 60) {
+                    requestAnimationFrame(resolveDiffusion);
+                }
             }
+            requestAnimationFrame(resolveDiffusion);
+            
+            // 2. Convert canvas to a Blob and send to V2 Beta Sketch API
+            drawCanv.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append("image", blob);
+                formData.append("prompt", "A highly detailed, intricate biomechanical masterpiece, trending on artstation, glowing neon");
+                formData.append("control_strength", "0.7");
+                formData.append("output_format", "png");
+
+                try {
+                    const response = await fetch("https://api.stability.ai/v2beta/stable-image/control/sketch", {
+                        method: "POST",
+                        headers: {
+                            // Do NOT set Content-Type here; FormData handles the boundary automatically
+                            "Accept": "application/json",
+                            "Authorization": "Bearer " + STABILITY_API_KEY
+                        },
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errData = await response.text();
+                        console.error("API Error Data: ", errData);
+                        throw new Error("API Error");
+                    }
+
+                    const jsonResponse = await response.json();
+                    
+                    // V2 Beta returns the base64 string directly under the "image" key
+                    const finalImgData = Reflect.get(jsonResponse, "image"); 
+
+                    // 3. Render result back to canvas
+                    const genImg = new Image();
+                    genImg.onload = () => {
+                        dCtx.globalAlpha = 1.0;
+                        dCtx.globalCompositeOperation = 'source-over';
+                        dCtx.drawImage(genImg, 0, 0, drawCanv.width, drawCanv.height);
+                        
+                        // Reset UI
+                        drawCanv.style.filter = "none";
+                        btn.innerText = "Generate Img2Img";
+                    };
+                    genImg.src = "data:image/png;base64," + finalImgData;
+
+                } catch (err) {
+                    console.error(err);
+                    alert("API Request Failed. Check console for details.");
+                    drawCanv.style.filter = "none";
+                    btn.innerText = "Generate Img2Img";
+                }
+            }, "image/png");
         });
 
         // ==========================================
