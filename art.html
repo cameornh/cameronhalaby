@@ -401,44 +401,44 @@
             drawCanv.toBlob(async (blob) => {
                 const formData = new FormData();
                 formData.append("image", blob);
-                formData.append("prompt", "A highly detailed, intricate biomechanical masterpiece, trending on artstation, glowing neon");
-                formData.append("control_strength", "0.7");
+                formData.append("prompt", "A masterpiece");
+                formData.append("control_strength", "0.6");
                 formData.append("output_format", "png");
 
                 try {
                     const response = await fetch("https://api.stability.ai/v2beta/stable-image/control/sketch", {
                         method: "POST",
                         headers: {
-                            // Do NOT set Content-Type here; FormData handles the boundary automatically
-                            "Accept": "application/json",
+                            // Tell the API we want the raw image back, not JSON
+                            "Accept": "image/*",
                             "Authorization": "Bearer " + STABILITY_API_KEY
                         },
                         body: formData
                     });
 
-                    if (!response.ok) {
+                    if (response.status !== 200) {
                         const errData = await response.text();
                         console.error("API Error Data: ", errData);
-                        throw new Error("API Error");
+                        throw new Error("API Error: " + response.status);
                     }
 
-                    const jsonResponse = await response.json();
-                    
-                    // V2 Beta returns the base64 string directly under the "image" key
-                    const finalImgData = Reflect.get(jsonResponse, "image"); 
+                    // 3. Receive the raw image blob directly
+                    const resultBlob = await response.blob();
+                    const objectUrl = URL.createObjectURL(resultBlob);
 
-                    // 3. Render result back to canvas
+                    // 4. Render result back to canvas
                     const genImg = new Image();
                     genImg.onload = () => {
                         dCtx.globalAlpha = 1.0;
                         dCtx.globalCompositeOperation = 'source-over';
                         dCtx.drawImage(genImg, 0, 0, drawCanv.width, drawCanv.height);
                         
-                        // Reset UI
+                        // Reset UI and clean up memory
                         drawCanv.style.filter = "none";
                         btn.innerText = "Generate Img2Img";
+                        URL.revokeObjectURL(objectUrl);
                     };
-                    genImg.src = "data:image/png;base64," + finalImgData;
+                    genImg.src = objectUrl;
 
                 } catch (err) {
                     console.error(err);
