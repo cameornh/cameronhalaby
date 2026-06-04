@@ -33,6 +33,30 @@
             transition: background-color 2s ease, color 2s ease;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -2px;
+            z-index: 900;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.18) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            mask-image: radial-gradient(ellipse at center, transparent 54%, rgba(0,0,0,0.75) 82%, #000 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, transparent 54%, rgba(0,0,0,0.75) 82%, #000 100%);
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 901;
+            pointer-events: none;
+            opacity: 0.045;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 6 -2.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
         /* NAVIGATION */
         .site-header {
             position: fixed; top: 0; width: 100%; padding: 30px 50px;
@@ -80,11 +104,11 @@
         /* HERO EDITORIAL GLASS UI */
         .hero-ui { position: relative; z-index: 10; perspective: 2000px; }
         .glass-card {
-            position: relative; width: 420px; padding: 55px 50px; border-radius: 4px;
-            background: rgba(12, 12, 15, 0.4); backdrop-filter: blur(35px) saturate(1.1);
+            position: relative; width: 420px; padding: 55px 50px; border-radius: 0;
+            background: rgba(12, 12, 15, 0.48); backdrop-filter: blur(28px) saturate(1.05);
             -webkit-backdrop-filter: blur(35px) saturate(1.1);
             border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.15);
-            border-left: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.95);
+            border-left: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 18px 45px rgba(0, 0, 0, 0.55);
             transform-style: preserve-3d; transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
             display: flex; flex-direction: column; align-items: center;
         }
@@ -122,15 +146,15 @@
 
         /* OBSIDIAN CARDS */
         .obs-card {
-            background: linear-gradient(145deg, #2b2b2e 0%, #161618 100%); border-radius: 18px; padding: 30px; position: relative;
-            box-shadow: 0 35px 65px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15); transform-style: preserve-3d; transition: transform 0.2s ease-out; text-decoration: none;
+            background: rgba(18, 18, 20, 0.94); border-radius: 0; padding: 30px; position: relative;
+            border: 1px solid rgba(128,128,128,0.24); box-shadow: 0 18px 36px rgba(0,0,0,0.14);
+            transform-style: preserve-3d; transition: transform 0.2s ease-out, border-color 0.2s ease, background 0.2s ease; text-decoration: none;
         }
-        .obs-card::before {
-            content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.7), transparent); box-shadow: 0 2px 12px rgba(255, 165, 0, 0.5); z-index: 2;
+        .obs-card:hover {
+            border-color: rgba(128,128,128,0.48);
         }
         .obs-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; transform: translateZ(20px); }
-        .obs-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #a78bfa, #7c3aed); border-radius: 12px; }
+        .obs-icon { width: 45px; height: 45px; background: #202024; border: 1px solid rgba(255,255,255,0.12); border-radius: 0; }
         .obs-title { color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; }
 
         /* 1:6 FULL WIDTH IMAGE SLIDESHOW STRIP */
@@ -193,8 +217,8 @@
 
         /* PHOTOS SECTION */
         #photos { background: radial-gradient(circle at 50% 0%, #ffffff 0%, var(--bg-color) 70%); }
-        .photo-card { cursor: pointer; padding: 15px; }
-        .photo-wrapper { position: relative; width: 100%; border-radius: 8px; overflow: hidden; transform: translateZ(20px); background: #000; }
+        .photo-card { cursor: pointer; padding: 12px; }
+        .photo-wrapper { position: relative; width: 100%; border-radius: 0; overflow: hidden; transform: translateZ(20px); background: #000; }
         .photo-wrapper img { width: 100%; height: 250px; object-fit: cover; display: block; transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.85; }
         .photo-card:hover .photo-wrapper img { transform: scale(1.05); opacity: 1; }
         
@@ -221,7 +245,7 @@
         .lightbox.active { display: flex; opacity: 1; }
         .lightbox img {
             max-width: 100%; max-height: 100%; object-fit: contain;
-            border-radius: 4px; box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            border-radius: 0; box-shadow: 0 0 60px rgba(0,0,0,0.8);
         }
         .lightbox-close {
             position: absolute; top: 30px; right: 40px; color: #fff; font-size: 2.5rem; cursor: pointer; transition: transform 0.2s ease; z-index: 3001;
@@ -229,27 +253,54 @@
         .lightbox-close:hover { transform: scale(1.2); }
 
         /* GENERATIVE ART SECTION */
-        .art-section { padding: 70px 0 50px 0; background-color: #050508; color: #f0f0f0; overflow: hidden; }
+        .art-section {
+            position: relative;
+            padding: 80px 0 70px 0;
+            background:
+                linear-gradient(180deg, rgba(244,244,246,0.12), rgba(5,5,8,0.78)),
+                radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 58%);
+            color: #f0f0f0;
+            overflow: hidden;
+            border-top: 1px solid rgba(128,128,128,0.18);
+            border-bottom: 1px solid rgba(128,128,128,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), inset 0 -70px 110px rgba(0,0,0,0.42);
+        }
+        .art-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.24;
+            mix-blend-mode: screen;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 5 -2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
         .art-title-formula {
+            position: relative; z-index: 2; max-width: 980px;
             font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 400; text-align: center;
-            margin-bottom: 60px; padding: 0 50px; line-height: 1.6; letter-spacing: 0.05em; color: #888;
+            margin: -18px auto 0; padding: 28px 36px; line-height: 1.6; letter-spacing: 0.05em; color: rgba(244,244,245,0.72);
+            background: rgba(8, 8, 12, 0.42);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(18px) saturate(1.1);
+            -webkit-backdrop-filter: blur(18px) saturate(1.1);
+            box-shadow: 0 24px 70px rgba(0,0,0,0.26);
         }
         .art-title-formula b { font-weight: 600; color: #ccc; }
         .art-title-formula i { font-style: italic; }
-        #function-art-canvas { display: block; width: 100%; height: 500px; background-color: #000; }
+        #function-art-canvas { position: relative; z-index: 1; display: block; width: 100%; height: 500px; background-color: #020205; opacity: 0.92; }
 
         /* TRIVIA & CONTACT CARDS (Reused lists) */
         .obs-list { display: flex; flex-direction: column; gap: 10px; transform: translateZ(10px); }
         .obs-item {
-            background: #f4f4f6; padding: 12px 18px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;
+            background: #f4f4f6; padding: 12px 18px; border-radius: 0; display: flex; justify-content: space-between; align-items: center;
             color: #111; font-weight: 500; font-size: 0.9rem;
-            box-shadow: 0 -2px 4px -2px rgba(0, 200, 255, 0.7), 0 2px 4px -2px rgba(255, 120, 0, 0.7);
+            border: 1px solid rgba(17,17,17,0.1);
+            box-shadow: none;
             transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
         }
 
         /* QUIZ INTERACTIVE OPTIONS */
         .quiz-option { cursor: pointer; }
-        .quiz-option:hover { transform: translateY(-2px) scale(1.02); background: #ffffff; }
+        .quiz-option:hover { transform: translateY(-2px); background: #ffffff; }
         .quiz-option.correct {
             background: #059669 !important; color: #ffffff !important;
             box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
@@ -263,15 +314,21 @@
         .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
         .contact-card { display: flex; align-items: center; gap: 20px; padding: 20px 25px; text-decoration: none; color: var(--text-color); }
         .contact-card .obs-icon { 
-            width: 35px; height: 35px; flex-shrink: 0; border-radius: 8px; transform: translateZ(10px); 
+            width: 35px; height: 35px; flex-shrink: 0; border-radius: 0; transform: translateZ(10px); 
             display: flex; justify-content: center; align-items: center;
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #trivia .obs-icon {
+            width: 18px;
+            height: 1px;
+            background: rgba(255,255,255,0.38) !important;
+            border: 0;
         }
         .contact-card .obs-title { font-size: 1.4rem; transform: translateZ(10px); }
         .request-cv-btn {
             display: inline-block; font-family: 'Archivo', sans-serif; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 2px;
             font-weight: 500; color: var(--text-color); padding: 18px 40px; border: 1px solid rgba(128,128,128,0.3);
-            text-decoration: none; border-radius: 4px; transition: all 0.3s ease; margin-top: 60px;
+            text-decoration: none; border-radius: 0; transition: all 0.3s ease; margin-top: 60px;
         }
         .request-cv-btn:hover { background: var(--text-color); color: var(--bg-color); border-color: transparent; }
 
@@ -467,7 +524,7 @@
 
                 <div class="obs-card">
                     <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #be123c);"></div>
+                        <div class="obs-icon"></div>
                         <h3 class="obs-title">Question 01</h3>
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">How old am I?</p>
@@ -480,7 +537,7 @@
                 
                 <div class="obs-card">
                     <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #be123c);"></div>
+                        <div class="obs-icon"></div>
                         <h3 class="obs-title">Question 02</h3>
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">What is my favorite song?</p>
@@ -493,7 +550,7 @@
 
                 <div class="obs-card">
                     <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #be123c);"></div>
+                        <div class="obs-icon"></div>
                         <h3 class="obs-title">Question 03</h3>
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">What is my preferred coding environment?</p>
@@ -506,7 +563,7 @@
 
                 <div class="obs-card">
                     <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #be123c);"></div>
+                        <div class="obs-icon"></div>
                         <h3 class="obs-title">Question 04</h3>
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">What is my daily-driver operating system?</p>
@@ -519,7 +576,7 @@
 
                 <div class="obs-card">
                     <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #be123c);"></div>
+                        <div class="obs-icon"></div>
                         <h3 class="obs-title">Question 05</h3>
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">Which mathematical function drives the art above?</p>
@@ -532,7 +589,7 @@
 
                 <div class="obs-card">
                     <div class="obs-header">
-                        <div class="obs-icon" style="background: linear-gradient(135deg, #fbbf24, #be123c);"></div>
+                        <div class="obs-icon"></div>
                         <h3 class="obs-title">Question 06</h3>
                     </div>
                     <p style="color: #888; font-size: 0.9rem; margin-bottom: 20px;">What is 'Inky'?</p>
@@ -615,7 +672,7 @@
                 
                 <!-- Replaced display:none with a max-height container so the script can detect proper width on load -->
                 <div id="visitors-map-container" style="max-height: 0px; opacity: 0; width: 100%; max-width: 320px; transition: all 0.5s ease; overflow: hidden;">
-                    <div style="margin-top: 25px; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <div style="margin-top: 25px; border-radius: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                         <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=dlo_efDbXyeA4tG4KGj5Qa2GjvXJeB_PqYgnNzrS-4c&cl=ffffff&w=a"></script>
                     </div>
                 </div>
@@ -795,23 +852,30 @@
             const tX = (rect.height / 2 - my) / 60, tY = (mx - rect.width / 2) / 60;
             const sX = (cR.left + cR.width / 2 - e.clientX) / 25, sY = (cR.top + cR.height / 2 - e.clientY) / 25;
             glassCard.style.transform = `rotateX(${tX}deg) rotateY(${tY}deg)`;
-            glassCard.style.boxShadow = `${sX}px ${sY}px 60px rgba(0,0,0,0.95), inset 0 1px 0 rgba(255,255,255,0.15)`;
+            glassCard.style.boxShadow = `${sX}px ${sY}px 46px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12)`;
         });
 
         heroSection.addEventListener('mouseleave', () => {
             glassCard.style.transform = 'none';
-            glassCard.style.boxShadow = `0 30px 60px rgba(0, 0, 0, 0.95)`;
+            glassCard.style.boxShadow = `0 18px 45px rgba(0, 0, 0, 0.55)`;
             glassCard.style.setProperty('--mouse-x-rel', `-500px`);
             glassCard.style.setProperty('--mouse-y-rel', `-500px`);
         });
 
-        document.querySelectorAll('.obs-card').forEach(c => {
-            c.addEventListener('mousemove', e => {
-                const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-                c.style.transform = `perspective(1200px) rotateX(${(r.height/2-y)/20}deg) rotateY(${(x-r.width/2)/20}deg) translateY(-5px)`;
+        function attachEditorialTilt(selector) {
+            document.querySelectorAll(selector).forEach(c => {
+                c.addEventListener('mousemove', e => {
+                    const r = c.getBoundingClientRect();
+                    const x = e.clientX - r.left;
+                    const y = e.clientY - r.top;
+                    const rotateX = (r.height / 2 - y) / 42;
+                    const rotateY = (x - r.width / 2) / 42;
+                    c.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px)`;
+                });
+                c.addEventListener('mouseleave', () => c.style.transform = 'none');
             });
-            c.addEventListener('mouseleave', () => c.style.transform = 'none');
-        });
+        }
+        attachEditorialTilt('.obs-card');
 
         // --- 8. PARTICLES LOGIC ---
         const pCanvas = document.getElementById('particle-canvas'), pCtx = pCanvas.getContext('2d');

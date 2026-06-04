@@ -11,39 +11,306 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
-        :root { --bg-color: #ecece9; --text-color: #111111; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body, html { width: 100vw; min-height: 100vh; background-color: var(--bg-color); font-family: 'Archivo', sans-serif; color: var(--text-color); -webkit-font-smoothing: antialiased; overflow-x: hidden; transition: background-color 2s ease, color 2s ease; }
+        :root {
+            --bg-color: #ecece9;
+            --text-color: #111111;
+            --muted-color: rgba(17,17,17,0.62);
+            --surface-color: rgba(255,255,255,0.62);
+            --surface-text: #111111;
+            --surface-muted: rgba(17,17,17,0.62);
+            --border-color: rgba(17,17,17,0.16);
+        }
 
-        /* NAVIGATION */
-        .site-header { position: fixed; top: 0; width: 100%; padding: 30px 50px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; pointer-events: none; }
-        .header-logo, .header-nav a { pointer-events: auto; text-decoration: none; font-family: 'Archivo', sans-serif; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 500; color: #ffffff; mix-blend-mode: difference; transition: opacity 0.3s; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body, html {
+            width: 100vw;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Archivo', sans-serif;
+            color: var(--text-color);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            transition: background-color 2s ease, color 2s ease;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -2px;
+            z-index: 900;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.18) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            mask-image: radial-gradient(ellipse at center, transparent 54%, rgba(0,0,0,0.75) 82%, #000 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, transparent 54%, rgba(0,0,0,0.75) 82%, #000 100%);
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: 901;
+            pointer-events: none;
+            opacity: 0.045;
+            mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 6 -2.8'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .site-header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 30px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .header-logo, .header-nav a {
+            pointer-events: auto;
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            color: #ffffff;
+            mix-blend-mode: difference;
+            transition: opacity 0.3s;
+        }
+
         .header-nav a:hover, .header-logo:hover { opacity: 0.5; }
         .header-nav { display: flex; gap: 40px; }
 
-        /* LATENT SPACE NAVIGATOR HERO */
-        .latent-hero { position: relative; width: 100vw; height: 75vh; background-color: #050508; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #latent-canvas { position: absolute; inset: 0; z-index: 1; cursor: crosshair; }
-        .latent-ui { position: relative; z-index: 10; pointer-events: none; text-align: center; color: #fff; }
-        .latent-title { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 500; margin-bottom: 10px; }
-        .latent-subtitle { font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: #888; }
-        .latent-tooltip { position: absolute; padding: 10px 15px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 4px; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; z-index: 20; }
+        .projects-hero {
+            position: relative;
+            width: 100vw;
+            min-height: 68vh;
+            height: 640px;
+            display: flex;
+            align-items: flex-end;
+            background: #050508;
+            color: #fff;
+            overflow: hidden;
+        }
 
-        /* PROJECTS LIST */
-        .page-section { padding: 100px 10%; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
-        
-        .obs-card { background: linear-gradient(145deg, #2b2b2e 0%, #161618 100%); border-radius: 18px; padding: 30px; position: relative; box-shadow: 0 35px 65px rgba(0,0,0,0.25), 0 10px 20px rgba(0,0,0,0.15); transform-style: preserve-3d; transition: transform 0.2s ease-out; }
-        .obs-card::before { content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.7), transparent); box-shadow: 0 2px 12px rgba(255, 165, 0, 0.5); z-index: 2; }
-        
-        .project-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); transform: translateZ(15px); }
-        .obs-title { color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 2rem; margin-bottom: 10px; transform: translateZ(20px); }
-        .project-desc { color: #a1a1aa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 30px; transform: translateZ(10px); }
-        
-        .request-cv-btn { display: inline-block; font-family: 'Archivo', sans-serif; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; font-weight: 500; color: #fff; padding: 15px 30px; border: 1px solid rgba(255,255,255,0.2); text-decoration: none; border-radius: 4px; transition: all 0.3s ease; transform: translateZ(25px); }
-        .request-cv-btn:hover { background: #fff; color: #000; }
+        #project-shader-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
 
-        .site-footer { background-color: #111111; color: #888; padding: 60px 10%; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+        .projects-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.18) 38%, rgba(0,0,0,0.82) 100%),
+                repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 4px);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 10% 90px;
+        }
+
+        .eyebrow {
+            display: block;
+            margin-bottom: 18px;
+            color: rgba(255,255,255,0.66);
+            font-size: 0.74rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            max-width: 780px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.4rem, 8vw, 7.4rem);
+            line-height: 0.92;
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        .hero-subtitle {
+            max-width: 620px;
+            margin-top: 28px;
+            color: rgba(255,255,255,0.76);
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .page-section {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 90px 10% 110px;
+        }
+
+        .section-kicker {
+            margin-bottom: 34px;
+            display: flex;
+            justify-content: space-between;
+            gap: 28px;
+            align-items: baseline;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 22px;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.6rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .section-note {
+            max-width: 420px;
+            color: var(--muted-color);
+            font-size: 0.86rem;
+            line-height: 1.7;
+            text-align: right;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 28px;
+        }
+        
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0;
+            box-shadow: 0 16px 34px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(128,128,128,0.5);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.12);
+        }
+        
+        .project-media {
+            position: relative;
+            aspect-ratio: 16 / 10;
+            background:
+                linear-gradient(135deg, rgba(128,128,128,0.18), rgba(128,128,128,0.03)),
+                repeating-linear-gradient(90deg, rgba(128,128,128,0.12) 0, rgba(128,128,128,0.12) 1px, transparent 1px, transparent 12px);
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .project-media::after {
+            content: attr(data-fallback);
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: var(--surface-muted);
+            font-size: 0.68rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .project-media.is-missing::after { opacity: 1; }
+
+        .project-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: saturate(0.85) contrast(1.04);
+        }
+
+        .project-media.is-missing .project-img {
+            visibility: hidden;
+        }
+
+        .project-body {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            padding: 26px;
+        }
+
+        .project-title {
+            color: var(--surface-text);
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .project-desc {
+            color: var(--surface-muted);
+            font-size: 0.92rem;
+            line-height: 1.65;
+            margin-bottom: 28px;
+        }
+        
+        .request-cv-btn {
+            display: inline-block;
+            align-self: flex-start;
+            margin-top: auto;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            font-weight: 500;
+            text-transform: uppercase;
+            color: var(--surface-text);
+            padding: 13px 20px;
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            border-radius: 0;
+            transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+        }
+
+        .request-cv-btn:hover {
+            background: var(--surface-text);
+            color: var(--bg-color);
+            border-color: var(--surface-text);
+        }
+
+        .site-footer {
+            background-color: #111111;
+            color: #888;
+            padding: 60px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 760px) {
+            .site-header { padding: 24px; }
+            .header-nav { gap: 22px; }
+            .projects-hero { height: 560px; }
+            .hero-content { padding: 0 24px 70px; }
+            .page-section { padding: 70px 24px 90px; }
+            .section-kicker { display: block; }
+            .section-note { margin-top: 16px; text-align: left; }
+        }
     </style>
 </head>
 <body>
@@ -58,39 +325,54 @@
     </nav>
 
     <main>
-        <!-- Latent Space Navigator -->
-        <section class="latent-hero">
-            <canvas id="latent-canvas"></canvas>
-            <div class="latent-ui">
-                <h1 class="latent-title">Latent Space</h1>
-                <p class="latent-subtitle">Drag to navigate project space</p>
+        <section class="projects-hero">
+            <canvas id="project-shader-canvas"></canvas>
+            <div class="hero-content">
+                <span class="eyebrow">Technical work</span>
+                <h1 class="hero-title">Projects</h1>
+                <p class="hero-subtitle">Applied machine learning, spatial computing, and systems experiments, with a little signal-noise left in the room.</p>
             </div>
-            <div class="latent-tooltip" id="latent-tooltip">Project Node</div>
         </section>
 
-        <!-- Project Cards -->
         <section class="page-section">
+            <div class="section-kicker">
+                <h2 class="section-title">Selected Work</h2>
+                <p class="section-note">A compact index of active and in-progress work. Each card keeps the existing interest link.</p>
+            </div>
+
             <div class="card-grid">
-                <div class="obs-card">
-                    <img src="./assets/pr1.jpg" alt="Project 1" class="project-img">
-                    <h3 class="obs-title">Geospatial NeRF</h3>
-                    <p class="project-desc">Under Construction. Check back later.</p>
-                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Geospatial%20NeRF&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Geospatial%20NeRF%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                </div>
+                <article class="project-card">
+                    <div class="project-media" data-fallback="pr1.jpg pending">
+                        <img src="./assets/pr1.jpg" alt="Geospatial NeRF project preview" class="project-img">
+                    </div>
+                    <div class="project-body">
+                        <h3 class="project-title">Geospatial NeRF</h3>
+                        <p class="project-desc">Under Construction. Check back later.</p>
+                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Geospatial%20NeRF&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Geospatial%20NeRF%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
+                    </div>
+                </article>
 
-                <div class="obs-card">
-                    <img src="./assets/pr2.jpg" alt="Project 2" class="project-img">
-                    <h3 class="obs-title">Semantic Course Map</h3>
-                    <p class="project-desc">Under Construction. Check back later.</p>
-                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Semantic%20Course%20Map&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Semantic%20Course%20Map%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                </div>
+                <article class="project-card">
+                    <div class="project-media" data-fallback="pr2.jpg pending">
+                        <img src="./assets/pr2.jpg" alt="Semantic Course Map project preview" class="project-img">
+                    </div>
+                    <div class="project-body">
+                        <h3 class="project-title">Semantic Course Map</h3>
+                        <p class="project-desc">Under Construction. Check back later.</p>
+                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Semantic%20Course%20Map&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Semantic%20Course%20Map%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
+                    </div>
+                </article>
 
-                <div class="obs-card">
-                    <img src="./assets/pr3.jpg" alt="Project 3" class="project-img">
-                    <h3 class="obs-title">EEG ML</h3>
-                    <p class="project-desc">Under Construction. Check back later.</p>
-                    <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20EEG%20ML&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20EEG%20ML%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                </div>
+                <article class="project-card">
+                    <div class="project-media" data-fallback="pr3.jpg pending">
+                        <img src="./assets/pr3.jpg" alt="EEG machine learning project preview" class="project-img">
+                    </div>
+                    <div class="project-body">
+                        <h3 class="project-title">EEG ML</h3>
+                        <p class="project-desc">Under Construction. Check back later.</p>
+                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20EEG%20ML&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20EEG%20ML%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
+                    </div>
+                </article>
             </div>
         </section>
     </main>
@@ -101,99 +383,198 @@
     </footer>
 
     <script>
-        // DYNAMIC THEME
         function updateTheme() {
             const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
-            const r = Math.round(5 + (236-5) * intensity), g = Math.round(5 + (236-5) * intensity), b = Math.round(8 + (233-8) * intensity);
-            const textR = Math.round(244 + (17-244) * intensity), textG = Math.round(244 + (17-244) * intensity), textB = Math.round(245 + (17-245) * intensity);
+            const r = Math.round(5 + (236-5) * intensity);
+            const g = Math.round(5 + (236-5) * intensity);
+            const b = Math.round(8 + (233-8) * intensity);
+            const isDay = intensity > 0.5;
             document.documentElement.style.setProperty('--bg-color', 'rgb(' + r + ',' + g + ',' + b + ')');
-            document.documentElement.style.setProperty('--text-color', 'rgb(' + textR + ',' + textG + ',' + textB + ')');
+            document.documentElement.style.setProperty('--text-color', isDay ? '#111111' : '#f4f4f5');
+            document.documentElement.style.setProperty('--muted-color', isDay ? 'rgba(17,17,17,0.62)' : 'rgba(244,244,245,0.62)');
+            document.documentElement.style.setProperty('--surface-color', isDay ? 'rgba(255,255,255,0.62)' : 'rgba(18,18,20,0.86)');
+            document.documentElement.style.setProperty('--surface-text', isDay ? '#111111' : '#ffffff');
+            document.documentElement.style.setProperty('--surface-muted', isDay ? 'rgba(17,17,17,0.62)' : 'rgba(244,244,245,0.66)');
+            document.documentElement.style.setProperty('--border-color', isDay ? 'rgba(17,17,17,0.16)' : 'rgba(244,244,245,0.18)');
         }
         setInterval(updateTheme, 60000); updateTheme();
 
-        // FOOTER DATE
         const dObj = new Date();
         const monthNames = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
         document.getElementById('dynamic-date').innerText = 'Updated ' + monthNames.at(dObj.getMonth()) + ' ' + dObj.getFullYear();
 
-        // 3D CARD TILT
-        document.querySelectorAll('.obs-card').forEach(c => {
-            c.addEventListener('mousemove', e => {
-                const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, cx = r.width / 2, cy = r.height / 2;
-                c.style.transform = 'perspective(1200px) rotateX(' + ((cy-y)/30) + 'deg) rotateY(' + ((x-cx)/30) + 'deg) translateY(-2px)';
-            });
-            c.addEventListener('mouseleave', () => c.style.transform = 'none');
-        });
+        const shaderCanvas = document.getElementById('project-shader-canvas');
+        const gl = shaderCanvas.getContext('webgl', { antialias: false });
+        let shaderStart = performance.now();
+        let shaderMouse = [0.5, 0.5];
 
-        // LATENT SPACE NAVIGATOR LOGIC
-        const lCanvas = document.getElementById('latent-canvas');
-        const lCtx = lCanvas.getContext('2d');
-        const tooltip = document.getElementById('latent-tooltip');
-        let width, height;
-        let nodes = new Array();
-        const projectNames = new Array("Geospatial NeRF", "Semantic Course Map", "EEG ML", "Project 4", "Project 5", "Project 6", "Project 7", "Project 8", "Project 9", "Project 10", "Project 11", "Project 12", "Project 13", "Project 14", "Project 15");
-        
-        let camX = 0, camY = 0, isDragging = false, startX, startY;
-        let mouseX = -1000, mouseY = -1000;
-
-        function initLatent() {
-            width = lCanvas.parentElement.clientWidth;
-            height = lCanvas.parentElement.clientHeight;
-            lCanvas.width = width; lCanvas.height = height;
-            nodes = new Array();
-            for(let i=0; i<24000; i++) {
-                const isMain = i < projectNames.length;
-                nodes.push({
-                    x: (Math.random() - 0.5) * width * 2,
-                    y: (Math.random() - 0.5) * height * 2,
-                    z: Math.random() * 2,
-                    isMain: isMain,
-                    name: isMain ? projectNames.at(i) : "Data Node",
-                    color: isMain ? '#4ec2e6' : '#222222'
-                });
+        function drawFallbackShader() {
+            const ctx = shaderCanvas.getContext('2d');
+            function resize() {
+                shaderCanvas.width = shaderCanvas.clientWidth * window.devicePixelRatio;
+                shaderCanvas.height = shaderCanvas.clientHeight * window.devicePixelRatio;
             }
+            resize();
+            window.addEventListener('resize', resize);
+            function frame(now) {
+                const w = shaderCanvas.width;
+                const h = shaderCanvas.height;
+                const grd = ctx.createLinearGradient(0, 0, w, h);
+                grd.addColorStop(0, '#111827');
+                grd.addColorStop(0.46 + Math.sin(now * 0.0004) * 0.08, '#14323a');
+                grd.addColorStop(1, '#050508');
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, 0, w, h);
+                ctx.globalAlpha = 0.24;
+                ctx.strokeStyle = '#d7fff1';
+                for (let y = 0; y < h; y += 22) {
+                    ctx.beginPath();
+                    for (let x = 0; x < w; x += 8) {
+                        const wave = Math.sin(x * 0.01 + now * 0.001) * 10 + Math.sin((x + y) * 0.006) * 15;
+                        if (x === 0) ctx.moveTo(x, y + wave);
+                        else ctx.lineTo(x, y + wave);
+                    }
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+                requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
         }
 
-        lCanvas.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX - camX; startY = e.clientY - camY; lCanvas.style.cursor = 'grabbing'; });
-        window.addEventListener('mouseup', () => { isDragging = false; lCanvas.style.cursor = 'crosshair'; });
-        lCanvas.addEventListener('mousemove', e => {
-            mouseX = e.clientX; mouseY = e.clientY;
-            if(isDragging) { camX = e.clientX - startX; camY = e.clientY - startY; }
-        });
+        if (!gl) {
+            drawFallbackShader();
+        } else {
+            const vertexSource = `
+                attribute vec2 a_position;
+                void main() {
+                    gl_Position = vec4(a_position, 0.0, 1.0);
+                }
+            `;
+            const fragmentSource = `
+                precision highp float;
+                uniform vec2 u_resolution;
+                uniform vec2 u_mouse;
+                uniform float u_time;
 
-        function drawLatent() {
-            lCtx.clearRect(0, 0, width, height);
-            let hoveredNode = null;
+                float hash(vec2 p) {
+                    p = fract(p * vec2(123.34, 456.21));
+                    p += dot(p, p + 45.32);
+                    return fract(p.x * p.y);
+                }
 
-            nodes.forEach(node => {
-                const drawX = width/2 + node.x + (camX * node.z);
-                const drawY = height/2 + node.y + (camY * node.z);
-                const size = node.isMain ? 4 : 1.5;
-                
-                const dist = Math.hypot(mouseX - drawX, mouseY - (drawY + lCanvas.parentElement.getBoundingClientRect().top));
-                if(dist < 20 && node.isMain) hoveredNode = node;
+                float contour(vec2 p, float scale, float speed) {
+                    float v = 0.0;
+                    v += sin((p.x + p.y) * scale + u_time * speed);
+                    v += sin(length(p - u_mouse * 2.0 + 1.0) * scale * 1.7 - u_time * speed * 1.2);
+                    v += sin((p.x - p.y) * scale * 0.72 - u_time * speed * 0.6);
+                    return smoothstep(0.02, 0.0, abs(fract(v * 0.18) - 0.5) - 0.44);
+                }
 
-                lCtx.beginPath();
-                lCtx.arc(drawX, drawY, size + (dist < 20 ? 2 : 0), 0, Math.PI * 2);
-                lCtx.fillStyle = dist < 20 && node.isMain ? '#ffffff' : node.color;
-                lCtx.fill();
-            });
+                void main() {
+                    vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+                    vec2 p = (gl_FragCoord.xy * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);
+                    vec2 drift = vec2(sin(u_time * 0.17), cos(u_time * 0.13)) * 0.16;
 
-            if(hoveredNode && !isDragging) {
-                tooltip.style.opacity = 1;
-                tooltip.innerText = hoveredNode.name;
-                tooltip.style.left = (mouseX + 15) + 'px';
-                tooltip.style.top = (mouseY + 15) + 'px';
-            } else {
-                tooltip.style.opacity = 0;
+                    float c1 = contour(p + drift, 8.0, 0.62);
+                    float c2 = contour(p * 1.35 - drift.yx, 5.8, -0.44);
+                    float sheen = smoothstep(0.0, 1.0, sin((p.x * 1.6 + p.y * 0.8) + u_time * 0.4) * 0.5 + 0.5);
+                    float vignette = smoothstep(1.28, 0.18, length(p));
+                    float grain = hash(gl_FragCoord.xy + floor(u_time * 36.0)) * 0.045;
+
+                    vec3 ink = vec3(0.015, 0.018, 0.025);
+                    vec3 teal = vec3(0.09, 0.50, 0.52);
+                    vec3 pearl = vec3(0.82, 0.88, 0.82);
+                    vec3 violet = vec3(0.30, 0.24, 0.46);
+                    vec3 color = ink;
+                    color = mix(color, teal, c1 * 0.62);
+                    color = mix(color, pearl, c2 * 0.28);
+                    color = mix(color, violet, sheen * 0.22);
+                    color += grain;
+                    color *= vignette;
+                    color += vec3(0.01, 0.012, 0.018);
+
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+            function makeShader(type, source) {
+                const shader = gl.createShader(type);
+                gl.shaderSource(shader, source);
+                gl.compileShader(shader);
+                return shader;
             }
 
-            requestAnimationFrame(drawLatent);
+            const program = gl.createProgram();
+            gl.attachShader(program, makeShader(gl.VERTEX_SHADER, vertexSource));
+            gl.attachShader(program, makeShader(gl.FRAGMENT_SHADER, fragmentSource));
+            gl.linkProgram(program);
+            gl.useProgram(program);
+
+            const positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+
+            const positionLocation = gl.getAttribLocation(program, 'a_position');
+            gl.enableVertexAttribArray(positionLocation);
+            gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+
+            const resolutionLocation = gl.getUniformLocation(program, 'u_resolution');
+            const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
+            const timeLocation = gl.getUniformLocation(program, 'u_time');
+
+            function resizeShader() {
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const width = Math.floor(shaderCanvas.clientWidth * dpr);
+                const height = Math.floor(shaderCanvas.clientHeight * dpr);
+                if (shaderCanvas.width !== width || shaderCanvas.height !== height) {
+                    shaderCanvas.width = width;
+                    shaderCanvas.height = height;
+                    gl.viewport(0, 0, width, height);
+                }
+            }
+
+            shaderCanvas.addEventListener('mousemove', e => {
+                const rect = shaderCanvas.getBoundingClientRect();
+                shaderMouse = [
+                    (e.clientX - rect.left) / rect.width,
+                    1 - ((e.clientY - rect.top) / rect.height)
+                ];
+            });
+
+            function renderShader(now) {
+                resizeShader();
+                gl.uniform2f(resolutionLocation, shaderCanvas.width, shaderCanvas.height);
+                gl.uniform2f(mouseLocation, shaderMouse[0], shaderMouse[1]);
+                gl.uniform1f(timeLocation, (now - shaderStart) * 0.001);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                requestAnimationFrame(renderShader);
+            }
+
+            window.addEventListener('resize', resizeShader);
+            requestAnimationFrame(renderShader);
         }
 
-        initLatent(); drawLatent();
-        window.addEventListener('resize', initLatent);
+        document.querySelectorAll('.project-media img').forEach(img => {
+            const media = img.closest('.project-media');
+            const setMissing = () => media.classList.add('is-missing');
+            if(img.complete && img.naturalWidth === 0) setMissing();
+            img.addEventListener('error', setMissing);
+            img.addEventListener('load', () => media.classList.remove('is-missing'));
+        });
+
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const r = card.getBoundingClientRect();
+                const x = e.clientX - r.left;
+                const y = e.clientY - r.top;
+                const rotateX = (r.height / 2 - y) / 48;
+                const rotateY = (x - r.width / 2) / 48;
+                card.style.transform = 'perspective(1200px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', () => { card.style.transform = 'none'; });
+        });
     </script>
 </body>
 </html>
