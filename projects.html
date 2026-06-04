@@ -22,6 +22,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        img { display: block; margin: 0; }
 
         body, html {
             width: 100vw;
@@ -198,6 +199,7 @@
             box-shadow: 0 16px 34px rgba(0,0,0,0.08);
             overflow: hidden;
             transform-style: preserve-3d;
+            cursor: pointer;
             transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
         }
 
@@ -210,9 +212,12 @@
         .project-media {
             position: relative;
             aspect-ratio: 16 / 10;
+            padding: 10px 10px 14px;
             background:
-                linear-gradient(135deg, rgba(128,128,128,0.18), rgba(128,128,128,0.03)),
-                repeating-linear-gradient(90deg, rgba(128,128,128,0.12) 0, rgba(128,128,128,0.12) 1px, transparent 1px, transparent 12px);
+                linear-gradient(135deg, rgba(255,255,255,0.18), rgba(255,255,255,0.045)),
+                repeating-linear-gradient(90deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 1px, transparent 1px, transparent 12px);
+            backdrop-filter: blur(16px) saturate(1.06);
+            -webkit-backdrop-filter: blur(16px) saturate(1.06);
             border-bottom: 1px solid var(--border-color);
             overflow: hidden;
         }
@@ -290,6 +295,171 @@
             border-color: var(--surface-text);
         }
 
+        .project-lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            background: rgba(4,4,6,0.72);
+            backdrop-filter: blur(22px) saturate(1.06);
+            -webkit-backdrop-filter: blur(22px) saturate(1.06);
+            opacity: 0;
+            transition: opacity 0.22s ease;
+        }
+
+        .project-lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .project-lightbox-frame {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+            width: min(1120px, 100%);
+            height: min(720px, 86vh);
+            background: rgba(12,12,14,0.92);
+            border: 1px solid rgba(255,255,255,0.16);
+            box-shadow: 0 34px 120px rgba(0,0,0,0.48);
+            overflow: hidden;
+        }
+
+        .project-lightbox-media {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-height: 0;
+            padding: 32px 32px 74px;
+            background:
+                radial-gradient(circle at 50% 42%, rgba(255,255,255,0.06), transparent 52%),
+                #050508;
+            border-right: 1px solid rgba(255,255,255,0.12);
+            overflow: hidden;
+        }
+
+        .project-lightbox-media::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0.12;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 7 -3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .project-lightbox-media::after {
+            content: attr(data-fallback);
+            position: absolute;
+            inset: 0;
+            display: none;
+            place-items: center;
+            color: rgba(255,255,255,0.48);
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .project-lightbox-media.is-missing::after { display: grid; }
+
+        .project-lightbox-img {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            background: rgba(255,255,255,0.035);
+            box-shadow: 0 18px 60px rgba(0,0,0,0.2);
+        }
+
+        .project-lightbox-media.is-missing .project-lightbox-img {
+            visibility: hidden;
+        }
+
+        .project-lightbox-panel {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            color: #f4f4f5;
+            background: rgba(16,16,18,0.94);
+        }
+
+        .project-lightbox-header {
+            padding: 32px 32px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .project-lightbox-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.4rem;
+            line-height: 1;
+            font-weight: 500;
+            margin-bottom: 14px;
+        }
+
+        .project-lightbox-link {
+            color: rgba(244,244,245,0.64);
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .project-lightbox-link:hover { color: #ffffff; }
+
+        .project-lightbox-description {
+            padding: 30px 32px;
+            color: rgba(244,244,245,0.68);
+            font-size: 0.93rem;
+            line-height: 1.75;
+            overflow-y: auto;
+        }
+
+        .project-lightbox-footer {
+            margin-top: auto;
+            padding: 26px 32px 32px;
+            border-top: 1px solid rgba(255,255,255,0.12);
+        }
+
+        .project-lightbox-interest {
+            display: block;
+            width: 100%;
+            padding: 15px 18px;
+            border: 1px solid rgba(255,255,255,0.26);
+            color: #ffffff;
+            text-align: center;
+            text-decoration: none;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+        }
+
+        .project-lightbox-interest:hover {
+            background: #ffffff;
+            color: #050508;
+            border-color: #ffffff;
+        }
+
+        .project-lightbox-close {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            z-index: 5;
+            width: 36px;
+            height: 36px;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(0,0,0,0.26);
+            color: #fff;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
         .site-footer {
             background-color: #111111;
             color: #888;
@@ -310,6 +480,23 @@
             .page-section { padding: 70px 24px 90px; }
             .section-kicker { display: block; }
             .section-note { margin-top: 16px; text-align: left; }
+            .project-lightbox { padding: 24px; }
+            .project-lightbox-frame {
+                grid-template-columns: 1fr;
+                height: 88vh;
+            }
+            .project-lightbox-media {
+                min-height: 42vh;
+                padding: 24px 24px 54px;
+                border-right: 0;
+                border-bottom: 1px solid rgba(255,255,255,0.12);
+            }
+            .project-lightbox-header,
+            .project-lightbox-description,
+            .project-lightbox-footer {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
         }
     </style>
 </head>
@@ -341,7 +528,7 @@
             </div>
 
             <div class="card-grid">
-                <article class="project-card">
+                <article class="project-card" data-title="Geospatial NeRF" data-image="./assets/pr1.jpg" data-fallback="pr1.jpg pending" data-link="https://www.cameronhalaby.com" data-link-label="cameronhalaby.com" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer finibus, sapien vitae luctus placerat, nibh magna gravida libero, sed porta ipsum arcu ac neque. Curabitur a neque at libero consequat interdum sit amet nec erat.">
                     <div class="project-media" data-fallback="pr1.jpg pending">
                         <img src="./assets/pr1.jpg" alt="Geospatial NeRF project preview" class="project-img">
                     </div>
@@ -352,7 +539,7 @@
                     </div>
                 </article>
 
-                <article class="project-card">
+                <article class="project-card" data-title="Semantic Course Map" data-image="./assets/pr2.jpg" data-fallback="pr2.jpg pending" data-link="https://www.cameronhalaby.com" data-link-label="cameronhalaby.com" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non lectus sed erat sagittis dictum. Sed vitae mauris et sem pretium luctus, vitae sodales mi. Pellentesque habitant morbi tristique senectus et netus.">
                     <div class="project-media" data-fallback="pr2.jpg pending">
                         <img src="./assets/pr2.jpg" alt="Semantic Course Map project preview" class="project-img">
                     </div>
@@ -363,7 +550,7 @@
                     </div>
                 </article>
 
-                <article class="project-card">
+                <article class="project-card" data-title="EEG ML" data-image="./assets/pr3.jpg" data-fallback="pr3.jpg pending" data-link="https://www.cameronhalaby.com" data-link-label="cameronhalaby.com" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus libero ut magna ultrices, at tempor massa mattis. Duis vel turpis ligula. Aenean consequat risus sed justo dictum, nec commodo sem pulvinar.">
                     <div class="project-media" data-fallback="pr3.jpg pending">
                         <img src="./assets/pr3.jpg" alt="EEG machine learning project preview" class="project-img">
                     </div>
@@ -381,6 +568,25 @@
         <p>2026 Cameron Halaby. No Rights Reserved.</p>
         <p id="dynamic-date"></p>
     </footer>
+
+    <div class="project-lightbox" id="project-lightbox" aria-hidden="true">
+        <div class="project-lightbox-frame" role="dialog" aria-modal="true" aria-labelledby="project-lightbox-title">
+            <button class="project-lightbox-close" type="button" id="project-lightbox-close" aria-label="Close project preview">&times;</button>
+            <div class="project-lightbox-media" id="project-lightbox-media" data-fallback="">
+                <img src="" alt="" class="project-lightbox-img" id="project-lightbox-img">
+            </div>
+            <aside class="project-lightbox-panel">
+                <div class="project-lightbox-header">
+                    <h2 class="project-lightbox-title" id="project-lightbox-title"></h2>
+                    <a href="https://www.cameronhalaby.com" class="project-lightbox-link" id="project-lightbox-link" target="_blank" rel="noopener noreferrer">cameronhalaby.com</a>
+                </div>
+                <p class="project-lightbox-description" id="project-lightbox-description"></p>
+                <div class="project-lightbox-footer">
+                    <a href="#" class="project-lightbox-interest" id="project-lightbox-interest">I'm Interested</a>
+                </div>
+            </aside>
+        </div>
+    </div>
 
     <script>
         function updateTheme() {
@@ -564,7 +770,64 @@
             img.addEventListener('load', () => media.classList.remove('is-missing'));
         });
 
+        const projectLightbox = document.getElementById('project-lightbox');
+        const projectLightboxMedia = document.getElementById('project-lightbox-media');
+        const projectLightboxImg = document.getElementById('project-lightbox-img');
+        const projectLightboxTitle = document.getElementById('project-lightbox-title');
+        const projectLightboxLink = document.getElementById('project-lightbox-link');
+        const projectLightboxDescription = document.getElementById('project-lightbox-description');
+        const projectLightboxInterest = document.getElementById('project-lightbox-interest');
+        const projectLightboxClose = document.getElementById('project-lightbox-close');
+
+        function openProjectLightbox(card) {
+            const title = card.getAttribute('data-title');
+            const image = card.getAttribute('data-image');
+            const fallback = card.getAttribute('data-fallback');
+            const projectLink = card.getAttribute('data-link');
+            const projectLinkLabel = card.getAttribute('data-link-label');
+            const description = card.getAttribute('data-description');
+            const interestLink = card.querySelector('.request-cv-btn').href;
+
+            projectLightboxTitle.innerText = title;
+            projectLightboxDescription.innerText = description;
+            projectLightboxLink.href = projectLink;
+            projectLightboxLink.innerText = projectLinkLabel;
+            projectLightboxInterest.href = interestLink;
+            projectLightboxMedia.setAttribute('data-fallback', fallback);
+            projectLightboxMedia.classList.remove('is-missing');
+            projectLightboxImg.alt = title + ' project preview';
+            projectLightboxImg.src = image;
+
+            projectLightbox.classList.add('active');
+            projectLightbox.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProjectLightbox() {
+            projectLightbox.classList.remove('active');
+            projectLightbox.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        projectLightboxImg.addEventListener('error', () => {
+            projectLightboxMedia.classList.add('is-missing');
+        });
+        projectLightboxImg.addEventListener('load', () => {
+            projectLightboxMedia.classList.remove('is-missing');
+        });
+        projectLightboxClose.addEventListener('click', closeProjectLightbox);
+        projectLightbox.addEventListener('click', e => {
+            if(e.target === projectLightbox) closeProjectLightbox();
+        });
+        window.addEventListener('keydown', e => {
+            if(e.key === 'Escape' && projectLightbox.classList.contains('active')) closeProjectLightbox();
+        });
+
         document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('click', e => {
+                if(e.target.closest('a')) return;
+                openProjectLightbox(card);
+            });
             card.addEventListener('mousemove', e => {
                 const r = card.getBoundingClientRect();
                 const x = e.clientX - r.left;
