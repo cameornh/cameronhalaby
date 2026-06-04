@@ -534,10 +534,12 @@
         </div>
     </div>
 
+    <script src="./theme-toggle.js"></script>
     <script>
         // DYNAMIC THEME
         function updateTheme() {
-            const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+            const d = window.CameronTheme ? window.CameronTheme.getDate() : new Date();
+            const h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
             
             // Smoothly transition the background

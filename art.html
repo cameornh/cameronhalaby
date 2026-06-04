@@ -82,7 +82,14 @@
         .obs-card { background: rgba(16,16,18,0.76); backdrop-filter: blur(8px); border-radius: 0; position: relative; border: 1px solid rgba(255,255,255,0.16); box-shadow: 0 18px 36px rgba(0,0,0,0.22); transform-style: preserve-3d; transition: transform 0.2s ease-out, border-color 0.2s ease; }
         .obs-card:hover { border-color: rgba(255,255,255,0.32); }
         
-        .photo-card { cursor: pointer; padding: 12px; }
+        .photo-card {
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+        }
+        .photo-card:hover { border-color: transparent; }
         .photo-wrapper {
             position: relative; width: 100%; border-radius: 0; overflow: hidden; transform: translateZ(20px);
             padding: 10px;
@@ -238,13 +245,14 @@
         <p id="dynamic-date"></p>
     </footer>
 
+    <script src="./theme-toggle.js"></script>
     <script>
         // ADD YOUR STABILITY AI API KEY HERE TO ENABLE IMG2IMG GENERATION
         const STABILITY_API_KEY = "sk-XALkbz2ANvymVnLma5czIhQbzH5CNDDskqJnnKdQL2VRrq7j";
 
         // DYNAMIC THEME (DAY/NIGHT)
         function updateTheme() {
-            const d = new Date();
+            const d = window.CameronTheme ? window.CameronTheme.getDate() : new Date();
             const h = d.getHours() + (d.getMinutes() / 60);
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
             
@@ -536,24 +544,57 @@
         }
         initRD(); window.addEventListener('resize', initRD);
 
-        // Hover Seeding Interaction (No click required)
-        window.addEventListener('mousemove', e => {
-            // ONLY seed if hovering directly over the background space (not UI cards or editors)
-            //const targetTag = e.target.tagName.toLowerCase();
-            //if (targetTag !== 'body' && targetTag !== 'html' && targetTag !== 'main') return;
+        let isErasingArtBackground = false;
 
-            const gx = Math.floor((e.clientX / window.innerWidth) * simW);
-            const gy = Math.floor((e.clientY / window.innerHeight) * simH);
-            const brush = 3;
-            
+        function isArtBackgroundTarget(target) {
+            if (!target || target === document.documentElement || target === document.body) return true;
+
+            const blocker = target.closest('a, button, input, select, textarea, .site-header, .theme-switcher, .obs-card, .photo-wrapper, .editor-wrapper, .canvas-container, .lightbox, .style-btn, .action-btn');
+            if (blocker) return false;
+
+            return Boolean(target.closest('main, .page-section, .hero-title-area, .gradient-bg, .nca-bg-canvas'));
+        }
+
+        function paintReactionBrush(clientX, clientY, value, brush) {
+            const gx = Math.floor((clientX / window.innerWidth) * simW);
+            const gy = Math.floor((clientY / window.innerHeight) * simH);
+
             for(let y = -brush; y <= brush; y++) {
                 for(let x = -brush; x <= brush; x++) {
                     const py = gy + y; const px = gx + x;
                     if(px >= 0 && px < simW && py >= 0 && py < simH && Math.hypot(x,y) < brush) {
-                        vB.setFloat32(((py * simW) + px) * 4, 1.0, true); 
+                        const i = ((py * simW) + px) * 4;
+                        vB.setFloat32(i, value, true);
+                        if (value === 0) vA.setFloat32(i, 1.0, true);
                     }
                 }
             }
+        }
+
+        // Hover Seeding Interaction (No click required)
+        window.addEventListener('mousemove', e => {
+            if (isErasingArtBackground) {
+                const target = document.elementFromPoint(e.clientX, e.clientY);
+                if (isArtBackgroundTarget(target)) paintReactionBrush(e.clientX, e.clientY, 0, 6);
+                return;
+            }
+
+            if (e.buttons !== 0) return;
+            paintReactionBrush(e.clientX, e.clientY, 1.0, 3);
+        });
+
+        window.addEventListener('mousedown', e => {
+            if (e.button !== 0 || !isArtBackgroundTarget(e.target)) return;
+            isErasingArtBackground = true;
+            paintReactionBrush(e.clientX, e.clientY, 0, 6);
+        });
+
+        window.addEventListener('mouseup', () => {
+            isErasingArtBackground = false;
+        });
+
+        window.addEventListener('blur', () => {
+            isErasingArtBackground = false;
         });
 
         function stepRD() {

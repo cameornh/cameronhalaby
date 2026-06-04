@@ -517,18 +517,18 @@
             <div class="hero-content">
                 <span class="eyebrow">Technical work</span>
                 <h1 class="hero-title">Projects</h1>
-                <p class="hero-subtitle">Applied machine learning, spatial computing, and systems experiments, with a little signal-noise left in the room.</p>
+                <p class="hero-subtitle">Applied machine learning, 3D reconstruction, and more.</p>
             </div>
         </section>
 
         <section class="page-section">
             <div class="section-kicker">
                 <h2 class="section-title">Selected Work</h2>
-                <p class="section-note">A compact index of active and in-progress work. Each card keeps the existing interest link.</p>
+                <p class="section-note">Active and in-progress work.</p>
             </div>
 
             <div class="card-grid">
-                <article class="project-card" data-title="Geospatial NeRF" data-image="./assets/pr1.jpg" data-fallback="pr1.jpg pending" data-link="https://www.cameronhalaby.com" data-link-label="cameronhalaby.com" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer finibus, sapien vitae luctus placerat, nibh magna gravida libero, sed porta ipsum arcu ac neque. Curabitur a neque at libero consequat interdum sit amet nec erat.">
+                <article class="project-card" data-title="Geospatial NeRF" data-image="./assets/pr1.jpg" data-fallback="pr1.jpg pending" data-link="https://theclassicjournal.org/enhancing-3-d-reconstruction/" data-link-label="theclassicjournal.org/enhancing-3-d-reconstruction" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer finibus, sapien vitae luctus placerat, nibh magna gravida libero, sed porta ipsum arcu ac neque. Curabitur a neque at libero consequat interdum sit amet nec erat.">
                     <div class="project-media" data-fallback="pr1.jpg pending">
                         <img src="./assets/pr1.jpg" alt="Geospatial NeRF project preview" class="project-img">
                     </div>
@@ -539,7 +539,7 @@
                     </div>
                 </article>
 
-                <article class="project-card" data-title="Semantic Course Map" data-image="./assets/pr2.jpg" data-fallback="pr2.jpg pending" data-link="https://www.cameronhalaby.com" data-link-label="cameronhalaby.com" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non lectus sed erat sagittis dictum. Sed vitae mauris et sem pretium luctus, vitae sodales mi. Pellentesque habitant morbi tristique senectus et netus.">
+                <article class="project-card" data-title="Semantic Course Map" data-image="./assets/pr2.jpg" data-fallback="pr2.jpg pending" data-link="https://ugacogsci.github.io/semantic-course-map/" data-link-label="ugacogsci.github.io/semantic-course-map" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum non lectus sed erat sagittis dictum. Sed vitae mauris et sem pretium luctus, vitae sodales mi. Pellentesque habitant morbi tristique senectus et netus.">
                     <div class="project-media" data-fallback="pr2.jpg pending">
                         <img src="./assets/pr2.jpg" alt="Semantic Course Map project preview" class="project-img">
                     </div>
@@ -550,7 +550,7 @@
                     </div>
                 </article>
 
-                <article class="project-card" data-title="EEG ML" data-image="./assets/pr3.jpg" data-fallback="pr3.jpg pending" data-link="https://www.cameronhalaby.com" data-link-label="cameronhalaby.com" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus libero ut magna ultrices, at tempor massa mattis. Duis vel turpis ligula. Aenean consequat risus sed justo dictum, nec commodo sem pulvinar.">
+                <article class="project-card" data-title="EEG ML" data-image="./assets/pr3.jpg" data-fallback="pr3.jpg pending" data-link="https://www.youtube.com/watch?v=MLGuQxJ2m_M" data-link-label="youtube.com/watch?v=MLGuQxJ2m_M" data-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent rhoncus libero ut magna ultrices, at tempor massa mattis. Duis vel turpis ligula. Aenean consequat risus sed justo dictum, nec commodo sem pulvinar.">
                     <div class="project-media" data-fallback="pr3.jpg pending">
                         <img src="./assets/pr3.jpg" alt="EEG machine learning project preview" class="project-img">
                     </div>
@@ -588,9 +588,11 @@
         </div>
     </div>
 
+    <script src="./theme-toggle.js"></script>
     <script>
         function updateTheme() {
-            const d = new Date(), h = d.getHours() + d.getMinutes() / 60;
+            const d = window.CameronTheme ? window.CameronTheme.getDate() : new Date();
+            const h = d.getHours() + d.getMinutes() / 60;
             const intensity = (Math.cos((h - 12) / 24 * Math.PI * 2) + 1) / 2;
             const r = Math.round(5 + (236-5) * intensity);
             const g = Math.round(5 + (236-5) * intensity);
