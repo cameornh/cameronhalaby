@@ -53,6 +53,10 @@
         .audio-player a:hover u { color: #a78bfa; }
         .audio-vol-wrapper { display: flex; align-items: center; gap: 10px; font-size: 0.6rem; opacity: 0.5; transition: opacity 0.3s; pointer-events: auto; }
         .audio-vol-wrapper:hover { opacity: 1; }
+        .audio-control-row { display: flex; align-items: center; gap: 8px; font-size: 0.56rem; opacity: 0.52; transition: opacity 0.3s; pointer-events: auto; }
+        .audio-control-row:hover { opacity: 1; }
+        .audio-control-btn { font: inherit; letter-spacing: inherit; text-transform: uppercase; color: inherit; background: transparent; border: 0; padding: 0; cursor: pointer; opacity: 0.72; }
+        .audio-control-btn:hover, .audio-control-btn.active { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
         .vol-slider { -webkit-appearance: none; width: 80px; height: 2px; background: rgba(255,255,255,0.3); border-radius: 1px; outline: none; cursor: pointer; }
         .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
 
@@ -97,13 +101,14 @@
         .track-meta { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-color); }
         .track-controls {
             display: grid;
-            grid-template-columns: auto minmax(160px, 1fr) auto auto;
+            grid-template-columns: auto auto minmax(160px, 1fr) auto auto;
             gap: 14px;
             align-items: center;
             margin-top: 18px;
             cursor: default;
         }
-        .track-play-btn {
+        .track-play-btn,
+        .track-loop-btn {
             min-width: 72px;
             padding: 9px 12px;
             border: 1px solid rgba(128,128,128,0.34);
@@ -117,7 +122,8 @@
             cursor: pointer;
             transition: background 0.2s, color 0.2s, border-color 0.2s;
         }
-        .track-play-btn:hover, .track-item.active .track-play-btn {
+        .track-play-btn:hover, .track-item.active .track-play-btn,
+        .track-loop-btn:hover, .track-loop-btn.active {
             background: var(--text-color);
             color: var(--bg-color);
             border-color: var(--text-color);
@@ -519,6 +525,12 @@
         <div class="audio-vol-wrapper">
             VOL <input type="range" class="vol-slider" id="bg-vol-slider" min="0" max="1" step="0.01" value="0.4">
         </div>
+        <div class="audio-control-row" aria-label="Audio controls">
+            <button class="audio-control-btn" id="audio-prev-btn" type="button">Prev</button>
+            <button class="audio-control-btn" id="audio-mute-btn" type="button" aria-pressed="false">Mute</button>
+            <button class="audio-control-btn" id="audio-loop-btn" type="button" aria-pressed="false">Loop</button>
+            <button class="audio-control-btn" id="audio-next-btn" type="button">Next</button>
+        </div>
     </div>
 
     <main>
@@ -538,6 +550,7 @@
                     </div>
                     <div class="track-controls">
                         <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
                         <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 01">
                         <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">02:28</span></span>
                         <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 01"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
@@ -550,6 +563,7 @@
                     </div>
                     <div class="track-controls">
                         <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
                         <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 02">
                         <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">00:40</span></span>
                         <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 02"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
@@ -562,6 +576,7 @@
                     </div>
                     <div class="track-controls">
                         <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
                         <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 03">
                         <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">01:36</span></span>
                         <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 03"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
@@ -574,6 +589,7 @@
                     </div>
                     <div class="track-controls">
                         <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
                         <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 04">
                         <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">01:39</span></span>
                         <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 04"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
@@ -586,6 +602,7 @@
                     </div>
                     <div class="track-controls">
                         <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
                         <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 05">
                         <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">02:42</span></span>
                         <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 05"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
@@ -598,9 +615,49 @@
                     </div>
                     <div class="track-controls">
                         <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
                         <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 06">
                         <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">02:11</span></span>
                         <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 06"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
+                    </div>
+                </div>
+                <div class="track-item" data-track-index="6">
+                    <div class="track-row">
+                        <span class="track-name">Song 07</span>
+                        <span class="track-meta">00:51</span>
+                    </div>
+                    <div class="track-controls">
+                        <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
+                        <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 07">
+                        <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">00:51</span></span>
+                        <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 07"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
+                    </div>
+                </div>
+                <div class="track-item" data-track-index="7">
+                    <div class="track-row">
+                        <span class="track-name">Song 08</span>
+                        <span class="track-meta">01:52</span>
+                    </div>
+                    <div class="track-controls">
+                        <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
+                        <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 08">
+                        <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">01:52</span></span>
+                        <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 08"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
+                    </div>
+                </div>
+                <div class="track-item" data-track-index="8">
+                    <div class="track-row">
+                        <span class="track-name">Song 09</span>
+                        <span class="track-meta">01:21</span>
+                    </div>
+                    <div class="track-controls">
+                        <button class="track-play-btn" type="button">Play</button>
+                        <button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>
+                        <input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub Song 09">
+                        <span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">01:21</span></span>
+                        <label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for Song 09"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>
                     </div>
                 </div>
             </div>
@@ -771,12 +828,20 @@
             { name: "Song 3", src: "./assets/song3.mp3" },
             { name: "Song 4", src: "./assets/song4.mp3" },
             { name: "Song 5", src: "./assets/song5.mp3" },
-            { name: "Song 6", src: "./assets/song6.mp3" }
+            { name: "Song 6", src: "./assets/song6.mp3" },
+            { name: "Song 7", src: "./assets/song7.mp3" },
+            { name: "Song 8", src: "./assets/song8.mp3" },
+            { name: "Song 9", src: "./assets/song9.mp3" }
         );
         const trackElements = document.querySelectorAll('.track-item');
-        let globalTrack = 0, hasStartedGlobal = false, globalFading = false, globalFadeInt, pendingSeekPercent = null;
+        let globalTrack = Math.floor(Math.random() * globalPlaylist.length), hasStartedGlobal = false, globalFading = false, globalFadeInt, pendingSeekPercent = null, loopTrackIndex = null;
         const fadeMs = 2000, globalAudio = new Audio(), gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
         const bgVolSlider = document.getElementById('bg-vol-slider');
+        const audioPrevBtn = document.getElementById('audio-prev-btn');
+        const audioNextBtn = document.getElementById('audio-next-btn');
+        const audioMuteBtn = document.getElementById('audio-mute-btn');
+        const audioLoopBtn = document.getElementById('audio-loop-btn');
+        gTrackUI.innerText = globalPlaylist.at(globalTrack).name;
 
         function formatAudioTime(seconds) {
             if(!Number.isFinite(seconds)) return "00:00";
@@ -795,6 +860,22 @@
             globalAudio.playbackRate = getTrackRate(index);
         }
 
+        function applyLoopState() {
+            globalAudio.loop = loopTrackIndex === globalTrack;
+        }
+
+        function syncFloatingAudioControls() {
+            if(audioMuteBtn) {
+                audioMuteBtn.classList.toggle('active', globalAudio.muted);
+                audioMuteBtn.setAttribute('aria-pressed', String(globalAudio.muted));
+            }
+            if(audioLoopBtn) {
+                const isLoopingCurrent = loopTrackIndex === globalTrack;
+                audioLoopBtn.classList.toggle('active', isLoopingCurrent);
+                audioLoopBtn.setAttribute('aria-pressed', String(isLoopingCurrent));
+            }
+        }
+
         function setScrubberProgress(input, percent) {
             const value = Math.max(0, Math.min(100, percent || 0));
             input.value = value;
@@ -806,11 +887,17 @@
             trackElements.forEach((item, index) => {
                 const isActive = activeTrackAttr === String(index);
                 const playBtn = item.querySelector('.track-play-btn');
+                const loopBtn = item.querySelector('.track-loop-btn');
                 const scrubber = item.querySelector('.track-scrubber');
                 const currentEl = item.querySelector('.track-current');
                 const durationEl = item.querySelector('.track-duration');
                 item.classList.toggle('active', isActive);
                 playBtn.innerText = isActive && !globalAudio.paused ? "Pause" : "Play";
+                if(loopBtn) {
+                    const isLoopingRow = loopTrackIndex === index;
+                    loopBtn.classList.toggle('active', isLoopingRow);
+                    loopBtn.setAttribute('aria-pressed', String(isLoopingRow));
+                }
 
                 if(isActive && Number.isFinite(globalAudio.duration)) {
                     const percent = (globalAudio.currentTime / globalAudio.duration) * 100;
@@ -822,6 +909,7 @@
                     currentEl.innerText = "00:00";
                 }
             });
+            syncFloatingAudioControls();
         }
 
         bgVolSlider.addEventListener('input', (e) => {
@@ -837,6 +925,7 @@
 
         function playGlobal(index, options = new Object()) {
             const previousTrack = globalAudio.getAttribute('data-track-index');
+            index = (index + globalPlaylist.length) % globalPlaylist.length;
             const sourceChanged = previousTrack !== String(index);
             const reset = options.reset !== undefined ? options.reset : sourceChanged;
             globalTrack = index;
@@ -848,6 +937,7 @@
             }
             if(reset && globalAudio.readyState > 0) globalAudio.currentTime = 0;
             applyTrackRate(globalTrack);
+            applyLoopState();
             globalFading = false;
             clearInterval(globalFadeInt);
 
@@ -862,9 +952,22 @@
             }).catch(e => console.log("Audio prevented."));
             syncTrackRows();
         }
+
+        function skipGlobal(delta) {
+            hasStartedGlobal = true;
+            clearInterval(globalFadeInt);
+            globalFading = false;
+            playGlobal(globalTrack + delta, { reset: true });
+        }
+
+        function toggleLoopForTrack(index) {
+            loopTrackIndex = loopTrackIndex === index ? null : index;
+            applyLoopState();
+            syncTrackRows();
+        }
         
         globalAudio.addEventListener('timeupdate', () => {
-            if (!globalFading && globalAudio.duration && (globalAudio.duration - globalAudio.currentTime) <= (fadeMs / 1000)) {
+            if (!globalAudio.loop && !globalFading && globalAudio.duration && (globalAudio.duration - globalAudio.currentTime) <= (fadeMs / 1000)) {
                 globalFading = true; clearInterval(globalFadeInt);
                 globalFadeInt = setInterval(() => { 
                     if (globalAudio.volume > 0.05) globalAudio.volume -= 0.05; 
@@ -884,6 +987,27 @@
         globalAudio.addEventListener('pause', syncTrackRows);
         globalAudio.addEventListener('ended', () => { playGlobal((globalTrack + 1) % globalPlaylist.length, { reset: true }); });
 
+        audioPrevBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            skipGlobal(-1);
+        });
+
+        audioNextBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            skipGlobal(1);
+        });
+
+        audioMuteBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            globalAudio.muted = !globalAudio.muted;
+            syncFloatingAudioControls();
+        });
+
+        audioLoopBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            toggleLoopForTrack(globalTrack);
+        });
+
         trackElements.forEach((item, index) => {
             item.addEventListener('click', (e) => {
                 if(e.target.closest('.track-controls')) return;
@@ -897,6 +1021,11 @@
                 hasStartedGlobal = true;
                 if(globalAudio.getAttribute('data-track-index') === String(index) && !globalAudio.paused) pauseGlobal();
                 else playGlobal(index, { reset: globalAudio.getAttribute('data-track-index') !== String(index) });
+            });
+
+            item.querySelector('.track-loop-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleLoopForTrack(index);
             });
 
             item.querySelector('.track-scrubber').addEventListener('input', (e) => {
@@ -925,10 +1054,12 @@
         });
 
         document.body.addEventListener('click', (e) => {
-            if(hasStartedGlobal || e.target.id === 'bg-vol-slider' || e.target.closest('.track-controls, #sys-logs-btn, #deep-archive')) return;
+            if(hasStartedGlobal || e.target.id === 'bg-vol-slider' || e.target.closest('.track-controls, .audio-control-row, #sys-logs-btn, #deep-archive')) return;
             hasStartedGlobal = true;
             playGlobal(globalTrack, { reset: false });
         });
+        applyLoopState();
+        syncFloatingAudioControls();
         syncTrackRows();
 
         const musicFieldCanvas = document.getElementById('music-field-canvas');
