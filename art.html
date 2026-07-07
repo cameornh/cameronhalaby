@@ -140,12 +140,28 @@
 
         /* Canvas Overlay Structure */
         .canvas-container { position: relative; width: 100%; height: 500px; border-radius: 0; overflow: hidden; box-shadow: inset 0 0 40px rgba(0,0,0,0.8); }
-        .draw-canvas { background: #000; cursor: crosshair; width: 100%; height: 100%; }
+        .draw-canvas { background: #000; cursor: none; width: 100%; height: 100%; }
         .canvas-noise-overlay { position: absolute; inset: 0; pointer-events: none; opacity: 0.15; mix-blend-mode: screen; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); z-index: 5; }
+        .brush-cursor-ring {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 8;
+            width: var(--brush-cursor-size, 8px);
+            height: var(--brush-cursor-size, 8px);
+            border: 1px solid rgba(255,255,255,0.82);
+            border-radius: 50%;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.58), 0 0 18px rgba(255,255,255,0.16);
+            opacity: 0;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: difference;
+        }
         
         .editor-controls { display: flex; gap: 15px; margin-top: 5px; flex-wrap: wrap; }
         .action-btn { font-family: 'Archivo', sans-serif; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; color: #fff; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 15px 30px; border-radius: 0; cursor: pointer; transition: all 0.3s ease; text-decoration: none; font-weight: 500; }
         .action-btn:hover { background: #fff; color: #000; }
+        .action-btn:disabled { opacity: 0.34; cursor: default; pointer-events: none; }
         .action-btn.accent { background: #f4f4f5; border-color: #f4f4f5; color: #0a0a0c; }
         .action-btn.accent:hover { opacity: 0.9; color: #000; box-shadow: 0 0 18px rgba(255,255,255,0.18); }
 
@@ -221,9 +237,12 @@
                 <div class="canvas-container">
                     <canvas class="draw-canvas" id="draw-canvas"></canvas>
                     <div class="canvas-noise-overlay"></div>
+                    <div class="brush-cursor-ring" id="brush-cursor-ring" aria-hidden="true"></div>
                 </div>
                 
                 <div class="editor-controls">
+                    <button class="action-btn" id="btn-undo" type="button" disabled>Undo</button>
+                    <button class="action-btn" id="btn-redo" type="button" disabled>Redo</button>
                     <button class="action-btn accent" id="btn-diffusion">Generate Img2Img</button>
                     <button class="action-btn" id="btn-clear">Clear</button>
                     <button class="action-btn" id="btn-download">Download Image</button>
@@ -308,11 +327,18 @@
         // ==========================================
         const drawCanv = document.getElementById('draw-canvas');
         const dCtx = drawCanv.getContext('2d', { willReadFrequently: true });
+        const brushCursorRing = document.getElementById('brush-cursor-ring');
+        const undoBtn = document.getElementById('btn-undo');
+        const redoBtn = document.getElementById('btn-redo');
         
         let isDrawingPad = false;
         let brushColor = '#a78bfa';
         let brushSize = 8;
         let brushStyle = 'paintbrush';
+        let isDiffusionProcessing = false;
+        const undoStack = [];
+        const redoStack = [];
+        const historyLimit = 30;
         
         function initDraw() {
             drawCanv.width = drawCanv.clientWidth; 
@@ -320,14 +346,124 @@
             // Initialize with black background to ensure accurate downloads and img2img processing
             dCtx.fillStyle = '#000000';
             dCtx.fillRect(0, 0, drawCanv.width, drawCanv.height);
+            resetCanvasHistory();
         }
         initDraw(); 
         window.addEventListener('resize', initDraw);
 
+        function captureCanvasState() {
+            return {
+                width: drawCanv.width,
+                height: drawCanv.height,
+                data: dCtx.getImageData(0, 0, drawCanv.width, drawCanv.height)
+            };
+        }
+
+        function createCanvasFromState(state) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = state.width;
+            tempCanvas.height = state.height;
+            tempCanvas.getContext('2d').putImageData(state.data, 0, 0);
+            return tempCanvas;
+        }
+
+        function restoreCanvasState(state) {
+            if(!state) return;
+            dCtx.save();
+            dCtx.globalAlpha = 1;
+            dCtx.globalCompositeOperation = 'source-over';
+            dCtx.shadowBlur = 0;
+            dCtx.filter = 'none';
+            dCtx.fillStyle = '#000000';
+            dCtx.fillRect(0, 0, drawCanv.width, drawCanv.height);
+
+            if(state.width === drawCanv.width && state.height === drawCanv.height) {
+                dCtx.putImageData(state.data, 0, 0);
+            } else {
+                dCtx.drawImage(createCanvasFromState(state), 0, 0, drawCanv.width, drawCanv.height);
+            }
+            dCtx.restore();
+            dCtx.globalAlpha = 1;
+            dCtx.globalCompositeOperation = 'source-over';
+            dCtx.shadowBlur = 0;
+            drawCanv.style.filter = 'none';
+        }
+
+        function updateHistoryButtons() {
+            undoBtn.disabled = isDiffusionProcessing || undoStack.length === 0;
+            redoBtn.disabled = isDiffusionProcessing || redoStack.length === 0;
+        }
+
+        function resetCanvasHistory() {
+            undoStack.length = 0;
+            redoStack.length = 0;
+            updateHistoryButtons();
+        }
+
+        function pushUndoState(state = captureCanvasState()) {
+            undoStack.push(state);
+            if(undoStack.length > historyLimit) undoStack.shift();
+            redoStack.length = 0;
+            updateHistoryButtons();
+        }
+
+        function getDiffusionRequestSize(sourceWidth, sourceHeight) {
+            const grid = 64;
+            const minSide = 320;
+            const maxSide = 1024;
+            const roundToGrid = value => Math.round(value / grid) * grid;
+            const clampToGrid = value => Math.max(minSide, Math.min(maxSide, roundToGrid(value)));
+            const safeAspect = Math.max(1 / 2.25, Math.min(2.25, sourceWidth / sourceHeight));
+
+            if(safeAspect >= 1) {
+                return {
+                    width: maxSide,
+                    height: clampToGrid(maxSide / safeAspect)
+                };
+            }
+
+            return {
+                width: clampToGrid(maxSide * safeAspect),
+                height: maxSide
+            };
+        }
+
+        function undoCanvasAction() {
+            if(isDiffusionProcessing || !undoStack.length) return;
+            redoStack.push(captureCanvasState());
+            restoreCanvasState(undoStack.pop());
+            updateHistoryButtons();
+        }
+
+        function redoCanvasAction() {
+            if(isDiffusionProcessing || !redoStack.length) return;
+            undoStack.push(captureCanvasState());
+            restoreCanvasState(redoStack.pop());
+            updateHistoryButtons();
+        }
+
+        function getVisibleBrushSize() {
+            if(brushStyle === 'eraser') return brushSize * 2;
+            if(brushStyle === 'pencil') return Math.max(3, brushSize * 0.3);
+            return brushSize;
+        }
+
+        function updateBrushCursor(e) {
+            const rect = drawCanv.getBoundingClientRect();
+            const size = Math.max(3, getVisibleBrushSize());
+            brushCursorRing.style.setProperty('--brush-cursor-size', size + 'px');
+            brushCursorRing.style.left = (e.clientX - rect.left) + 'px';
+            brushCursorRing.style.top = (e.clientY - rect.top) + 'px';
+            brushCursorRing.style.opacity = '1';
+        }
+
         // Toolbar Setup
         const sizeSlider = document.getElementById('draw-size');
         document.getElementById('draw-color').addEventListener('input', e => { brushColor = e.target.value; });
-        sizeSlider.addEventListener('input', e => { brushSize = parseInt(e.target.value); });
+        sizeSlider.addEventListener('input', e => {
+            brushSize = parseInt(e.target.value);
+            brushCursorRing.style.setProperty('--brush-cursor-size', Math.max(3, getVisibleBrushSize()) + 'px');
+        });
         
         const styleBtns = document.querySelectorAll('.style-btn');
         for(let i = 0; i < styleBtns.length; i++) {
@@ -336,8 +472,12 @@
                 for(let j = 0; j < styleBtns.length; j++) Reflect.get(styleBtns, j).classList.remove('active');
                 e.target.classList.add('active');
                 brushStyle = e.target.getAttribute('data-style');
+                brushCursorRing.style.setProperty('--brush-cursor-size', Math.max(3, getVisibleBrushSize()) + 'px');
             });
         }
+
+        undoBtn.addEventListener('click', undoCanvasAction);
+        redoBtn.addEventListener('click', redoCanvasAction);
 
         // Mouse Wheel Size Adjustment (Only when hovering canvas)
         drawCanv.addEventListener('wheel', e => {
@@ -345,15 +485,19 @@
             if (e.deltaY > 0) brushSize = Math.max(1, brushSize - 2);
             else brushSize = Math.min(100, brushSize + 2);
             sizeSlider.value = brushSize;
+            updateBrushCursor(e);
         });
 
         drawCanv.addEventListener('mousedown', e => { 
+            if(isDiffusionProcessing) return;
+            pushUndoState();
             isDrawingPad = true; 
             dCtx.beginPath(); 
             dCtx.moveTo(e.offsetX, e.offsetY); 
         });
         
         drawCanv.addEventListener('mousemove', e => { 
+            updateBrushCursor(e);
             if(!isDrawingPad) return;
 
             dCtx.shadowBlur = 0; 
@@ -407,9 +551,16 @@
                 dCtx.stroke();
             }
         });
+
+        drawCanv.addEventListener('mouseenter', updateBrushCursor);
+        drawCanv.addEventListener('mouseleave', () => {
+            brushCursorRing.style.opacity = '0';
+        });
         
         window.addEventListener('mouseup', () => { isDrawingPad = false; });
         document.getElementById('btn-clear').addEventListener('click', () => {
+            if(isDiffusionProcessing) return;
+            pushUndoState();
             dCtx.globalCompositeOperation = 'source-over';
             dCtx.globalAlpha = 1.0;
             dCtx.fillStyle = '#000000';
@@ -429,37 +580,67 @@
         // ==========================================
         document.getElementById('btn-diffusion').addEventListener('click', (e) => {
             const btn = e.target;
-            if (btn.innerText === "Processing...") return;
+            if (isDiffusionProcessing) return;
             
             if (STABILITY_API_KEY === "YOUR_API_KEY_HERE") {
                 alert("Please add your Stability API key to the script.");
                 return;
             }
 
+            const diffusionBeforeState = captureCanvasState();
+            redoStack.length = 0;
+            isDiffusionProcessing = true;
+            isDrawingPad = false;
+            updateHistoryButtons();
+            btn.disabled = true;
             btn.innerText = "Processing...";
 
             // 1. Start the visual animation
             let frame = 0;
+            let isAnimationActive = true;
             drawCanv.style.filter = 'url(#diffusion-filter) contrast(1.5) saturate(1.5)';
             
             function resolveDiffusion() {
+                if(!isAnimationActive) return;
                 frame++;
                 dCtx.fillStyle = 'rgba(0,0,0,0.05)'; 
                 dCtx.fillRect(0, 0, drawCanv.width, drawCanv.height);
                 if (frame < 60) requestAnimationFrame(resolveDiffusion);
             }
             requestAnimationFrame(resolveDiffusion);
+
+            function finishDiffusion() {
+                isAnimationActive = false;
+                isDiffusionProcessing = false;
+                drawCanv.style.filter = "none";
+                btn.disabled = false;
+                btn.innerText = "Generate Img2Img";
+                updateHistoryButtons();
+            }
+
+            function failDiffusion(err) {
+                if(err) console.error(err);
+                isAnimationActive = false;
+                restoreCanvasState(diffusionBeforeState);
+                finishDiffusion();
+                alert("Img2Img request failed. The canvas was restored to its previous state.");
+            }
             
-            // 2. Create a compliant Off-Screen Canvas (1024x410 = 2.49 ratio)
+            // 2. Create a stable, 64px-aligned request canvas from the pre-animation state.
             const offscreen = document.createElement('canvas');
-            offscreen.width = 1024;
-            offscreen.height = 410;
+            const requestSize = getDiffusionRequestSize(diffusionBeforeState.width, diffusionBeforeState.height);
+            offscreen.width = requestSize.width;
+            offscreen.height = requestSize.height;
             const oCtx = offscreen.getContext('2d');
-            // Draw your current drawing into the compliant resolution
-            oCtx.drawImage(drawCanv, 0, 0, 1024, 410);
+            oCtx.drawImage(createCanvasFromState(diffusionBeforeState), 0, 0, offscreen.width, offscreen.height);
 
             // 3. Send the compliant Off-Screen blob
             offscreen.toBlob(async (blob) => {
+                if(!blob) {
+                    failDiffusion(new Error("Could not export canvas for img2img."));
+                    return;
+                }
+
                 const formData = new FormData();
                 formData.append("image", blob);
                 formData.append("prompt", "A masterpiece");
@@ -479,7 +660,7 @@
                     if (response.status !== 200) {
                         const errText = await response.text();
                         console.error("API Error Data: ", errText);
-                        throw new Error("Status " + response.status);
+                        throw new Error("Img2Img API rejected the request with status " + response.status);
                     }
 
                     const resultBlob = await response.blob();
@@ -489,20 +670,21 @@
                     genImg.onload = () => {
                         dCtx.globalAlpha = 1.0;
                         dCtx.globalCompositeOperation = 'source-over';
+                        pushUndoState(diffusionBeforeState);
                         // Draw result back to main canvas, scaling to fit UI
                         dCtx.drawImage(genImg, 0, 0, drawCanv.width, drawCanv.height);
                         
-                        drawCanv.style.filter = "none";
-                        btn.innerText = "Generate Img2Img";
+                        finishDiffusion();
+                        URL.revokeObjectURL(objectUrl);
+                    };
+                    genImg.onerror = () => {
+                        failDiffusion(new Error("Generated image could not be loaded."));
                         URL.revokeObjectURL(objectUrl);
                     };
                     genImg.src = objectUrl;
 
                 } catch (err) {
-                    console.error(err);
-                    alert("API Request Failed. Ensure aspect ratio is valid.");
-                    drawCanv.style.filter = "none";
-                    btn.innerText = "Generate Img2Img";
+                    failDiffusion(err);
                 }
             }, "image/png");
         });
