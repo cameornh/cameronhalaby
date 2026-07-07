@@ -503,62 +503,6 @@
         <!-- 1:6 FULL WIDTH IMAGE SLIDESHOW STRIP -->
         <section class="slideshow-section">
             <div class="slideshow-wrapper" id="image-slideshow">
-                <div class="slide active">
-                    <img src="./assets/strip1.jpg" alt="Slide 1">
-                    <div class="slide-caption">caterpillar</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip2.jpg" alt="Slide 2">
-                    <div class="slide-caption">tolantongo</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip2a.jpg" alt="Slide 2a">
-                    <div class="slide-caption">cameron_eeg</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip2b.jpg" alt="Slide 2b">
-                    <div class="slide-caption">inky_eeg</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip2c.jpg" alt="Slide 2c">
-                    <div class="slide-caption">cameron_fnirs</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip3.jpg" alt="Slide 3">
-                    <div class="slide-caption">Data Subsystems</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip4.jpg" alt="Slide 4">
-                    <div class="slide-caption">inky</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip5.jpg" alt="Slide 5">
-                    <div class="slide-caption">inky_convoluted</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip6.jpg" alt="Slide 6">
-                    <div class="slide-caption">cameron</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip7.jpg" alt="Slide 7">
-                    <div class="slide-caption">cameron_convoluted</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip8.jpg" alt="Slide 8">
-                    <div class="slide-caption">yucca</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip9.jpg" alt="Slide 9">
-                    <div class="slide-caption">orb weaver</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip9a.jpg" alt="Slide 9a">
-                    <div class="slide-caption">mini_me</div>
-                </div>
-                <div class="slide">
-                    <img src="./assets/strip10.jpg" alt="Slide 10">
-                    <div class="slide-caption">boulder</div>
-                </div>
             </div>
         </section>
 
@@ -569,44 +513,7 @@
                 <p class="section-subtitle">Gallery</p>
             </div>
             
-            <div class="card-grid">
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p1.jpg')">
-                    <div class="photo-wrapper">
-                        <div class="squiggle-left"></div><div class="squiggle-right"></div>
-                        <img src="./assets/p1.jpg" alt="Photo 1">
-                    </div>
-                </div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p2.jpg')">
-                    <div class="photo-wrapper">
-                        <div class="squiggle-left"></div><div class="squiggle-right"></div>
-                        <img src="./assets/p2.jpg" alt="Photo 2">
-                    </div>
-                </div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p3.jpg')">
-                    <div class="photo-wrapper">
-                        <div class="squiggle-left"></div><div class="squiggle-right"></div>
-                        <img src="./assets/p3.jpg" alt="Photo 3">
-                    </div>
-                </div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p4b.jpg')">
-                    <div class="photo-wrapper">
-                        <div class="squiggle-left"></div><div class="squiggle-right"></div>
-                        <img src="./assets/p4a.jpg" alt="Photo 4">
-                    </div>
-                </div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p5.jpg')">
-                    <div class="photo-wrapper">
-                        <div class="squiggle-left"></div><div class="squiggle-right"></div>
-                        <img src="./assets/p5.jpg" alt="Photo 5">
-                    </div>
-                </div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/p6.jpg')">
-                    <div class="photo-wrapper">
-                        <div class="squiggle-left"></div><div class="squiggle-right"></div>
-                        <img src="./assets/p6.jpg" alt="Photo 6">
-                    </div>
-                </div>
-            </div>
+            <div class="card-grid" id="index-photo-grid"></div>
         </section>
 
         <!-- GENERATIVE ART SECTION -->
@@ -798,6 +705,7 @@
     </footer>
 
     <script src="./theme-toggle.js"></script>
+    <script src="./asset-catalog.js"></script>
     <script src="./liquid-lightbox.js"></script>
     <script>
         // --- 1. DYNAMIC TIME-OF-DAY THEME ---
@@ -832,20 +740,8 @@
         footerDate.innerText = `Updated ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
 
         // --- 3. BACKGROUND AUDIO PLAYER LOGIC WITH CROSSFADE & VOLUME ---
-        // Add your repository MP3 paths here:
-        const playlist = new Array(
-            { name: "Song 1", src: "./assets/song1.mp3" },
-            { name: "Song 2", src: "./assets/song2.mp3" },
-            { name: "Song 3", src: "./assets/song3.mp3" },
-            { name: "Song 4", src: "./assets/song4.mp3" },
-            { name: "Song 5", src: "./assets/song5.mp3" },
-            { name: "Song 6", src: "./assets/song6.mp3" },
-            { name: "Song 7", src: "./assets/song7.mp3" },
-            { name: "Song 8", src: "./assets/song8.mp3" },
-            { name: "Song 9", src: "./assets/song9.mp3" }
-        );
-        
-        let currentTrack = Math.floor(Math.random() * playlist.length);
+        const playlist = window.CameronAssets ? window.CameronAssets.songs() : [];
+        let currentTrack = playlist.length ? Math.floor(Math.random() * playlist.length) : 0;
         let hasStartedAudio = false;
         let isFadingOut = false;
         let isLoopingAudio = false;
@@ -861,7 +757,24 @@
         const audioPauseBtn = document.getElementById('audio-pause-btn');
         const audioMuteBtn = document.getElementById('audio-mute-btn');
         const audioLoopBtn = document.getElementById('audio-loop-btn');
-        trackNameUI.innerText = playlist.at(currentTrack).name;
+        trackNameUI.innerText = playlist.at(currentTrack)?.name || 'No Songs';
+
+        function refreshAudioPlaylist() {
+            if(!window.CameronAssets) return;
+            const nextPlaylist = window.CameronAssets.songs();
+            const currentSrc = playlist.at(currentTrack)?.src;
+            playlist.splice(0, playlist.length, ...nextPlaylist);
+            if(!playlist.length) {
+                currentTrack = 0;
+                trackNameUI.innerText = 'No Songs';
+                return;
+            }
+
+            const currentIndex = playlist.findIndex(track => track.src === currentSrc);
+            currentTrack = currentIndex >= 0 ? currentIndex : Math.min(currentTrack, playlist.length - 1);
+            trackNameUI.innerText = playlist.at(currentTrack).name;
+        }
+        if(window.CameronAssets) window.CameronAssets.ready.then(refreshAudioPlaylist);
 
         function syncAudioControls() {
             audioPauseBtn.innerText = audioObj.paused ? 'Play' : 'Pause';
@@ -877,6 +790,7 @@
         });
 
         function playTrack(index) {
+            if(!playlist.length) return;
             currentTrack = (index + playlist.length) % playlist.length;
             audioObj.src = playlist.at(currentTrack).src;
             trackNameUI.innerText = playlist.at(currentTrack).name;
@@ -906,12 +820,14 @@
         }
 
         function skipTrack(delta) {
+            if(!playlist.length) return;
             hasStartedAudio = true;
             clearInterval(fadeInterval);
             playTrack(currentTrack + delta);
         }
 
         function resumeTrack() {
+            if(!playlist.length) return;
             if(!audioObj.src) {
                 playTrack(currentTrack);
                 return;
@@ -998,13 +914,74 @@
 
 
         // --- 4. SLIDESHOW LOGIC ---
-        const slides = document.querySelectorAll('.slide');
+        let slideTimer = null;
         let currentSlide = 0;
-        setInterval(() => {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (currentSlide + 1) % slides.length;
-            slides[currentSlide].classList.add('active');
-        }, 8000); 
+        function renderStripSlides() {
+            const slideshow = document.getElementById('image-slideshow');
+            const stripImages = window.CameronAssets ? window.CameronAssets.stripImages() : [];
+            slideshow.innerHTML = '';
+            currentSlide = 0;
+            if(slideTimer) clearInterval(slideTimer);
+
+            stripImages.forEach((slide, index) => {
+                const slideEl = document.createElement('div');
+                slideEl.className = 'slide' + (index === 0 ? ' active' : '');
+
+                const img = document.createElement('img');
+                img.src = slide.src;
+                img.alt = 'Slide ' + (index + 1);
+
+                const caption = document.createElement('div');
+                caption.className = 'slide-caption';
+                caption.innerText = slide.caption;
+
+                slideEl.append(img, caption);
+                slideshow.appendChild(slideEl);
+            });
+
+            const slides = slideshow.querySelectorAll('.slide');
+            if(slides.length <= 1) return;
+            slideTimer = setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, 8000);
+        }
+
+        renderStripSlides();
+        if(window.CameronAssets) window.CameronAssets.ready.then(renderStripSlides);
+
+        function renderIndexPhotos() {
+            const grid = document.getElementById('index-photo-grid');
+            const photos = window.CameronAssets ? window.CameronAssets.indexPhotos() : [];
+            grid.innerHTML = '';
+
+            photos.forEach(photo => {
+                const card = document.createElement('div');
+                card.className = 'obs-card photo-card';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'photo-wrapper';
+
+                const squiggleLeft = document.createElement('div');
+                squiggleLeft.className = 'squiggle-left';
+                const squiggleRight = document.createElement('div');
+                squiggleRight.className = 'squiggle-right';
+
+                const img = document.createElement('img');
+                img.src = photo.thumb;
+                img.alt = photo.alt;
+
+                wrapper.append(squiggleLeft, squiggleRight, img);
+                card.appendChild(wrapper);
+                card.addEventListener('click', () => openLightbox(photo.lightbox));
+                grid.appendChild(card);
+            });
+            attachEditorialTilt('#index-photo-grid .obs-card');
+        }
+
+        renderIndexPhotos();
+        if(window.CameronAssets) window.CameronAssets.ready.then(renderIndexPhotos);
 
         // --- 5. LIGHTBOX LOGIC ---
         function openLightbox(src) {
@@ -1058,6 +1035,8 @@
 
         function attachEditorialTilt(selector) {
             document.querySelectorAll(selector).forEach(c => {
+                if(c.dataset.tiltBound === 'true') return;
+                c.dataset.tiltBound = 'true';
                 c.addEventListener('mousemove', e => {
                     const r = c.getBoundingClientRect();
                     const x = e.clientX - r.left;

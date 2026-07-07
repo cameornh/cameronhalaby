@@ -545,7 +545,7 @@
                 <p class="section-subtitle">Original Music</p>
             </div>
 
-            <div class="track-list">
+            <div class="track-list" id="track-list">
                 <div class="track-item" data-track-index="0">
                     <div class="track-row">
                         <span class="track-name">Song 01</span>
@@ -798,6 +798,7 @@
     </div>
 
     <script src="./theme-toggle.js"></script>
+    <script src="./asset-catalog.js"></script>
     <script>
         // DYNAMIC THEME
         function updateTheme() {
@@ -825,19 +826,32 @@
         document.getElementById('dynamic-date').innerText = 'Updated ' + monthNames.at(dObj.getMonth()) + ' ' + dObj.getFullYear();
 
         // GLOBAL AUDIO PLAYER
-        const globalPlaylist = new Array(
-            { name: "Song 1", src: "./assets/song1.mp3" },
-            { name: "Song 2", src: "./assets/song2.mp3" },
-            { name: "Song 3", src: "./assets/song3.mp3" },
-            { name: "Song 4", src: "./assets/song4.mp3" },
-            { name: "Song 5", src: "./assets/song5.mp3" },
-            { name: "Song 6", src: "./assets/song6.mp3" },
-            { name: "Song 7", src: "./assets/song7.mp3" },
-            { name: "Song 8", src: "./assets/song8.mp3" },
-            { name: "Song 9", src: "./assets/song9.mp3" }
-        );
+        function initializeGlobalAudioPlayer() {
+        const globalPlaylist = window.CameronAssets ? window.CameronAssets.songs() : [];
+        const trackList = document.getElementById('track-list');
+
+        function createSpeedSelect(trackName) {
+            return '<label class="track-speed"><span>Speed</span><select class="speed-select" aria-label="Speed for ' + trackName + '"><option value="0.5">0.5x</option><option value="0.75">0.75x</option><option value="1" selected>1x</option><option value="1.25">1.25x</option><option value="1.5">1.5x</option><option value="2">2x</option></select></label>';
+        }
+
+        trackList.innerHTML = globalPlaylist.map((track, index) => {
+            return '<div class="track-item" data-track-index="' + index + '">' +
+                '<div class="track-row">' +
+                    '<span class="track-name">' + track.displayName + '</span>' +
+                    '<span class="track-meta">--:--</span>' +
+                '</div>' +
+                '<div class="track-controls">' +
+                    '<button class="track-play-btn" type="button">Play</button>' +
+                    '<button class="track-loop-btn" type="button" aria-pressed="false">Loop</button>' +
+                    '<input type="range" class="track-scrubber" min="0" max="100" value="0" step="0.01" aria-label="Scrub ' + track.displayName + '">' +
+                    '<span class="track-time"><span class="track-current">00:00</span> / <span class="track-duration">--:--</span></span>' +
+                    createSpeedSelect(track.displayName) +
+                '</div>' +
+            '</div>';
+        }).join('');
+
         const trackElements = document.querySelectorAll('.track-item');
-        let globalTrack = Math.floor(Math.random() * globalPlaylist.length), hasStartedGlobal = false, globalFading = false, globalFadeInt, pendingSeekPercent = null, loopTrackIndex = null;
+        let globalTrack = globalPlaylist.length ? Math.floor(Math.random() * globalPlaylist.length) : 0, hasStartedGlobal = false, globalFading = false, globalFadeInt, pendingSeekPercent = null, loopTrackIndex = null;
         const fadeMs = 2000, globalAudio = new Audio(), gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
         const bgVolSlider = document.getElementById('bg-vol-slider');
         const audioPrevBtn = document.getElementById('audio-prev-btn');
@@ -845,6 +859,10 @@
         const audioPauseBtn = document.getElementById('audio-pause-btn');
         const audioMuteBtn = document.getElementById('audio-mute-btn');
         const audioLoopBtn = document.getElementById('audio-loop-btn');
+        if(!globalPlaylist.length) {
+            gTrackUI.innerText = 'No Songs';
+            return;
+        }
         gTrackUI.innerText = globalPlaylist.at(globalTrack).name;
 
         function formatAudioTime(seconds) {
@@ -1115,6 +1133,10 @@
         applyLoopState();
         syncFloatingAudioControls();
         syncTrackRows();
+        }
+
+        if(window.CameronAssets) window.CameronAssets.ready.then(initializeGlobalAudioPlayer);
+        else initializeGlobalAudioPlayer();
 
         const musicFieldCanvas = document.getElementById('music-field-canvas');
         const musicFieldCtx = musicFieldCanvas.getContext('2d');

@@ -385,6 +385,65 @@
             visibility: hidden;
         }
 
+        .project-lightbox-nav {
+            position: absolute;
+            top: 50%;
+            z-index: 3;
+            width: 42px;
+            height: 64px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(0,0,0,0.28);
+            color: rgba(255,255,255,0.86);
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            transform: translateY(-50%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        }
+
+        .project-lightbox-nav:hover {
+            background: rgba(255,255,255,0.16);
+            color: #ffffff;
+        }
+
+        .project-lightbox-nav[hidden],
+        .project-lightbox-dots[hidden] {
+            display: none;
+        }
+
+        .project-lightbox-prev { left: 18px; }
+        .project-lightbox-next { right: 18px; }
+
+        .project-lightbox-dots {
+            position: absolute;
+            left: 50%;
+            bottom: 28px;
+            z-index: 3;
+            display: flex;
+            gap: 9px;
+            align-items: center;
+            transform: translateX(-50%);
+        }
+
+        .project-lightbox-dot {
+            width: 8px;
+            height: 8px;
+            padding: 0;
+            border: 1px solid rgba(255,255,255,0.5);
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .project-lightbox-dot.active {
+            background: rgba(255,255,255,0.9);
+            border-color: rgba(255,255,255,0.9);
+            transform: scale(1.16);
+        }
+
         .project-lightbox-panel {
             display: flex;
             flex-direction: column;
@@ -547,51 +606,7 @@
                 <p class="section-note">Active and in-progress work.</p>
             </div>
 
-            <div class="card-grid">
-                <article class="project-card" data-title="Fruit Phenotyping" data-image="./assets/pr1.jpg" data-fallback="pr1.jpg pending" data-link="https://zsong101.github.io/FruitPhenome/" data-link-label="zsong101.github.io/FruitPhenome/" data-description="The goal of this project is to automate the phenotyping pipeline for growers of crops. Right now this looks like uploading a batch of photos of fruit, and getting back a list of traits (i.e. height, width, color). This is primarily a segmentation/computer vision problem, but a lot of thought is being put into organizing the data and mapping out the latent space of fruit types and image types, in order to aid on the fly training of a MOE pipeline. The near future goal is a 'world model for fruit'.">
-                    <div class="project-media" data-fallback="pr1.jpg pending">
-                        <img src="./assets/pr1.jpg" alt="Fruit Phenotyping project preview" class="project-img">
-                    </div>
-                    <div class="project-body">
-                        <h3 class="project-title">Fruit Phenotyping</h3>
-                        <p class="project-desc">Work I led, working with UGA's CAES Horticulture Lab. Click for more details.</p>
-                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Fruit%20Phenotyping&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Fruit%20Phenotyping%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                    </div>
-                </article>
-
-                <article class="project-card" data-title="Geospatial NeRF" data-image="./assets/pr2.jpg" data-fallback="pr2.jpg pending" data-link="https://theclassicjournal.org/enhancing-3-d-reconstruction/" data-link-label="theclassicjournal.org/enhancing-3-d-reconstruction" data-description="This specific paper seeks to pry into the training process of a NeRF model (trained specifically on drone-collected near nadir photos of UGA's Sanford Stadium), and see if there are any ways to improve the quality of the reconstruction. What we landed on was a scheduled LPIPS weighted loss function. Similar projects I've worked on at SSRL have centered around physics based approaches to the same 3D reconstruction problem, though with satellite-collected photos (one idea was to penalize the reconstruction based on occlusions predicted from known solar data).">
-                    <div class="project-media" data-fallback="pr1.jpg pending">
-                        <img src="./assets/pr2.jpg" alt="Geospatial NeRF project preview" class="project-img">
-                    </div>
-                    <div class="project-body">
-                        <h3 class="project-title">Geospatial NeRF</h3>
-                        <p class="project-desc">Research I contributed to, working with UGA's Small Satellite Research Lab. Click for more details.</p>
-                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Geospatial%20NeRF&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Geospatial%20NeRF%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                    </div>
-                </article>
-
-                <article class="project-card" data-title="Semantic Course Map" data-image="./assets/pr3.jpg" data-fallback="pr3.jpg pending" data-link="https://ugacogsci.github.io/semantic-course-map/" data-link-label="ugacogsci.github.io/semantic-course-map" data-description="Created for UGA's 3rd annual GenAI competition, by the Cognitive Science Club. A scrape of UGA's bulletin of courses, organized into a searchable 2D map by semantic similarity. For formal pitch slides: https://canva.link/sv63mkh5jh64qyp. For creation logs: https://docs.google.com/document/d/1mgYQv5-SZpyEKsqoAlZoU2Iq2IQd65xGSoqzWGmQZIk/edit?usp=sharing. In the near future, the plan is to pivot this project to a four year plan generator and launch a startup.">
-                    <div class="project-media" data-fallback="pr2.jpg pending">
-                        <img src="./assets/pr3.jpg" alt="Semantic Course Map project preview" class="project-img">
-                    </div>
-                    <div class="project-body">
-                        <h3 class="project-title">Semantic Course Map</h3>
-                        <p class="project-desc">A map of the courses at the University of Georgia, organized by semantic similarity. Click for more details.</p>
-                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20Semantic%20Course%20Map&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20Semantic%20Course%20Map%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                    </div>
-                </article>
-
-                <article class="project-card" data-title="EEG ML" data-image="./assets/pr4.jpg" data-fallback="pr4.jpg pending" data-link="https://www.youtube.com/watch?v=MLGuQxJ2m_M" data-link-label="youtube.com/watch?v=MLGuQxJ2m_M" data-description="Started this project to learn more about cognitive neuroscience and explore the feasibility of a BCI project on a hobbyist budget. See the above video for a full report. See PiEEG for the core technical backbone: https://github.com/pieeg-club/PiEEG-server. In the near future, the plan is to continue exploring what I can glean from Inky's brain and lay the foundation for moving towards a human BCI project.">
-                    <div class="project-media" data-fallback="pr3.jpg pending">
-                        <img src="./assets/pr4.jpg" alt="EEG machine learning project preview" class="project-img">
-                    </div>
-                    <div class="project-body">
-                        <h3 class="project-title">EEG ML</h3>
-                        <p class="project-desc">An exploratory hardware project involving collecting and interpreting data from my dog, Inky's, brain. Click for more details.</p>
-                        <a href="mailto:crhalaby652@gmail.com?subject=Interest%20in%20EEG%20ML&body=Hi%20Cameron,%0D%0A%0D%0AI%20was%20looking%20at%20your%20portfolio%20and%20am%20very%20interested%20in%20the%20EEG%20ML%20project.%20I'd%20love%20to%20hear%20more%20about%20it.%0D%0A%0D%0AThanks" class="request-cv-btn">I'm Interested</a>
-                    </div>
-                </article>
-            </div>
+            <div class="card-grid" id="project-card-grid"></div>
         </section>
     </main>
 
@@ -604,7 +619,10 @@
         <div class="project-lightbox-frame" role="dialog" aria-modal="true" aria-labelledby="project-lightbox-title">
             <button class="project-lightbox-close" type="button" id="project-lightbox-close" aria-label="Close project preview">&times;</button>
             <div class="project-lightbox-media" id="project-lightbox-media" data-fallback="">
+                <button class="project-lightbox-nav project-lightbox-prev" type="button" id="project-lightbox-prev" aria-label="Previous project image" hidden>&lsaquo;</button>
                 <img src="" alt="" class="project-lightbox-img" id="project-lightbox-img">
+                <button class="project-lightbox-nav project-lightbox-next" type="button" id="project-lightbox-next" aria-label="Next project image" hidden>&rsaquo;</button>
+                <div class="project-lightbox-dots" id="project-lightbox-dots" aria-label="Project image pagination" hidden></div>
             </div>
             <aside class="project-lightbox-panel">
                 <div class="project-lightbox-header">
@@ -620,6 +638,7 @@
     </div>
 
     <script src="./theme-toggle.js"></script>
+    <script src="./asset-catalog.js"></script>
     <script src="./projects-light-field.js"></script>
     <script>
         function updateTheme() {
@@ -984,23 +1003,65 @@
             }
         }
 
-        document.querySelectorAll('.project-media img').forEach(img => {
-            const media = img.closest('.project-media');
-            const setMissing = () => media.classList.add('is-missing');
-            if(img.complete && img.naturalWidth === 0) setMissing();
-            img.addEventListener('error', setMissing);
-            img.addEventListener('load', () => media.classList.remove('is-missing'));
-        });
-
         const projectLightbox = document.getElementById('project-lightbox');
         const projectLightboxMedia = document.getElementById('project-lightbox-media');
         const projectLightboxImg = document.getElementById('project-lightbox-img');
+        const projectLightboxPrev = document.getElementById('project-lightbox-prev');
+        const projectLightboxNext = document.getElementById('project-lightbox-next');
+        const projectLightboxDots = document.getElementById('project-lightbox-dots');
         const projectLightboxTitle = document.getElementById('project-lightbox-title');
         const projectLightboxLink = document.getElementById('project-lightbox-link');
         const projectLightboxDescription = document.getElementById('project-lightbox-description');
         const projectLightboxInterest = document.getElementById('project-lightbox-interest');
         const projectLightboxClose = document.getElementById('project-lightbox-close');
         const projectLightboxFrame = projectLightbox.querySelector('.project-lightbox-frame');
+        let activeProject = null;
+        let activeProjectSlide = 0;
+
+        const projectMetadata = {
+            1: {
+                title: 'Fruit Phenotyping',
+                cardDesc: "Work I led, working with UGA's CAES Horticulture Lab. Click for more details.",
+                link: 'https://zsong101.github.io/FruitPhenome/',
+                linkLabel: 'zsong101.github.io/FruitPhenome/',
+                description: "The goal of this project is to automate the phenotyping pipeline for growers of crops. Right now this looks like uploading a batch of photos of fruit, and getting back a list of traits (i.e. height, width, color). This is primarily a segmentation/computer vision problem, but a lot of thought is being put into organizing the data and mapping out the latent space of fruit types and image types, in order to aid on the fly training of a MOE pipeline. The near future goal is a 'world model for fruit'."
+            },
+            2: {
+                title: 'Geospatial NeRF',
+                cardDesc: "Research I contributed to, working with UGA's Small Satellite Research Lab. Click for more details.",
+                link: 'https://theclassicjournal.org/enhancing-3-d-reconstruction/',
+                linkLabel: 'theclassicjournal.org/enhancing-3-d-reconstruction',
+                description: "This specific paper seeks to pry into the training process of a NeRF model (trained specifically on drone-collected near nadir photos of UGA's Sanford Stadium), and see if there are any ways to improve the quality of the reconstruction. What we landed on was a scheduled LPIPS weighted loss function. Similar projects I've worked on at SSRL have centered around physics based approaches to the same 3D reconstruction problem, though with satellite-collected photos (one idea was to penalize the reconstruction based on occlusions predicted from known solar data)."
+            },
+            3: {
+                title: 'Semantic Course Map',
+                cardDesc: "A map of the courses at the University of Georgia, organized by semantic similarity. Click for more details.",
+                link: 'https://ugacogsci.github.io/semantic-course-map/',
+                linkLabel: 'ugacogsci.github.io/semantic-course-map',
+                description: "Created for UGA's 3rd annual GenAI competition, by the Cognitive Science Club. A scrape of UGA's bulletin of courses, organized into a searchable 2D map by semantic similarity. For formal pitch slides: https://canva.link/sv63mkh5jh64qyp. For creation logs: https://docs.google.com/document/d/1mgYQv5-SZpyEKsqoAlZoU2Iq2IQd65xGSoqzWGmQZIk/edit?usp=sharing. In the near future, the plan is to pivot this project to a four year plan generator and launch a startup."
+            },
+            4: {
+                title: 'EEG ML',
+                cardDesc: "An exploratory hardware project involving collecting and interpreting data from my dog, Inky's, brain. Click for more details.",
+                link: 'https://www.youtube.com/watch?v=MLGuQxJ2m_M',
+                linkLabel: 'youtube.com/watch?v=MLGuQxJ2m_M',
+                description: "Started this project to learn more about cognitive neuroscience and explore the feasibility of a BCI project on a hobbyist budget. See the above video for a full report. See PiEEG for the core technical backbone: https://github.com/pieeg-club/PiEEG-server. In the near future, the plan is to continue exploring what I can glean from Inky's brain and lay the foundation for moving towards a human BCI project."
+            }
+        };
+
+        function getProjectMetadata(index) {
+            return projectMetadata[index] || {
+                title: 'Project ' + index,
+                cardDesc: 'New project entry. Click for more details.',
+                link: 'https://www.cameronhalaby.com',
+                linkLabel: 'cameronhalaby.com',
+                description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae libero at augue pulvinar mattis. Sed posuere, erat id faucibus pretium, arcu nibh gravida neque, sit amet facilisis lectus mi sed mi.'
+            };
+        }
+
+        function getProjectInterestLink(title) {
+            return 'mailto:crhalaby652@gmail.com?subject=' + encodeURIComponent('Interest in ' + title) + '&body=' + encodeURIComponent("Hi Cameron,\n\nI was looking at your portfolio and am very interested in the " + title + " project. I'd love to hear more about it.\n\nThanks");
+        }
 
         function renderDescriptionWithLinks(container, text) {
             container.textContent = '';
@@ -1030,25 +1091,46 @@
             container.appendChild(document.createTextNode(source.slice(lastIndex)));
         }
 
-        function openProjectLightbox(card) {
-            const title = card.getAttribute('data-title');
-            const image = card.getAttribute('data-image');
-            const fallback = card.getAttribute('data-fallback');
-            const projectLink = card.getAttribute('data-link');
-            const projectLinkLabel = card.getAttribute('data-link-label');
-            const description = card.getAttribute('data-description');
-            const interestLink = card.querySelector('.request-cv-btn').href;
+        function renderProjectSlide(index) {
+            if(!activeProject || !activeProject.files.length) return;
+            activeProjectSlide = (index + activeProject.files.length) % activeProject.files.length;
+            const src = activeProject.files[activeProjectSlide];
+            const fallback = src.split('/').pop() + ' pending';
 
-            projectLightboxTitle.innerText = title;
-            renderDescriptionWithLinks(projectLightboxDescription, description);
-            projectLightboxLink.href = projectLink;
-            projectLightboxLink.innerText = projectLinkLabel;
-            projectLightboxInterest.href = interestLink;
             projectLightboxMedia.setAttribute('data-fallback', fallback);
             projectLightboxMedia.classList.remove('is-missing');
             projectLightboxFrame.classList.remove('is-wide');
-            projectLightboxImg.alt = title + ' project preview';
-            projectLightboxImg.src = image;
+            projectLightboxImg.alt = activeProject.title + ' project preview ' + (activeProjectSlide + 1);
+            projectLightboxImg.src = src;
+
+            const hasMultipleSlides = activeProject.files.length > 1;
+            projectLightboxPrev.hidden = !hasMultipleSlides;
+            projectLightboxNext.hidden = !hasMultipleSlides;
+            projectLightboxDots.hidden = !hasMultipleSlides;
+            projectLightboxDots.innerHTML = '';
+
+            if(hasMultipleSlides) {
+                activeProject.files.forEach((file, dotIndex) => {
+                    const dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.className = 'project-lightbox-dot' + (dotIndex === activeProjectSlide ? ' active' : '');
+                    dot.setAttribute('aria-label', 'Show project image ' + (dotIndex + 1));
+                    dot.addEventListener('click', () => renderProjectSlide(dotIndex));
+                    projectLightboxDots.appendChild(dot);
+                });
+            }
+        }
+
+        function openProjectLightbox(project) {
+            activeProject = project;
+            activeProjectSlide = 0;
+
+            projectLightboxTitle.innerText = project.title;
+            renderDescriptionWithLinks(projectLightboxDescription, project.description);
+            projectLightboxLink.href = project.link;
+            projectLightboxLink.innerText = project.linkLabel;
+            projectLightboxInterest.href = project.interestLink;
+            renderProjectSlide(0);
 
             projectLightbox.classList.add('active');
             projectLightbox.setAttribute('aria-hidden', 'false');
@@ -1061,26 +1143,9 @@
             document.body.style.overflow = '';
         }
 
-        projectLightboxImg.addEventListener('error', () => {
-            projectLightboxMedia.classList.add('is-missing');
-        });
-        projectLightboxImg.addEventListener('load', () => {
-            projectLightboxMedia.classList.remove('is-missing');
-            projectLightboxFrame.classList.toggle('is-wide', projectLightboxImg.naturalWidth / Math.max(projectLightboxImg.naturalHeight, 1) > 1.45);
-        });
-        projectLightboxClose.addEventListener('click', closeProjectLightbox);
-        projectLightbox.addEventListener('click', e => {
-            if(e.target === projectLightbox) closeProjectLightbox();
-        });
-        window.addEventListener('keydown', e => {
-            if(e.key === 'Escape' && projectLightbox.classList.contains('active')) closeProjectLightbox();
-        });
-
-        document.querySelectorAll('.project-card').forEach(card => {
-            card.addEventListener('click', e => {
-                if(e.target.closest('a')) return;
-                openProjectLightbox(card);
-            });
+        function attachProjectCardTilt(card) {
+            if(card.dataset.tiltBound === 'true') return;
+            card.dataset.tiltBound = 'true';
             card.addEventListener('mousemove', e => {
                 const r = card.getBoundingClientRect();
                 const x = e.clientX - r.left;
@@ -1090,6 +1155,84 @@
                 card.style.transform = 'perspective(1200px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-4px)';
             });
             card.addEventListener('mouseleave', () => { card.style.transform = 'none'; });
+        }
+
+        function createProjectCard(project) {
+            const card = document.createElement('article');
+            card.className = 'project-card';
+
+            const media = document.createElement('div');
+            media.className = 'project-media';
+            media.setAttribute('data-fallback', project.fallback);
+
+            const img = document.createElement('img');
+            img.src = project.thumb;
+            img.alt = project.title + ' project preview';
+            img.className = 'project-img';
+            img.addEventListener('error', () => media.classList.add('is-missing'));
+            img.addEventListener('load', () => media.classList.remove('is-missing'));
+            media.appendChild(img);
+
+            const body = document.createElement('div');
+            body.className = 'project-body';
+
+            const title = document.createElement('h3');
+            title.className = 'project-title';
+            title.innerText = project.title;
+
+            const desc = document.createElement('p');
+            desc.className = 'project-desc';
+            desc.innerText = project.cardDesc;
+
+            const interest = document.createElement('a');
+            interest.href = project.interestLink;
+            interest.className = 'request-cv-btn';
+            interest.innerText = "I'm Interested";
+
+            body.append(title, desc, interest);
+            card.append(media, body);
+            card.addEventListener('click', e => {
+                if(e.target.closest('a')) return;
+                openProjectLightbox(project);
+            });
+            attachProjectCardTilt(card);
+            return card;
+        }
+
+        function renderProjectCards() {
+            const grid = document.getElementById('project-card-grid');
+            const groups = window.CameronAssets ? window.CameronAssets.projectGroups() : [];
+            grid.innerHTML = '';
+
+            groups.forEach(group => {
+                const meta = getProjectMetadata(group.index);
+                const project = Object.assign({}, group, meta, {
+                    interestLink: getProjectInterestLink(meta.title)
+                });
+                grid.appendChild(createProjectCard(project));
+            });
+        }
+
+        renderProjectCards();
+        if(window.CameronAssets) window.CameronAssets.ready.then(renderProjectCards);
+
+        projectLightboxImg.addEventListener('error', () => {
+            projectLightboxMedia.classList.add('is-missing');
+        });
+        projectLightboxImg.addEventListener('load', () => {
+            projectLightboxMedia.classList.remove('is-missing');
+            projectLightboxFrame.classList.toggle('is-wide', projectLightboxImg.naturalWidth / Math.max(projectLightboxImg.naturalHeight, 1) > 1.45);
+        });
+        projectLightboxPrev.addEventListener('click', () => renderProjectSlide(activeProjectSlide - 1));
+        projectLightboxNext.addEventListener('click', () => renderProjectSlide(activeProjectSlide + 1));
+        projectLightboxClose.addEventListener('click', closeProjectLightbox);
+        projectLightbox.addEventListener('click', e => {
+            if(e.target === projectLightbox) closeProjectLightbox();
+        });
+        window.addEventListener('keydown', e => {
+            if(e.key === 'Escape' && projectLightbox.classList.contains('active')) closeProjectLightbox();
+            if(e.key === 'ArrowLeft' && projectLightbox.classList.contains('active')) renderProjectSlide(activeProjectSlide - 1);
+            if(e.key === 'ArrowRight' && projectLightbox.classList.contains('active')) renderProjectSlide(activeProjectSlide + 1);
         });
     </script>
 </body>

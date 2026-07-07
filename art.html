@@ -190,14 +190,7 @@
 
         <!-- Gallery Section -->
         <section class="page-section" id="photos">
-            <div class="card-grid">
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar1.JPG')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar1.JPG" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar2.JPG')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar2.JPG" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar3.JPG')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar3.JPG" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar4.JPG')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar4.JPG" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar5.JPG')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar5.JPG" class="photo-img"></div></div>
-                <div class="obs-card photo-card" onclick="openLightbox('./assets/ar6.JPG')"><div class="photo-wrapper"><div class="squiggle-left"></div><div class="squiggle-right"></div><img src="./assets/ar6.JPG" class="photo-img"></div></div>
-            </div>
+            <div class="card-grid" id="art-gallery-grid"></div>
         </section>
 
         <section class="page-section" style="padding-top: 40px;">
@@ -265,6 +258,7 @@
     </footer>
 
     <script src="./theme-toggle.js"></script>
+    <script src="./asset-catalog.js"></script>
     <script src="./liquid-lightbox.js"></script>
     <script>
         // ADD YOUR STABILITY AI API KEY HERE TO ENABLE IMG2IMG GENERATION
@@ -299,19 +293,58 @@
         document.getElementById('dynamic-date').innerText = 'Updated ' + Reflect.get(monthNames, dObj.getMonth()) + ' ' + dObj.getFullYear();
 
         // CONTROLLED CARD TILT
-        const obsCards = document.querySelectorAll('.obs-card');
-        for (let i = 0; i < obsCards.length; i++) {
-            const c = Reflect.get(obsCards, i);
-            c.addEventListener('mousemove', e => {
-                const r = c.getBoundingClientRect();
-                const x = e.clientX - r.left;
-                const y = e.clientY - r.top;
-                const rotateX = (r.height / 2 - y) / 42;
-                const rotateY = (x - r.width / 2) / 42;
-                c.style.transform = 'perspective(1200px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-4px)';
-            });
-            c.addEventListener('mouseleave', () => { c.style.transform = 'none'; });
+        function attachCardTilt(selector) {
+            const obsCards = document.querySelectorAll(selector);
+            for (let i = 0; i < obsCards.length; i++) {
+                const c = Reflect.get(obsCards, i);
+                if(c.dataset.tiltBound === 'true') continue;
+                c.dataset.tiltBound = 'true';
+                c.addEventListener('mousemove', e => {
+                    const r = c.getBoundingClientRect();
+                    const x = e.clientX - r.left;
+                    const y = e.clientY - r.top;
+                    const rotateX = (r.height / 2 - y) / 42;
+                    const rotateY = (x - r.width / 2) / 42;
+                    c.style.transform = 'perspective(1200px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) translateY(-4px)';
+                });
+                c.addEventListener('mouseleave', () => { c.style.transform = 'none'; });
+            }
         }
+
+        function renderArtGallery() {
+            const grid = document.getElementById('art-gallery-grid');
+            const images = window.CameronAssets ? window.CameronAssets.artImages() : [];
+            grid.innerHTML = '';
+
+            images.forEach(image => {
+                const card = document.createElement('div');
+                card.className = 'obs-card photo-card';
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'photo-wrapper';
+
+                const squiggleLeft = document.createElement('div');
+                squiggleLeft.className = 'squiggle-left';
+                const squiggleRight = document.createElement('div');
+                squiggleRight.className = 'squiggle-right';
+
+                const img = document.createElement('img');
+                img.src = image.src;
+                img.alt = image.alt;
+                img.className = 'photo-img';
+
+                wrapper.append(squiggleLeft, squiggleRight, img);
+                card.appendChild(wrapper);
+                card.addEventListener('click', () => openLightbox(image.src));
+                grid.appendChild(card);
+            });
+
+            attachCardTilt('#art-gallery-grid .obs-card');
+        }
+
+        renderArtGallery();
+        if(window.CameronAssets) window.CameronAssets.ready.then(renderArtGallery);
+        attachCardTilt('.obs-card');
 
         // LIGHTBOX
         function openLightbox(src) { 
