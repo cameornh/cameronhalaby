@@ -68,6 +68,7 @@
             overflow: hidden;
         }
         .music-list-section > .section-header,
+        .music-list-section > .music-toolbar,
         .music-list-section > .track-list {
             position: relative;
             z-index: 2;
@@ -86,6 +87,45 @@
         }
         .section-title { font-family: 'Cormorant Garamond', serif; font-size: 3.5rem; font-weight: 500; margin-bottom: 10px; color: var(--text-color); }
         .section-subtitle { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-color); opacity: 0.6; margin-bottom: 60px; }
+        .music-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            margin: -34px 0 28px;
+        }
+        .autoplay-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 0 9px 18px;
+            border-left: 1px solid rgba(128,128,128,0.34);
+            color: var(--text-color);
+            font-size: 0.68rem;
+            letter-spacing: 1.8px;
+            line-height: 1;
+            text-transform: uppercase;
+        }
+        .autoplay-select {
+            appearance: none;
+            -webkit-appearance: none;
+            min-width: 164px;
+            padding: 9px 34px 9px 12px;
+            border: 1px solid rgba(128,128,128,0.34);
+            border-radius: 0;
+            background:
+                linear-gradient(45deg, transparent 50%, var(--text-color) 50%) calc(100% - 17px) 50% / 5px 5px no-repeat,
+                linear-gradient(135deg, var(--text-color) 50%, transparent 50%) calc(100% - 12px) 50% / 5px 5px no-repeat,
+                rgba(128,128,128,0.055);
+            color: var(--text-color);
+            font-family: 'Archivo', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+        .autoplay-select:focus {
+            outline: 1px solid var(--text-color);
+            outline-offset: 2px;
+        }
 
         /* TRACK LIST */
         .track-list { display: flex; flex-direction: column; border-top: 1px solid rgba(128,128,128,0.2); }
@@ -476,6 +516,10 @@
             .track-speed {
                 justify-self: end;
             }
+            .music-toolbar {
+                justify-content: flex-start;
+                margin-top: -36px;
+            }
             .synth-matrix-panel {
                 flex-direction: column;
             }
@@ -503,6 +547,18 @@
             .track-time, .track-speed {
                 justify-self: start;
                 text-align: left;
+            }
+            .music-toolbar {
+                margin: -36px 0 26px;
+            }
+            .autoplay-control {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+            }
+            .autoplay-select {
+                width: 100%;
             }
             .synth-container {
                 padding: 24px;
@@ -543,6 +599,17 @@
             <div class="section-header">
                 <h2 class="section-title">Music</h2>
                 <p class="section-subtitle">Original Music</p>
+            </div>
+
+            <div class="music-toolbar" aria-label="Music playback options">
+                <label class="autoplay-control" for="autoplay-mode">
+                    <span>Autoplay</span>
+                    <select class="autoplay-select" id="autoplay-mode">
+                        <option value="off">Off</option>
+                        <option value="ordered">On (in order)</option>
+                        <option value="shuffle">Shuffle</option>
+                    </select>
+                </label>
             </div>
 
             <div class="track-list" id="track-list">
@@ -826,6 +893,7 @@
         document.getElementById('dynamic-date').innerText = 'Updated ' + monthNames.at(dObj.getMonth()) + ' ' + dObj.getFullYear();
 
         // GLOBAL AUDIO PLAYER
+        const globalAudio = new Audio();
         function initializeGlobalAudioPlayer() {
         const globalPlaylist = window.CameronAssets ? window.CameronAssets.songs() : [];
         const trackList = document.getElementById('track-list');
@@ -852,18 +920,60 @@
 
         const trackElements = document.querySelectorAll('.track-item');
         let globalTrack = globalPlaylist.length ? Math.floor(Math.random() * globalPlaylist.length) : 0, hasStartedGlobal = false, globalFading = false, globalFadeInt, pendingSeekPercent = null, loopTrackIndex = null;
-        const fadeMs = 2000, globalAudio = new Audio(), gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
+        const fadeMs = 2000, gUI = document.getElementById('audio-player'), gTrackUI = document.getElementById('track-name');
         const bgVolSlider = document.getElementById('bg-vol-slider');
         const audioPrevBtn = document.getElementById('audio-prev-btn');
         const audioNextBtn = document.getElementById('audio-next-btn');
         const audioPauseBtn = document.getElementById('audio-pause-btn');
         const audioMuteBtn = document.getElementById('audio-mute-btn');
         const audioLoopBtn = document.getElementById('audio-loop-btn');
+        const autoplaySelect = document.getElementById('autoplay-mode');
+        let autoplayMode = 'off';
+        let autoplayOrder = [];
         if(!globalPlaylist.length) {
             gTrackUI.innerText = 'No Songs';
             return;
         }
         gTrackUI.innerText = globalPlaylist.at(globalTrack).name;
+
+        function buildAutoplayOrder(mode) {
+            const order = globalPlaylist.map((track, index) => index);
+            if(mode !== 'shuffle') return order;
+            for(let i = order.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = order[i];
+                order[i] = order[j];
+                order[j] = temp;
+            }
+            return order;
+        }
+
+        function setAutoplayMode(mode) {
+            autoplayMode = mode;
+            autoplayOrder = buildAutoplayOrder(mode);
+        }
+
+        function getSequencedTrack(delta) {
+            if(!globalPlaylist.length) return 0;
+            if(autoplayMode === 'shuffle' && autoplayOrder.length) {
+                const orderIndex = autoplayOrder.indexOf(globalTrack);
+                if(orderIndex !== -1) {
+                    const nextOrderIndex = (orderIndex + delta + autoplayOrder.length) % autoplayOrder.length;
+                    return autoplayOrder.at(nextOrderIndex);
+                }
+            }
+            return (globalTrack + delta + globalPlaylist.length) % globalPlaylist.length;
+        }
+
+        function getAutoplayNextTrack() {
+            if(autoplayMode === 'off') return null;
+            return getSequencedTrack(1);
+        }
+
+        if(autoplaySelect) {
+            setAutoplayMode(autoplaySelect.value);
+            autoplaySelect.addEventListener('change', (e) => setAutoplayMode(e.target.value));
+        }
 
         function formatAudioTime(seconds) {
             if(!Number.isFinite(seconds)) return "00:00";
@@ -1004,7 +1114,7 @@
             hasStartedGlobal = true;
             clearInterval(globalFadeInt);
             globalFading = false;
-            playGlobal(globalTrack + delta, { reset: true });
+            playGlobal(getSequencedTrack(delta), { reset: true });
         }
 
         function toggleGlobalPause() {
@@ -1041,7 +1151,16 @@
         });
         globalAudio.addEventListener('play', syncTrackRows);
         globalAudio.addEventListener('pause', syncTrackRows);
-        globalAudio.addEventListener('ended', () => { playGlobal((globalTrack + 1) % globalPlaylist.length, { reset: true }); });
+        globalAudio.addEventListener('ended', () => {
+            const nextTrack = getAutoplayNextTrack();
+            if(nextTrack === null) {
+                globalFading = false;
+                clearInterval(globalFadeInt);
+                syncTrackRows();
+                return;
+            }
+            playGlobal(nextTrack, { reset: true });
+        });
 
         audioPrevBtn.addEventListener('click', e => {
             e.stopPropagation();
@@ -1126,7 +1245,7 @@
         });
 
         document.body.addEventListener('click', (e) => {
-            if(hasStartedGlobal || e.target.id === 'bg-vol-slider' || e.target.closest('.track-controls, .audio-control-row, #sys-logs-btn, #deep-archive')) return;
+            if(hasStartedGlobal || e.target.id === 'bg-vol-slider' || e.target.closest('.track-controls, .audio-control-row, .music-toolbar, #sys-logs-btn, #deep-archive')) return;
             hasStartedGlobal = true;
             playGlobal(globalTrack, { reset: false });
         });
