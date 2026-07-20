@@ -49,6 +49,22 @@
     const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
     const imagePattern = /\.(avif|gif|jpe?g|png|webp)$/i;
     const audioPattern = /\.(flac|m4a|mp3|ogg|wav)$/i;
+    const stripCaptions = {
+        strip1: "caterpillar",
+        strip2: "tolantongo",
+        strip2a: "cameron_eeg",
+        strip2b: "inky_eeg",
+        strip2c: "cameron_fnirs",
+        strip3: "Data Subsystems",
+        strip4: "inky",
+        strip5: "inky_convoluted",
+        strip6: "cameron",
+        strip7: "cameron_convoluted",
+        strip8: "yucca",
+        strip9: "orb weaver",
+        strip9a: "mini_me",
+        strip10: "boulder"
+    };
     let files = normalizeFiles(manifestFiles);
 
     function assetPath(file) {
@@ -167,7 +183,7 @@
             .flatMap(group => group.variants)
             .map(variant => ({
                 src: variant.src,
-                caption: variant.label.replace(/^strip/i, "strip ")
+                caption: stripCaptions[variant.label.toLowerCase()] || variant.label.replace(/^strip/i, "strip ")
             }));
     }
 
