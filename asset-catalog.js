@@ -14,11 +14,14 @@
         "p5.jpg",
         "p6.jpg",
         "pr1a.jpg",
+        "pr1b.JPG",
         "pr2a.jpg",
         "pr3a.jpg",
+        "pr3b.jpg",
         "pr4a.jpg",
         "pr4b.jpg",
         "song1.mp3",
+        "song10.mp3",
         "song2.mp3",
         "song3.mp3",
         "song4.mp3",
@@ -68,27 +71,7 @@
         )).sort(collator.compare);
     }
 
-    async function discoverDirectoryFiles() {
-        if(location.protocol === "file:") return [];
-
-        try {
-            const response = await fetch("./assets/", { cache: "no-store" });
-            if(!response.ok) return [];
-
-            const text = await response.text();
-            if(!/href=/i.test(text)) return [];
-
-            const doc = new DOMParser().parseFromString(text, "text/html");
-            return normalizeFiles(Array.from(doc.querySelectorAll("a[href]"), link => link.getAttribute("href")));
-        } catch (err) {
-            return [];
-        }
-    }
-
-    const ready = discoverDirectoryFiles().then(discovered => {
-        files = normalizeFiles(files.concat(discovered));
-        return files;
-    });
+    const ready = Promise.resolve(files);
 
     function currentFiles() {
         return files.slice();
