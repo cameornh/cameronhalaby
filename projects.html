@@ -637,9 +637,12 @@
         </div>
     </div>
 
+    <link rel="stylesheet" href="./site-performance.css?v=20261105">
+    <script src="./site-performance.js?v=20261105"></script>
+    <script src="./asset-previews.js"></script>
     <script src="./theme-toggle.js"></script>
-    <script src="./asset-catalog.js"></script>
-    <script src="./projects-light-field.js"></script>
+    <script src="./asset-catalog.js?v=20261105"></script>
+    <script src="./projects-light-field.js?v=20261105"></script>
     <script>
         function updateTheme() {
             const d = window.CameronTheme ? window.CameronTheme.getDate() : new Date();
@@ -673,8 +676,9 @@
         function drawFallbackShader() {
             const ctx = shaderCanvas.getContext('2d');
             function resize() {
-                shaderCanvas.width = shaderCanvas.clientWidth * window.devicePixelRatio;
-                shaderCanvas.height = shaderCanvas.clientHeight * window.devicePixelRatio;
+                const dpr = window.CameronPerformance.pixelRatio(shaderCanvas);
+                shaderCanvas.width = shaderCanvas.clientWidth * dpr;
+                shaderCanvas.height = shaderCanvas.clientHeight * dpr;
             }
             resize();
             window.addEventListener('resize', resize);
@@ -702,9 +706,8 @@
                 }
                 ctx.filter = 'none';
                 ctx.globalAlpha = 1;
-                requestAnimationFrame(frame);
             }
-            requestAnimationFrame(frame);
+            window.CameronPerformance.animate(shaderCanvas, frame);
         }
 
         if (!gl) {
@@ -811,6 +814,7 @@
 
                     for (int i = 0; i < ${rippleCount}; i++) {
                         vec4 rippleData = u_ripples[i];
+                        if (rippleData.w <= 0.001) continue;
                         vec2 ripplePoint = (rippleData.xy - 0.5) * vec2(aspect, 1.0);
                         vec2 delta = p - ripplePoint;
                         float distanceFromRipple = length(delta);
@@ -840,7 +844,7 @@
                     vec2 flow = warped + vec2(u_time * 0.014, -u_time * 0.01);
                     float c0 = causticField(flow);
                     float cR = causticField(flow + vec2(0.004, -0.001));
-                    float cG = causticField(flow);
+                    float cG = c0;
                     float cB = causticField(flow - vec2(0.0045, 0.0015));
 
                     float depth = fbm(warped * vec2(1.7, 1.35) + vec2(-u_time * 0.018, u_time * 0.01));
@@ -938,7 +942,7 @@
             }
 
             function resizeShader() {
-                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const dpr = window.CameronPerformance.pixelRatio(shaderCanvas);
                 const width = Math.floor(shaderCanvas.clientWidth * dpr);
                 const height = Math.floor(shaderCanvas.clientHeight * dpr);
                 if (shaderCanvas.width !== width || shaderCanvas.height !== height) {
@@ -974,7 +978,6 @@
             });
 
             function renderShader(now) {
-                resizeShader();
                 const deltaTime = Math.min(0.05, (now - shaderLastFrame) * 0.001);
                 shaderLastFrame = now;
                 shaderMouse[0] += (shaderMouseTarget[0] - shaderMouse[0]) * 0.12;
@@ -994,11 +997,10 @@
                 gl.uniform1f(timeLocation, (now - shaderStart) * 0.001);
                 if (rippleLocation) gl.uniform4fv(rippleLocation, rippleUniforms);
                 gl.drawArrays(gl.TRIANGLES, 0, 6);
-                requestAnimationFrame(renderShader);
             }
 
-            window.addEventListener('resize', resizeShader);
-            requestAnimationFrame(renderShader);
+            window.CameronPerformance.watchSize(shaderCanvas, resizeShader);
+            window.CameronPerformance.animate(shaderCanvas, renderShader);
             }
             }
         }
@@ -1139,6 +1141,7 @@
 
         function closeProjectLightbox() {
             projectLightbox.classList.remove('active');
+            projectLightboxImg.removeAttribute('src');
             projectLightbox.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
         }
@@ -1166,7 +1169,7 @@
             media.setAttribute('data-fallback', project.fallback);
 
             const img = document.createElement('img');
-            img.src = project.thumb;
+            window.CameronAssets.displayImage(img, project.thumb);
             img.alt = project.title + ' project preview';
             img.className = 'project-img';
             img.addEventListener('error', () => media.classList.add('is-missing'));
@@ -1214,7 +1217,6 @@
         }
 
         renderProjectCards();
-        if(window.CameronAssets) window.CameronAssets.ready.then(renderProjectCards);
 
         projectLightboxImg.addEventListener('error', () => {
             projectLightboxMedia.classList.add('is-missing');

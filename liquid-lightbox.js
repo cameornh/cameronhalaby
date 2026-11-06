@@ -132,6 +132,7 @@
             </svg>
         `;
         document.body.appendChild(host);
+        host.querySelector('svg').pauseAnimations();
     }
 
     function cssUrl(value) {
@@ -157,12 +158,17 @@
         lightbox.appendChild(lens);
 
         function syncLensImage() {
+            if (!image.getAttribute('src')) {
+                lens.style.removeProperty('--lens-image');
+                return;
+            }
             const src = image.currentSrc || image.src;
             if (src) lens.style.setProperty('--lens-image', cssUrl(src));
         }
 
         function hideLens() {
             lens.classList.remove('is-visible');
+            document.querySelector('.liquid-glass-filter-host svg').pauseAnimations();
         }
 
         function moveLens(clientX, clientY) {
@@ -194,6 +200,7 @@
             lens.style.setProperty('--lens-bg-x', backgroundX + 'px');
             lens.style.setProperty('--lens-bg-y', backgroundY + 'px');
             lens.classList.add('is-visible');
+            document.querySelector('.liquid-glass-filter-host svg').unpauseAnimations();
         }
 
         stage.addEventListener('pointermove', event => moveLens(event.clientX, event.clientY));

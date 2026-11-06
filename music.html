@@ -864,8 +864,10 @@
         </div>
     </div>
 
+    <link rel="stylesheet" href="./site-performance.css?v=20261105">
+    <script src="./site-performance.js?v=20261105"></script>
     <script src="./theme-toggle.js"></script>
-    <script src="./asset-catalog.js"></script>
+    <script src="./asset-catalog.js?v=20261105"></script>
     <script>
         // DYNAMIC THEME
         function updateTheme() {
@@ -894,6 +896,8 @@
 
         // GLOBAL AUDIO PLAYER
         const globalAudio = new Audio();
+        globalAudio.preload = 'none';
+        let pauseMusicForArchive = () => {};
         function initializeGlobalAudioPlayer() {
         const globalPlaylist = window.CameronAssets ? window.CameronAssets.songs() : [];
         const trackList = document.getElementById('track-list');
@@ -1079,6 +1083,10 @@
             globalAudio.pause();
             syncTrackRows();
         }
+        pauseMusicForArchive = () => {
+            pauseGlobal();
+            gUI.style.opacity = 0;
+        };
 
         function playGlobal(index, options = new Object()) {
             const previousTrack = globalAudio.getAttribute('data-track-index');
@@ -1260,7 +1268,7 @@
         const musicFieldCanvas = document.getElementById('music-field-canvas');
         const musicFieldCtx = musicFieldCanvas.getContext('2d');
         function resizeMusicField() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const dpr = window.CameronPerformance.pixelRatio(musicFieldCanvas);
             musicFieldCanvas.width = Math.floor(musicFieldCanvas.clientWidth * dpr);
             musicFieldCanvas.height = Math.floor(musicFieldCanvas.clientHeight * dpr);
         }
@@ -1292,11 +1300,10 @@
                     }
                 }
             }
-            requestAnimationFrame(drawMusicField);
         }
         resizeMusicField();
         window.addEventListener('resize', resizeMusicField);
-        requestAnimationFrame(drawMusicField);
+        window.CameronPerformance.animate(musicFieldCanvas, drawMusicField);
 
 
         // ==========================================
@@ -1536,6 +1543,7 @@
                 modOsc.connect(modGain);
                 modGain.connect(osc.frequency);
                 modOsc.start();
+                modOsc.onended = () => { modOsc.disconnect(); modGain.disconnect(); };
                 modOsc.stop(now + 3);
             }
 
@@ -1585,6 +1593,12 @@
             }
 
             osc.start();
+            osc.onended = () => {
+                osc.disconnect();
+                filter.disconnect();
+                masterGain.disconnect();
+                if (tremOsc) { tremOsc.disconnect(); tremGain.disconnect(); }
+            };
             osc.stop(now + atk + rel + 0.1);
         }
 
@@ -1700,8 +1714,7 @@
         const archiveResizeHandle = document.getElementById('archive-resize-handle');
 
         function silenceArchiveAudio() {
-            pauseGlobal();
-            gUI.style.opacity = 0;
+            pauseMusicForArchive();
             if(isSeqPlaying) {
                 isSeqPlaying = false;
                 clearTimeout(seqTimerId);
@@ -1843,7 +1856,7 @@
             const sampleCanvas = document.createElement('canvas');
             const sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
 
-            let rafId = null;
+            let luminanceBuffer = new Float32Array(0);
             let lastWidth = 0;
             let lastHeight = 0;
 
@@ -1853,7 +1866,7 @@
             }
 
             function resize() {
-                const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+                const dpr = window.CameronPerformance.pixelRatio(canvas);
                 const width = Math.max(1, Math.floor(canvas.clientWidth * dpr));
                 const height = Math.max(1, Math.floor(canvas.clientHeight * dpr));
                 if(width !== lastWidth || height !== lastHeight) {
@@ -1865,10 +1878,9 @@
             }
 
             function draw() {
-                resize();
                 const w = canvas.width;
                 const h = canvas.height;
-                const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+                const dpr = window.CameronPerformance.pixelRatio(canvas);
                 const conveyor = document.getElementById('sys-logs-conveyor-canvas');
                 const panelRect = canvas.getBoundingClientRect();
                 const conveyorRect = conveyor ? conveyor.getBoundingClientRect() : null;
@@ -1897,8 +1909,10 @@
                         ctx.drawImage(conveyor, sx, sy, sw, sh, 0, 0, w, h);
                         ctx.restore();
 
-                        sampleCanvas.width = cols;
-                        sampleCanvas.height = rows;
+                        if (sampleCanvas.width !== cols || sampleCanvas.height !== rows) {
+                            sampleCanvas.width = cols;
+                            sampleCanvas.height = rows;
+                        }
                         sampleCtx.clearRect(0, 0, cols, rows);
                         sampleCtx.filter = 'grayscale(1) contrast(2.15) brightness(2.05)';
                         sampleCtx.drawImage(conveyor, sx, sy, sw, sh, 0, 0, cols, rows);
@@ -1913,7 +1927,8 @@
                 ctx.fillRect(0, 0, w, h);
 
                 if(sampleData) {
-                    luminanceCells = new Float32Array(cols * rows);
+                    if (luminanceBuffer.length !== cols * rows) luminanceBuffer = new Float32Array(cols * rows);
+                    luminanceCells = luminanceBuffer;
                     let minLuma = 1;
                     let maxLuma = 0;
                     for(let i = 0; i < cols * rows; i++) {
@@ -1975,11 +1990,6 @@
                     }
                 }
 
-                if(archiveDiv.classList.contains('active')) {
-                    rafId = requestAnimationFrame(draw);
-                } else {
-                    rafId = null;
-                }
             }
 
             if(window.ResizeObserver) {
@@ -1987,14 +1997,14 @@
             }
             window.addEventListener('resize', resize);
 
+            const animation = window.CameronPerformance.animate(canvas, draw, { fps: 24, active: false });
             return {
                 start() {
                     resize();
-                    if(!rafId) rafId = requestAnimationFrame(draw);
+                    animation.start();
                 },
                 stop() {
-                    if(rafId) cancelAnimationFrame(rafId);
-                    rafId = null;
+                    animation.stop();
                 }
             };
         }
@@ -2173,14 +2183,13 @@
             const timeLocation = gl.getUniformLocation(program, 'uTime');
             const targetMouse = { x: 0.5, y: 0.37 };
             const smoothMouse = { x: 0.5, y: 0.37 };
-            let rafId = null;
             let startedAt = performance.now();
             let lastWidth = 0;
             let lastHeight = 0;
 
             function resize() {
                 const rect = canvas.getBoundingClientRect();
-                const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+                const dpr = window.CameronPerformance.pixelRatio(canvas);
                 const width = Math.max(1, Math.floor(rect.width * dpr));
                 const height = Math.max(1, Math.floor(rect.height * dpr));
                 if (width !== lastWidth || height !== lastHeight) {
@@ -2193,7 +2202,6 @@
             }
 
             function render(now) {
-                resize();
                 smoothMouse.x += (targetMouse.x - smoothMouse.x) * 0.08;
                 smoothMouse.y += (targetMouse.y - smoothMouse.y) * 0.08;
 
@@ -2206,11 +2214,6 @@
                 gl.uniform1f(timeLocation, (now - startedAt) * 0.001);
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-                if (archiveDiv.classList.contains('active')) {
-                    rafId = requestAnimationFrame(render);
-                } else {
-                    rafId = null;
-                }
             }
 
             archiveDiv.addEventListener('pointermove', e => {
@@ -2221,30 +2224,30 @@
 
             window.addEventListener('resize', resize);
 
+            const animation = window.CameronPerformance.animate(canvas, render, { fps: 24, active: false });
             return {
                 start() {
                     resize();
-                    if (!rafId) {
-                        startedAt = performance.now();
-                        rafId = requestAnimationFrame(render);
-                    }
+                    startedAt = performance.now();
+                    animation.start();
                 },
                 stop() {
-                    if (rafId) cancelAnimationFrame(rafId);
-                    rafId = null;
+                    animation.stop();
                 }
             };
         }
 
         initArchivePanelDrag();
-        const archiveDither = createArchiveDither();
-        const sysLogsConveyor = createSysLogsConveyor();
+        let archiveDither = null;
+        let sysLogsConveyor = null;
 
         function openArchive() {
             silenceArchiveAudio();
             archiveDiv.classList.add('active');
             placeArchivePanelDefault();
             clampArchivePanel();
+            if (!sysLogsConveyor) sysLogsConveyor = createSysLogsConveyor();
+            if (!archiveDither) archiveDither = createArchiveDither();
             if (sysLogsConveyor) sysLogsConveyor.start();
             if (archiveDither) archiveDither.start();
             setTimeout(() => termInput.focus(), 500);

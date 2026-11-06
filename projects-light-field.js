@@ -56,13 +56,12 @@
         if (!ctx) return;
 
         function resize() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            const dpr = window.CameronPerformance.pixelRatio(canvas, 600000);
             canvas.width = Math.max(1, Math.floor(canvas.clientWidth * dpr));
             canvas.height = Math.max(1, Math.floor(canvas.clientHeight * dpr));
         }
 
         function draw(now) {
-            resize();
             const { intensity, dayTravel } = getThemeState();
             const w = canvas.width;
             const h = canvas.height;
@@ -98,11 +97,10 @@
             ctx.fillStyle = glow;
             ctx.fillRect(0, 0, w, h);
             ctx.globalAlpha = 1;
-            requestAnimationFrame(draw);
         }
 
-        window.addEventListener('resize', resize);
-        requestAnimationFrame(draw);
+        window.CameronPerformance.watchSize(canvas, resize);
+        window.CameronPerformance.animate(canvas, draw, { fps: 24 });
     }
 
     function startLightField(canvas) {
@@ -111,7 +109,7 @@
             antialias: false,
             premultipliedAlpha: false,
             preserveDrawingBuffer: false,
-            powerPreference: 'high-performance'
+            powerPreference: 'low-power'
         });
 
         if (!gl) {
@@ -329,7 +327,7 @@
         let lastHeight = 0;
 
         function resize() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+            const dpr = window.CameronPerformance.pixelRatio(canvas, 600000);
             const width = Math.max(1, Math.floor(canvas.clientWidth * dpr));
             const height = Math.max(1, Math.floor(canvas.clientHeight * dpr));
             if (width !== lastWidth || height !== lastHeight) {
@@ -343,7 +341,6 @@
 
         function render(now) {
             const theme = getThemeState();
-            resize();
             smoothMouse.x += (targetMouse.x - smoothMouse.x) * 0.055;
             smoothMouse.y += (targetMouse.y - smoothMouse.y) * 0.055;
 
@@ -359,7 +356,6 @@
             gl.uniform1f(intensityLocation, theme.intensity);
             gl.uniform1f(dayTravelLocation, theme.dayTravel);
             gl.drawArrays(gl.TRIANGLES, 0, 3);
-            requestAnimationFrame(render);
         }
 
         window.addEventListener('pointermove', event => {
@@ -368,8 +364,8 @@
             targetMouse.y = 1 - Math.max(0, Math.min(1, (event.clientY - rect.top) / Math.max(rect.height, 1)));
         });
 
-        window.addEventListener('resize', resize);
-        requestAnimationFrame(render);
+        window.CameronPerformance.watchSize(canvas, resize);
+        window.CameronPerformance.animate(canvas, render, { fps: 24 });
     }
 
     function boot() {

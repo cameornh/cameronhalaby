@@ -257,9 +257,12 @@
         <p id="dynamic-date"></p>
     </footer>
 
+    <link rel="stylesheet" href="./site-performance.css?v=20261105">
+    <script src="./site-performance.js?v=20261105"></script>
+    <script src="./asset-previews.js"></script>
     <script src="./theme-toggle.js"></script>
-    <script src="./asset-catalog.js"></script>
-    <script src="./liquid-lightbox.js"></script>
+    <script src="./asset-catalog.js?v=20261105"></script>
+    <script src="./liquid-lightbox.js?v=20261105"></script>
     <script>
         // ADD YOUR STABILITY AI API KEY HERE TO ENABLE IMG2IMG GENERATION
         const STABILITY_API_KEY = "sk-XALkbz2ANvymVnLma5czIhQbzH5CNDDskqJnnKdQL2VRrq7j";
@@ -329,7 +332,7 @@
                 squiggleRight.className = 'squiggle-right';
 
                 const img = document.createElement('img');
-                img.src = image.src;
+                window.CameronAssets.displayImage(img, image.src);
                 img.alt = image.alt;
                 img.className = 'photo-img';
 
@@ -343,7 +346,6 @@
         }
 
         renderArtGallery();
-        if(window.CameronAssets) window.CameronAssets.ready.then(renderArtGallery);
         attachCardTilt('.obs-card');
 
         // LIGHTBOX
@@ -353,6 +355,7 @@
         }
         function closeLightbox() { 
             document.getElementById('lightbox').classList.remove('active'); 
+            document.getElementById('lightbox-img').removeAttribute('src');
         }
 
         // ==========================================
@@ -732,33 +735,27 @@
         let simH = 80; 
         let totalCells = simW * simH;
         
-        let bufferA = new ArrayBuffer(totalCells * 4); let vA = new DataView(bufferA);
-        let bufferB = new ArrayBuffer(totalCells * 4); let vB = new DataView(bufferB);
-        let nextA = new ArrayBuffer(totalCells * 4); let nA = new DataView(nextA);
-        let nextB = new ArrayBuffer(totalCells * 4); let nB = new DataView(nextB);
+        let vA, vB, nA, nB, feedByX, killByY;
 
         function initRD() {
             const aspect = window.innerHeight / window.innerWidth;
             simH = Math.floor(simW * aspect);
             totalCells = simW * simH;
             
-            bufferA = new ArrayBuffer(totalCells * 4); vA = new DataView(bufferA);
-            bufferB = new ArrayBuffer(totalCells * 4); vB = new DataView(bufferB);
-            nextA = new ArrayBuffer(totalCells * 4); nA = new DataView(nextA);
-            nextB = new ArrayBuffer(totalCells * 4); nB = new DataView(nextB);
-
-            for(let i = 0; i < totalCells; i++) {
-                vA.setFloat32(i * 4, 1.0, true);
-                vB.setFloat32(i * 4, 0.0, true);
-            }
+            vA = new Float32Array(totalCells).fill(1);
+            vB = new Float32Array(totalCells);
+            nA = new Float32Array(totalCells);
+            nB = new Float32Array(totalCells);
+            feedByX = Float64Array.from({ length: simW }, (_, x) => 0.054 + Math.sin(x * 0.05) * 0.002);
+            killByY = Float64Array.from({ length: simH }, (_, y) => 0.062 + Math.cos(y * 0.05) * 0.002);
             const cx = Math.floor(simW / 2); const cy = Math.floor(simH / 2);
             for(let y = cy - 5; y < cy + 5; y++) {
                 for(let x = cx - 5; x < cx + 5; x++) {
-                    vB.setFloat32((y * simW + x) * 4, 1.0, true);
+                    if (x >= 0 && x < simW && y >= 0 && y < simH) vB[y * simW + x] = 1;
                 }
             }
         }
-        initRD(); window.addEventListener('resize', initRD);
+        window.addEventListener('resize', initRD);
 
         let isErasingArtBackground = false;
 
@@ -779,9 +776,9 @@
                 for(let x = -brush; x <= brush; x++) {
                     const py = gy + y; const px = gx + x;
                     if(px >= 0 && px < simW && py >= 0 && py < simH && Math.hypot(x,y) < brush) {
-                        const i = ((py * simW) + px) * 4;
-                        vB.setFloat32(i, value, true);
-                        if (value === 0) vA.setFloat32(i, 1.0, true);
+                        const i = py * simW + px;
+                        vB[i] = value;
+                        if (value === 0) vA[i] = 1;
                     }
                 }
             }
@@ -814,32 +811,29 @@
         });
 
         function stepRD() {
-            const dA = 1.0, dB = 0.5, baseFeed = 0.054, baseK = 0.062;
+            const dA = 1.0, dB = 0.5;
             for(let y = 1; y < simH - 1; y++) {
                 for(let x = 1; x < simW - 1; x++) {
-                    const i = (y * simW + x) * 4;
-                    let a = vA.getFloat32(i, true), b = vB.getFloat32(i, true);
+                    const i = y * simW + x;
+                    const a = vA[i], b = vB[i];
                     let lapA = a * -1.0, lapB = b * -1.0;
 
-                    const up = ((y - 1) * simW + x) * 4, down = ((y + 1) * simW + x) * 4;
-                    const left = (y * simW + (x - 1)) * 4, right = (y * simW + (x + 1)) * 4;
-                    lapA += (vA.getFloat32(up, true) + vA.getFloat32(down, true) + vA.getFloat32(left, true) + vA.getFloat32(right, true)) * 0.2;
-                    lapB += (vB.getFloat32(up, true) + vB.getFloat32(down, true) + vB.getFloat32(left, true) + vB.getFloat32(right, true)) * 0.2;
+                    const up = i - simW, down = i + simW;
+                    const left = i - 1, right = i + 1;
+                    lapA += (vA[up] + vA[down] + vA[left] + vA[right]) * 0.2;
+                    lapB += (vB[up] + vB[down] + vB[left] + vB[right]) * 0.2;
 
-                    const upL = ((y - 1) * simW + (x - 1)) * 4, upR = ((y - 1) * simW + (x + 1)) * 4;
-                    const downL = ((y + 1) * simW + (x - 1)) * 4, downR = ((y + 1) * simW + (x + 1)) * 4;
-                    lapA += (vA.getFloat32(upL, true) + vA.getFloat32(upR, true) + vA.getFloat32(downL, true) + vA.getFloat32(downR, true)) * 0.05;
-                    lapB += (vB.getFloat32(upL, true) + vB.getFloat32(upR, true) + vB.getFloat32(downL, true) + vB.getFloat32(downR, true)) * 0.05;
+                    lapA += (vA[up - 1] + vA[up + 1] + vA[down - 1] + vA[down + 1]) * 0.05;
+                    lapB += (vB[up - 1] + vB[up + 1] + vB[down - 1] + vB[down + 1]) * 0.05;
 
-                    const feed = baseFeed + (Math.sin(x * 0.05) * 0.002);
-                    const k = baseK + (Math.cos(y * 0.05) * 0.002);
+                    const feed = feedByX[x], k = killByY[y];
                     const ab2 = a * b * b;
                     
                     let newA = Math.max(0, Math.min(1, a + (dA * lapA - ab2 + feed * (1 - a))));
                     let newB = Math.max(0, Math.min(1, b + (dB * lapB + ab2 - (k + feed) * b)));
 
-                    nA.setFloat32(i, newA, true);
-                    nB.setFloat32(i, newB, true);
+                    nA[i] = newA;
+                    nB[i] = newB;
                 }
             }
             const tempA = vA; vA = nA; nA = tempA;
@@ -848,41 +842,50 @@
 
         const tmpCanv = document.createElement('canvas');
         const tCtx = tmpCanv.getContext('2d');
+        let rdPixels;
+
+        function resizeRDCanvas() {
+            tmpCanv.width = simW; tmpCanv.height = simH;
+            rdPixels = tCtx.createImageData(simW, simH);
+            bgCanv.width = window.innerWidth; bgCanv.height = window.innerHeight;
+            bCtx.filter = 'drop-shadow(0 0 10px rgba(249, 115, 22, 0.5))';
+            bCtx.imageSmoothingEnabled = true;
+        }
+        initRD();
+        resizeRDCanvas();
+        window.addEventListener('resize', resizeRDCanvas);
 
         function renderRD() {
-            tmpCanv.width = simW; tmpCanv.height = simH;
-            const imgData = tCtx.createImageData(simW, simH);
-            const dView = new DataView(imgData.data.buffer);
+            const imgData = rdPixels;
+            const pixels = imgData.data;
             
             for(let i = 0; i < totalCells; i++) {
-                const bVal = vB.getFloat32(i * 4, true);
+                const bVal = vB[i];
                 const pixelIdx = i * 4;
                 if (bVal > 0.1) {
                     const normalized = Math.min(1, bVal * 2.5);
-                    dView.setUint8(pixelIdx, normalized * 249);     
-                    dView.setUint8(pixelIdx + 1, normalized * 115); 
-                    dView.setUint8(pixelIdx + 2, 22);               
-                    dView.setUint8(pixelIdx + 3, normalized * 255); 
+                    pixels[pixelIdx] = normalized * 249;
+                    pixels[pixelIdx + 1] = normalized * 115;
+                    pixels[pixelIdx + 2] = 22;
+                    pixels[pixelIdx + 3] = normalized * 255;
                 } else {
-                    dView.setUint8(pixelIdx + 3, 0); 
+                    pixels[pixelIdx + 3] = 0;
                 }
             }
 
             tCtx.putImageData(imgData, 0, 0);
             
-            bgCanv.width = window.innerWidth; bgCanv.height = window.innerHeight;
-            bCtx.filter = 'drop-shadow(0 0 10px rgba(249, 115, 22, 0.5))';
-            bCtx.imageSmoothingEnabled = true; 
             bCtx.clearRect(0, 0, bgCanv.width, bgCanv.height);
             bCtx.drawImage(tmpCanv, 0, 0, bgCanv.width, bgCanv.height);
         }
 
-        function animateRDBgLoop() {
-            for(let s = 0; s < 8; s++) { stepRD(); }
+        let rdSteps = 0;
+        function animateRDBgLoop(now, delta) {
+            rdSteps = Math.min(rdSteps + delta * 480, 24);
+            while (rdSteps >= 1) { stepRD(); rdSteps--; }
             renderRD();
-            requestAnimationFrame(animateRDBgLoop);
         }
-        animateRDBgLoop();
+        window.CameronPerformance.animate(bgCanv, animateRDBgLoop);
 
     </script>
 </body>

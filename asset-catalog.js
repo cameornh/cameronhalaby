@@ -26,6 +26,7 @@
         "song1.mp3",
         "song10.mp3",
         "song11.mp3",
+        "song12.mp3",
         "song2.mp3",
         "song3.mp3",
         "song4.mp3",
@@ -73,6 +74,18 @@
 
     function assetPath(file) {
         return "./assets/" + file;
+    }
+
+    function displayImage(image, src, options = {}) {
+        const preview = (window.CameronPreviews || {})[normalizeFileName(src)];
+        image.loading = options.eager ? 'eager' : 'lazy';
+        image.decoding = 'async';
+        if (preview) {
+            image.width = preview.width;
+            image.height = preview.height;
+            image.onerror = () => { image.onerror = null; image.src = src; };
+        }
+        image.src = preview ? preview.src : src;
     }
 
     function normalizeFileName(file) {
@@ -192,6 +205,7 @@
     }
 
     window.CameronAssets = {
+        displayImage,
         ready,
         files: currentFiles,
         artImages: getArtImages,

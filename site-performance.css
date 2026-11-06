@@ -1,0 +1,9 @@
+.effects-hidden *, .effects-hidden *::before, .effects-hidden *::after,
+.effects-offscreen, .effects-offscreen *, .effects-offscreen::before, .effects-offscreen::after {
+    animation-play-state: paused !important;
+}
+
+.liquid-glass-lens:not(.is-visible) {
+    visibility: hidden;
+    animation-play-state: paused;
+}

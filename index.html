@@ -704,9 +704,12 @@
         <p id="dynamic-date"></p>
     </footer>
 
+    <link rel="stylesheet" href="./site-performance.css?v=20261105">
+    <script src="./site-performance.js?v=20261105"></script>
+    <script src="./asset-previews.js"></script>
     <script src="./theme-toggle.js"></script>
-    <script src="./asset-catalog.js"></script>
-    <script src="./liquid-lightbox.js"></script>
+    <script src="./asset-catalog.js?v=20261105"></script>
+    <script src="./liquid-lightbox.js?v=20261105"></script>
     <script>
         // --- 1. DYNAMIC TIME-OF-DAY THEME ---
         function updateTheme() {
@@ -729,6 +732,7 @@
             document.documentElement.style.setProperty('--heading-color', 'rgb(' + headingR + ',' + headingG + ',' + headingB + ')');
             document.documentElement.style.setProperty('--hero-flow-opacity', (0.68 * intensity).toFixed(3));
             document.documentElement.style.setProperty('--hero-flow-grain-opacity', (0.08 * intensity).toFixed(3));
+            window.CameronPerformance.wake();
         }
         setInterval(updateTheme, 60000); // Check every minute
         updateTheme(); // Initial load
@@ -749,6 +753,7 @@
         const fadeDurationMs = 2000; // 2 seconds fade in/out
         
         const audioObj = new Audio();
+        audioObj.preload = 'none';
         const playerUI = document.getElementById('audio-player');
         const trackNameUI = document.getElementById('track-name');
         const bgVolSlider = document.getElementById('bg-vol-slider');
@@ -921,14 +926,15 @@
             const stripImages = window.CameronAssets ? window.CameronAssets.stripImages() : [];
             slideshow.innerHTML = '';
             currentSlide = 0;
-            if(slideTimer) clearInterval(slideTimer);
+            if(slideTimer) slideTimer.stop();
 
             stripImages.forEach((slide, index) => {
                 const slideEl = document.createElement('div');
                 slideEl.className = 'slide' + (index === 0 ? ' active' : '');
 
                 const img = document.createElement('img');
-                img.src = slide.src;
+                img.dataset.src = slide.src;
+                if (index === 0) window.CameronAssets.displayImage(img, slide.src);
                 img.alt = 'Slide ' + (index + 1);
 
                 const caption = document.createElement('div');
@@ -941,15 +947,28 @@
 
             const slides = slideshow.querySelectorAll('.slide');
             if(slides.length <= 1) return;
-            slideTimer = setInterval(() => {
+            let elapsed = 0;
+            let fadingSlide = null;
+            slideTimer = window.CameronPerformance.animate(slideshow, (now, delta) => {
+                elapsed += delta;
+                if (fadingSlide && elapsed > 2.5) {
+                    fadingSlide.querySelector('img').removeAttribute('src');
+                    fadingSlide = null;
+                }
+                const nextIndex = (currentSlide + 1) % slides.length;
+                const nextImage = slides[nextIndex].querySelector('img');
+                if (elapsed > 6 && !nextImage.getAttribute('src')) window.CameronAssets.displayImage(nextImage, nextImage.dataset.src, { eager: true });
+                if (elapsed < 8) return;
+                if (!nextImage.complete) return;
+                elapsed = 0;
+                fadingSlide = slides[currentSlide];
                 slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
+                currentSlide = nextIndex;
                 slides[currentSlide].classList.add('active');
-            }, 8000);
+            }, { fps: 15 });
         }
 
         renderStripSlides();
-        if(window.CameronAssets) window.CameronAssets.ready.then(renderStripSlides);
 
         function renderIndexPhotos() {
             const grid = document.getElementById('index-photo-grid');
@@ -969,7 +988,7 @@
                 squiggleRight.className = 'squiggle-right';
 
                 const img = document.createElement('img');
-                img.src = photo.thumb;
+                window.CameronAssets.displayImage(img, photo.thumb);
                 img.alt = photo.alt;
 
                 wrapper.append(squiggleLeft, squiggleRight, img);
@@ -981,7 +1000,6 @@
         }
 
         renderIndexPhotos();
-        if(window.CameronAssets) window.CameronAssets.ready.then(renderIndexPhotos);
 
         // --- 5. LIGHTBOX LOGIC ---
         function openLightbox(src) {
@@ -990,6 +1008,7 @@
         }
         function closeLightbox() {
             document.getElementById('lightbox').classList.remove('active');
+            document.getElementById('lightbox-img').removeAttribute('src');
         }
 
         // --- 6. QUIZ LOGIC (UPDATED: Only highlights guessed option) ---
@@ -1251,7 +1270,7 @@
             let flowDpr = 1;
 
             function resizeFlowCanvas() {
-                flowDpr = Math.min(window.devicePixelRatio || 1, 2);
+                flowDpr = window.CameronPerformance.pixelRatio(flowCanvas);
                 const width = Math.max(1, Math.floor(flowCanvas.clientWidth * flowDpr));
                 const height = Math.max(1, Math.floor(flowCanvas.clientHeight * flowDpr));
 
@@ -1263,8 +1282,6 @@
             }
 
             function drawFlowGradient(now) {
-                resizeFlowCanvas();
-
                 const overflowX = (flowCanvas.clientWidth - heroSection.clientWidth) / 2;
                 const overflowY = (flowCanvas.clientHeight - heroSection.clientHeight) / 2;
                 const mouseX = (heroMX + overflowX) * flowDpr;
@@ -1282,10 +1299,12 @@
                 gl.uniform1f(timeLocation, time);
                 gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-                requestAnimationFrame(drawFlowGradient);
             }
 
-            requestAnimationFrame(drawFlowGradient);
+            window.CameronPerformance.watchSize(flowCanvas, resizeFlowCanvas);
+            window.CameronPerformance.animate(heroSection, drawFlowGradient, {
+                enabled: () => !window.CameronTheme || window.CameronTheme.getIntensity() > 0.01
+            });
         }
 
         initHeroFlowGradient();
@@ -1302,50 +1321,72 @@
             pCtx.clearRect(0,0,pCanvas.width,pCanvas.height); pCtx.fillStyle = '#000';
             parts.forEach(p => {
                 const dx = heroMX - p.x, dy = heroMY - p.y, d = Math.sqrt(dx*dx + dy*dy);
-                if (d < 120) { p.vx -= (dx/d) * (120-d)/120 * 20; p.vy -= (dy/d) * (120-d)/120 * 20; }
+                if (d > 0 && d < 120) { p.vx -= (dx/d) * (120-d)/120 * 20; p.vy -= (dy/d) * (120-d)/120 * 20; }
                 else { p.vx += (p.bx - p.x)/10; p.vy += (p.by - p.y)/10; }
                 p.vx *= 0.9; p.vy *= 0.9; p.x += p.vx; p.y += p.vy;
                 pCtx.beginPath(); pCtx.arc(p.x, p.y, 0.6, 0, Math.PI*2); pCtx.fill();
             });
-            requestAnimationFrame(animP);
         };
-        initP(); animP(); window.addEventListener('resize', initP);
+        initP(); window.addEventListener('resize', initP);
+        window.CameronPerformance.animate(heroSection, animP, { fps: 60 });
 
         // --- 10. GENERATIVE ART LOGIC ---
         const aCanv = document.getElementById('function-art-canvas'), aCtx = aCanv.getContext('2d');
         let t = 0;
-        const resArt = () => { aCanv.width = aCanv.clientWidth / 2; aCanv.height = aCanv.clientHeight / 2; };
+        let artPixels;
+        let artX, artY, gaussian1X, gaussian2X, waveX, waveY;
+        const resArt = () => {
+            aCanv.width = aCanv.clientWidth / 2; aCanv.height = aCanv.clientHeight / 2;
+            artPixels = aCtx.createImageData(aCanv.width, aCanv.height);
+            artX = Float32Array.from({ length: aCanv.width }, (_, x) => (x - aCanv.width / 2) / aCanv.width * 120);
+            artY = Float32Array.from({ length: aCanv.height }, (_, y) => (y - aCanv.height / 2) / aCanv.height * 120);
+            gaussian1X = new Float32Array(aCanv.width);
+            gaussian2X = new Float32Array(aCanv.width);
+            waveX = new Float32Array(aCanv.width);
+            waveY = new Float32Array(aCanv.height);
+        };
         resArt(); window.addEventListener('resize', resArt);
 
-        const lerpC = (v) => {
-            const n = (v + 1) / 2;
-            if (n < 0.3) { const f = n / 0.3; return[0, 10 * f, 40 * f]; }
-            else if (n < 0.7) { const f = (n - 0.3) / 0.4; return[150 * f, 10 + 20 * f, 40 + 150 * f]; }
-            else { const f = (n - 0.7) / 0.3; return[150 + 105 * f, 30 + 120 * f, 190 - 50 * f]; }
-        };
-
-        const drawA = () => {
-            t += 0.012;
-            const w = aCanv.width, h = aCanv.height, iD = aCtx.createImageData(w, h), dat = iD.data;
+        const drawA = (now, delta) => {
+            t += delta * 0.72;
+            const w = aCanv.width, h = aCanv.height, dat = artPixels.data;
             const g1x = w/2 + Math.sin(t*0.6)*w*0.3, g1y = h/2 + Math.cos(t*0.5)*h*0.3;
             const g2x = w/2 + Math.sin(t*0.4)*w*0.4, g2y = h/2 + Math.cos(t*0.7)*h*0.4;
-
+            const cosAngle = Math.cos(t * 0.1), sinAngle = Math.sin(t * 0.1);
+            const scale = 1.55 * (1 + Math.sin(t * 0.2) * 0.1);
+            for (let x = 0; x < w; x++) {
+                gaussian1X[x] = Math.exp(-((x - g1x) ** 2) / 15000);
+                gaussian2X[x] = Math.exp(-((x - g2x) ** 2) / 25000);
+                waveX[x] = Math.sin(artX[x] * scale);
+            }
+            for (let y = 0; y < h; y++) waveY[y] = Math.cos(artY[y] * scale);
             for (let y = 0; y < h; y++) {
+                const gy1 = Math.exp(-((y - g1y) ** 2) / 15000);
+                const gy2 = Math.exp(-((y - g2y) ** 2) / 25000);
                 for (let x = 0; x < w; x++) {
                     const idx = (y * w + x) * 4;
-                    const u = (x - w/2) / w * 120, v = (y - h/2) / h * 120;
-                    const ang = t * 0.1, ur = u * Math.cos(ang) - v * Math.sin(ang), vr = u * Math.sin(ang) + v * Math.cos(ang);
+                    const u = artX[x], v = artY[y];
+                    const ur = u * cosAngle - v * sinAngle, vr = u * sinAngle + v * cosAngle;
                     const l1 = Math.sin(ur * 1.5 + t) * Math.cos(vr * 1.5);
-                    const sc = 1 + Math.sin(t * 0.2) * 0.1, l2 = Math.sin(u * 1.55 * sc) * Math.cos(v * 1.55 * sc);
-                    const d1 = Math.exp(-(Math.pow(x-g1x,2) + Math.pow(y-g1y,2))/15000), d2 = Math.exp(-(Math.pow(x-g2x,2) + Math.pow(y-g2y,2))/25000);
-                    const rgb = lerpC(Math.max(-1, Math.min(1, l1 * l2 * (d1 + d2) * 1.5)));
-                    dat[idx] = rgb[0]; dat[idx+1] = rgb[1]; dat[idx+2] = rgb[2]; dat[idx+3] = 255;
+                    const l2 = waveX[x] * waveY[y];
+                    const d1 = gaussian1X[x] * gy1, d2 = gaussian2X[x] * gy2;
+                    const n = (Math.max(-1, Math.min(1, l1 * l2 * (d1 + d2) * 1.5)) + 1) / 2;
+                    if (n < 0.3) {
+                        const f = n / 0.3;
+                        dat[idx] = 0; dat[idx+1] = 10*f; dat[idx+2] = 40*f;
+                    } else if (n < 0.7) {
+                        const f = (n - 0.3) / 0.4;
+                        dat[idx] = 150*f; dat[idx+1] = 10+20*f; dat[idx+2] = 40+150*f;
+                    } else {
+                        const f = (n - 0.7) / 0.3;
+                        dat[idx] = 150+105*f; dat[idx+1] = 30+120*f; dat[idx+2] = 190-50*f;
+                    }
+                    dat[idx+3] = 255;
                 }
             }
-            aCtx.putImageData(iD, 0, 0);
-            requestAnimationFrame(drawA);
+            aCtx.putImageData(artPixels, 0, 0);
         };
-        drawA();
+        window.CameronPerformance.animate(aCanv, drawA, { fps: 24 });
 
         // --- 11. SITE VIEWS TOGGLE LOGIC ---
         const toggleBtn = document.getElementById('toggle-visitors-btn');
@@ -1474,10 +1515,9 @@
             lastUserX = heroMX;
             lastUserY = heroMY;
 
-            requestAnimationFrame(updateObserver);
         }
         
-        requestAnimationFrame(updateObserver);
+        window.CameronPerformance.animate(heroSection, updateObserver, { fps: 60 });
         
     </script>
 </body>
